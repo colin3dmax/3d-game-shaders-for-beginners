@@ -105,18 +105,16 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="film-grain.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="dilation">Dilation</h2>
+<h1 id="3d-游戏着色器入门">3D 游戏着色器入门</h1>
+<h2 id="膨胀dilation">膨胀（Dilation）</h2>
 <p align="center">
 <img src="../resources/images/z751O74.gif" alt="Dilation" title="Dilation">
 </p>
 
-<p>Dilation dilates or enlarges the brighter areas of an image while at
-the same time, contracts or shrinks the darker areas of an image. This
-tends to create a pillowy look. You can use dilation for a glow/bloom
-effect or to add bokeh to your <a href="depth-of-field.html">depth of
-field</a>.</p>
+<p>膨胀操作会扩大图像中亮度较高的区域，同时收缩图像中较暗的区域，<br />
+从而产生一种“膨胀柔软”的外观。<br />
+你可以使用膨胀来实现光晕 / 泛光效果，或者为你的 <a
+href="depth-of-field.html">景深效果</a> 添加散景。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>   size         <span class="op">=</span> <span class="dt">int</span><span class="op">(</span>parameters<span class="op">.</span>x<span class="op">);</span></span>
@@ -125,12 +123,13 @@ field</a>.</p>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> maxThreshold <span class="op">=</span> <span class="fl">0.3</span><span class="op">;</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The <code>size</code> and <code>separation</code> parameters control
-how dilated the image becomes. A larger <code>size</code> will increase
-the dilation at the cost of performance. A larger
-<code>separation</code> will increase the dilation at the cost of
-quality. The <code>minThreshold</code> and <code>maxThreshold</code>
-parameters control which parts of the image become dilated.</p>
+<p><code>size</code> 和 <code>separation</code>
+参数控制图像的膨胀程度。<br />
+更大的 <code>size</code> 会带来更明显的膨胀效果，但性能开销更大。<br />
+更大的 <code>separation</code>
+也会扩大膨胀区域，但会降低图像质量。<br />
+<code>minThreshold</code> 和 <code>maxThreshold</code>
+控制图像中哪些部分会被膨胀。</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  vec2 texSize   <span class="op">=</span> textureSize<span class="op">(</span>colorTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
@@ -139,7 +138,7 @@ parameters control which parts of the image become dilated.</p>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span> fragCoord <span class="op">/</span> texSize<span class="op">);</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Sample the color at the current fragment's position.</p>
+<p>采样当前片元位置的颜色。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span>  mx <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
@@ -152,9 +151,9 @@ parameters control which parts of the image become dilated.</p>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Loop through a <code>size</code> by <code>size</code> window,
-centered at the current fragment position. As you loop, find the
-brightest color based on the surrounding greyscale values.</p>
+<p>在当前片元位置周围建立一个 <code>size</code> × <code>size</code>
+的窗口进行遍历。<br />
+在遍历过程中，找出周围片元中亮度最高的颜色。</p>
 <p align="center">
 <img src="../resources/images/X3uIyIL.png" alt="Dilation Window" title="Dilation Window">
 </p>
@@ -171,10 +170,9 @@ brightest color based on the surrounding greyscale values.</p>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(!(</span>distance<span class="op">(</span>vec2<span class="op">(</span>i<span class="op">,</span> j<span class="op">),</span> vec2<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">))</span> <span class="op">&lt;=</span> size<span class="op">))</span> <span class="op">{</span> <span class="cf">continue</span><span class="op">;</span> <span class="op">}</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span></code></pre></div>
-<p>The window shape will determine the shape of the dilated parts of the
-image. For a rectangular shape, you can use every fragment covered by
-the window. For any other shape, skip the fragments that fall outside
-the desired shape.</p>
+<p>窗口的形状会影响图像膨胀区域的形状。<br />
+如果使用矩形形状，则处理窗口内的所有片元；<br />
+若使用其他形状（如菱形或圆形），则跳过不在该形状内的片元。</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>      vec4 c <span class="op">=</span></span>
@@ -187,13 +185,13 @@ the desired shape.</p>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>          <span class="op">);</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span></code></pre></div>
-<p>Sample a fragment color from the surrounding window.</p>
+<p>从周围窗口中采样片元颜色。</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>      <span class="dt">float</span> mxt <span class="op">=</span> dot<span class="op">(</span>c<span class="op">.</span>rgb<span class="op">,</span> vec3<span class="op">(</span><span class="fl">0.21</span><span class="op">,</span> <span class="fl">0.72</span><span class="op">,</span> <span class="fl">0.07</span><span class="op">));</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span></code></pre></div>
-<p>Convert the sampled color to a greyscale value.</p>
+<p>将采样颜色转换为灰度值（亮度值）。</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>mxt <span class="op">&gt;</span> mx<span class="op">)</span> <span class="op">{</span></span>
@@ -202,9 +200,7 @@ the desired shape.</p>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span></code></pre></div>
-<p>If the sampled greyscale value is larger than the current maximum
-greyscale value, update the maximum greyscale value and its
-corresponding color.</p>
+<p>如果当前灰度值大于之前记录的最大值，则更新最大灰度值和对应颜色。</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  fragColor<span class="op">.</span>rgb <span class="op">=</span></span>
@@ -215,14 +211,11 @@ corresponding color.</p>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">);</span></span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The new fragment color is a mixture between the existing fragment
-color and the brightest color found. If the maximum greyscale value
-found is less than <code>minThreshold</code>, the fragment color is
-unchanged. If the maximum greyscale value is greater than
-<code>maxThreshold</code>, the fragment color is replaced with the
-brightest color found. For any other case, the fragment color is a mix
-between the current fragment color and the brightest color.</p>
-<h3 id="source">Source</h3>
+<p>最终的片元颜色是原始颜色与亮度最高颜色之间的混合结果。<br />
+如果最大灰度值小于 <code>minThreshold</code>，颜色保持不变；<br />
+如果大于 <code>maxThreshold</code>，颜色被替换为亮度最高的颜色；<br />
+如果介于两者之间，则按 <code>smoothstep</code> 插值进行混合。</p>
+<h3 id="源码参考">源码参考</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

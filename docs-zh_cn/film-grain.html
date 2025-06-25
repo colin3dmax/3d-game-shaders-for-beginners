@@ -105,27 +105,24 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="lookup-table.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="film-grain">Film Grain</h2>
+<h1 id="3d-游戏着色器入门">3D 游戏着色器入门</h1>
+<h2 id="胶片颗粒film-grain">胶片颗粒（Film Grain）</h2>
 <p align="center">
 <img src="../resources/images/ct7mTv5.gif" alt="Film Grain" title="Film Grain">
 </p>
 
-<p>Film grain (when applied in subtle doses, unlike here) can add a bit
-of realism you don't notice until it's removed. Typically, it's the
-imperfections that make a digitally generated image more believable. In
-terms of the shader graph, film grain is usually the last effect applied
-before the game is put on screen.</p>
-<h3 id="amount">Amount</h3>
+<p>胶片颗粒效果（如果应用得当、不过度），可以悄无声息地增加画面的真实感。<br />
+通常来说，正是这些“瑕疵”让数字图像看起来更可信。<br />
+在着色器流程中，胶片颗粒通常是游戏画面输出前的最后一个后处理效果。</p>
+<h3 id="强度控制">强度控制</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> amount <span class="op">=</span> <span class="fl">0.1</span><span class="op">;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The <code>amount</code> controls how noticeable the film grain is.
-Crank it up for a snowy picture.</p>
-<h3 id="random-intensity">Random Intensity</h3>
+<p><code>amount</code> 控制胶片颗粒的可见程度。<br />
+将其调高可以营造出类似雪花的效果。</p>
+<h3 id="随机强度">随机强度</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>uniform <span class="dt">float</span> osg_FrameTime<span class="op">;</span></span>
@@ -150,17 +147,14 @@ Crank it up for a snowy picture.</p>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">);</span></span>
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>This snippet calculates the random intensity needed to adjust the
-amount.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Time Since F1 <span class="op">=</span> <span class="bn">00</span> <span class="bn">01</span> <span class="bn">02</span> <span class="bn">03</span> <span class="bn">04</span> <span class="bn">05</span> <span class="bn">06</span> <span class="bn">07</span> <span class="dv">0</span><span class="er">8</span> <span class="dv">0</span><span class="er">9</span> <span class="dv">10</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Frame Number  <span class="op">=</span> F1    F3    F4       F5 F6</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>osg_FrameTime <span class="op">=</span> <span class="bn">00</span>    <span class="bn">02</span>    <span class="bn">04</span>       <span class="bn">07</span> <span class="dv">0</span><span class="er">8</span></span></code></pre></div>
-<p><code>osg_FrameTime</code> is <a
-href="https://github.com/panda3d/panda3d/blob/daa57733cb9b4ccdb23e28153585e8e20b5ccdb5/panda/src/display/graphicsStateGuardian.cxx#L930">provided</a>
-by Panda3D. The frame time is a timestamp of how many seconds have
-passed since the first frame. The example code uses this to animate the
-film grain as <code>osg_FrameTime</code> will always be different each
-frame.</p>
+<p>这段代码用于计算每个片元的随机强度，用于调节噪声。</p>
+<pre class="text"><code>Time Since F1 = 00 01 02 03 04 05 06 07 08 09 10
+Frame Number  = F1    F3    F4       F5 F6
+osg_FrameTime = 00    02    04       07 08</code></pre>
+<p><code>osg_FrameTime</code> 是由 <a
+href="https://github.com/panda3d/panda3d/blob/daa57733cb9b4ccdb23e28153585e8e20b5ccdb5/panda/src/display/graphicsStateGuardian.cxx#L930">Panda3D
+提供</a> 的帧时间，表示从第一帧开始经过的秒数。<br />
+演示代码利用这个时间戳为胶片颗粒动画提供变化，使每一帧都略有不同。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>              <span class="co">// ...</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -169,9 +163,9 @@ frame.</p>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>              <span class="op">*</span> <span class="dv">8009</span> <span class="co">// Large number here.</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>              <span class="co">// ...</span></span></code></pre></div>
-<p>For static film grain, replace <code>osg_FrameTime</code> with a
-large number. You may have to try different numbers to avoid seeing any
-patterns.</p>
+<p>如果你想要静态噪点效果，可以将 <code>osg_FrameTime</code>
+替换成一个较大的常数。<br />
+你可能需要多试几个数值，来避免出现重复图案。</p>
 <p align="center">
 <img src="../resources/images/xqSIMCb.gif" alt="Horizontal, vertical, and diagonal lines." title="Horizontal, vertical, and diagonal lines.">
 </p>
@@ -185,62 +179,58 @@ patterns.</p>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>              <span class="op">*</span> someNumber</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>              <span class="co">// ...</span></span></code></pre></div>
-<p>Both the x and y coordinate are used to create points or specs of
-film grain. If only x was used, there would only be vertical lines.
-Similarly, if only y was used, there would be only horizontal lines.</p>
-<p>The reason the snippet multiplies one coordinate by some number is to
-break up the diagonal symmetry.</p>
+<p>将 <code>x</code> 和 <code>y</code>
+坐标同时作为输入，能够产生颗粒状分布。<br />
+如果只使用 <code>x</code>，会出现垂直条纹；<br />
+只用 <code>y</code>，则会出现水平条纹。<br />
+乘以某个数值是为了打破对角对称性。</p>
 <p align="center">
 <img src="../resources/images/4UXllmS.gif" alt="Rain" title="Rain">
 </p>
 
-<p>You can of course remove the coordinate multiplier for a somewhat
-decent looking rain effect. To animate the rain effect, multiply the
-output of <code>sin</code> by <code>osg_FrameTime</code>.</p>
+<p>当然，也可以去掉乘数，获得类似雨滴的效果。<br />
+为了使雨滴动起来，可以把 <code>sin</code> 的输出再乘以
+<code>osg_FrameTime</code>。</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>              <span class="co">// ...</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>              <span class="op">(</span> gl_FragCoord<span class="op">.</span>x</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>              <span class="op">+</span> gl_FragCoord<span class="op">.</span>y</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>              <span class="co">// ...</span></span></code></pre></div>
-<p>Play around with the x and y coordinate to try and get the rain to
-change directions. Keep only the x coordinate for a straight
-downpour.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>input <span class="op">=</span> <span class="op">(</span>gl_FragCoord<span class="op">.</span>x <span class="op">+</span> gl_FragCoord<span class="op">.</span>y <span class="op">*</span> osg_FrameTime<span class="op">)</span> <span class="op">*</span> toRadians</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  frame<span class="op">(</span><span class="dv">10000</span> <span class="op">*</span> sin<span class="op">(</span>input<span class="op">))</span> <span class="op">=</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    fract<span class="op">(</span><span class="dv">10000</span> <span class="op">*</span> sin<span class="op">(</span><span class="fl">6.977777777777778</span><span class="op">))</span> <span class="op">=</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      fract<span class="op">(</span><span class="dv">10000</span> <span class="op">*</span> <span class="fl">0.6400723818964882</span><span class="op">)</span> <span class="op">=</span></span></code></pre></div>
-<p><code>sin</code> is used as a hashing function. The fragment's
-coordinates are hashed to some output of <code>sin</code>. This has the
-nice property that no matter the input (big or small), the output range
-is negative one to one.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fract<span class="op">(</span><span class="dv">10000</span> <span class="op">*</span> sin<span class="op">(</span><span class="fl">6.977777777777778</span><span class="op">))</span> <span class="op">=</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  fract<span class="op">(</span><span class="dv">10000</span> <span class="op">*</span> <span class="fl">0.6400723818964882</span><span class="op">)</span> <span class="op">=</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    fract<span class="op">(</span><span class="fl">6400.723818964882</span><span class="op">)</span> <span class="op">=</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      <span class="fl">0.723818964882</span></span></code></pre></div>
-<p><code>sin</code> is also used as a pseudo random number generator
-when combined with <code>fract</code>.</p>
+<p>调整 <code>x</code> 与 <code>y</code>
+的参与方式可以改变“雨滴”落下的方向。<br />
+只保留 <code>x</code> 坐标可模拟垂直下落的雨线。</p>
+<pre class="text"><code>input = (gl_FragCoord.x + gl_FragCoord.y * osg_FrameTime) * toRadians
+  frame(10000 * sin(input)) =
+    fract(10000 * sin(6.977777777777778)) =
+      fract(10000 * 0.6400723818964882) =</code></pre>
+<p><code>sin</code> 在这里被用作哈希函数。<br />
+每个片元的坐标经过 <code>sin</code> 运算后被压缩到 -1 到 1
+的范围，从而产生看似随机的值。</p>
+<pre class="text"><code>fract(10000 * sin(6.977777777777778)) =
+  fract(10000 * 0.6400723818964882) =
+    fract(6400.723818964882) =
+      0.723818964882</code></pre>
+<p>结合 <code>fract</code> 使用时，<code>sin</code>
+也可作为伪随机数生成器。</p>
 <div class="sourceCode" id="cb9"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> [floor(fract(<span class="dv">4</span>     <span class="op">*</span> sin(x <span class="op">*</span> toRadians)) <span class="op">*</span> <span class="dv">10</span>) <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">10</span>)]</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>]</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> [floor(fract(<span class="dv">10000</span> <span class="op">*</span> sin(x <span class="op">*</span> toRadians)) <span class="op">*</span> <span class="dv">10</span>) <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">10</span>)]</span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>[<span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">7</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">5</span>]</span></code></pre></div>
-<p>Take a look at the first sequence of numbers and then the second.
-Each sequence is deterministic but the second sequence has less of a
-pattern than the first. So while the output of
-<code>fract(10000 * sin(...))</code> is deterministic, it doesn't have
-much of a discernible pattern.</p>
+<p>可以看到第二组数比第一组更“随机”，尽管它们本质上都是确定性输出。<br />
+这说明 <code>fract(10000 * sin(...))</code>
+虽然是可预测的，但很难察觉出规律。</p>
 <p align="center">
 <img src="../resources/images/Mtt8BNg.gif" alt="Increasing the pseudo randomness." title="Increasing the pseudo randomness.">
 </p>
 
-<p>Here you see the <code>sin</code> multiplier going from 1, to 10, to
-100, and then to 1000.</p>
-<p>As you increase the <code>sin</code> output multiplier, you get less
-and less of a pattern. This is the reason the snippet multiplies
-<code>sin</code> by 10,000.</p>
-<h3 id="fragment-color">Fragment Color</h3>
+<p>上图展示了 <code>sin</code> 乘数从 1、10、100 到 1000
+的变化过程。<br />
+乘数越大，图案越混乱。<br />
+这也是为什么示例中使用了 <code>10000</code> 作为乘数。</p>
+<h3 id="设置片元颜色">设置片元颜色</h3>
 <div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  vec2 texSize  <span class="op">=</span> textureSize<span class="op">(</span>colorTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
@@ -249,8 +239,7 @@ and less of a pattern. This is the reason the snippet multiplies
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  vec4 color <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Convert the fragment's coordinates to UV coordinates. Using these UV
-coordinates, look up the texture color for this fragment.</p>
+<p>将片元坐标转换为 UV 坐标，并使用该坐标从纹理中采样颜色。</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    amount <span class="op">*=</span> randomIntensity<span class="op">;</span></span>
@@ -258,15 +247,14 @@ coordinates, look up the texture color for this fragment.</p>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">.</span>rgb <span class="op">+=</span> amount<span class="op">;</span></span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>Adjust the amount by the random intensity and add this to the
-color.</p>
+<p>将随机强度乘上总强度，并叠加到颜色上。</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> color<span class="op">;</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Set the fragment color and you're done.</p>
-<h3 id="source">Source</h3>
+<p>设置最终的片元颜色，大功告成。</p>
+<h3 id="源码参考">源码参考</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

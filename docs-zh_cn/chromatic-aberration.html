@@ -105,23 +105,20 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="screen-space-reflection.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="chromatic-aberration">Chromatic Aberration</h2>
+<h1 id="3d-游戏着色器入门教程">3D 游戏着色器入门教程</h1>
+<h2 id="色差chromatic-aberration">色差（Chromatic Aberration）</h2>
 <p align="center">
 <img src="../resources/images/bawgERm.gif" alt="Chromatic Aberration" title="Chromatic Aberration">
 </p>
 
-<p>Chromatic aberration is a screen space technique that simulates lens
-distortion. Use it to give your scene a cinematic, lo-fi analog feel or
-to emphasize a chaotic event.</p>
-<h3 id="texture">Texture</h3>
+<p>色差是一种屏幕空间技术，模拟镜头失真效果。
+你可以用它来为场景营造电影感、低保真模拟效果，或者强调混乱的事件。</p>
+<h3 id="纹理">纹理</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>uniform sampler2D colorTexture<span class="op">;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>The input texture needed is the scene's colors captured into a
-framebuffer texture.</p>
-<h3 id="parameters">Parameters</h3>
+<p>此处需要的输入纹理是场景颜色被捕获到帧缓冲纹理中。</p>
+<h3 id="参数">参数</h3>
 <p align="center">
 <img src="../resources/images/fNpMaPL.gif" alt="Chromatic Aberration" title="Chromatic Aberration">
 </p>
@@ -133,11 +130,10 @@ framebuffer texture.</p>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> blueOffset  <span class="op">=</span> <span class="op">-</span><span class="fl">0.006</span><span class="op">;</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The adjustable parameters for this technique are the red, green, and
-blue offsets. Feel free to play around with these to get the particular
-color fringe you're looking for. These particular offsets produce a
-yellowish orange and blue fringe.</p>
-<h3 id="direction">Direction</h3>
+<p>该技术的可调参数是红色、绿色和蓝色的偏移量。
+你可以自由调整它们以获得理想的色彩边缘效果。
+这里的偏移量产生了黄色橙色和蓝色的色彩边缘。</p>
+<h3 id="方向">方向</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>uniform vec2 mouseFocusPoint<span class="op">;</span></span>
@@ -150,11 +146,10 @@ yellowish orange and blue fringe.</p>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  vec2 direction <span class="op">=</span> texCoord <span class="op">-</span> mouseFocusPoint<span class="op">;</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The offsets can occur horizontally, vertically, or radially. One
-approach is to radiate out from the <a href="depth-of-field.html">depth of
-field</a> focal point. As the scene gets more out of focus, the
-chromatic aberration increases.</p>
-<h3 id="samples">Samples</h3>
+<p>偏移可以沿水平、垂直或径向方向发生。 一种思路是从<a
+href="depth-of-field.html">景深</a> 的焦点位置向外辐射。
+随着场景越发模糊，色差效果越强。</p>
+<h3 id="采样">采样</h3>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>out vec4 fragColor<span class="op">;</span></span>
@@ -165,10 +160,9 @@ chromatic aberration increases.</p>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  fragColor<span class="op">.</span>g  <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span> texCoord <span class="op">+</span> <span class="op">(</span>direction <span class="op">*</span> vec2<span class="op">(</span>greenOffset<span class="op">))).</span>g<span class="op">;</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  fragColor<span class="op">.</span>ba <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span> texCoord <span class="op">+</span> <span class="op">(</span>direction <span class="op">*</span> vec2<span class="op">(</span>blueOffset <span class="op">))).</span>ba<span class="op">;</span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>With the direction and offsets, make three samples of the scene's
-colors—one for the red, green, and blue channels. These will be the
-final fragment color.</p>
-<h3 id="source">Source</h3>
+<p>基于方向和偏移，分别对场景颜色进行三次采样，分别取红、绿、蓝通道的颜色值。
+这些采样结果组成最终的片元颜色输出。</p>
+<h3 id="源码">源码</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

@@ -105,71 +105,67 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="posterization.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="depth-of-field">Depth Of Field</h2>
+<h1 id="3d-游戏着色器入门">3D 游戏着色器入门</h1>
+<h2 id="景深depth-of-field">景深（Depth Of Field）</h2>
 <p align="center">
 <img src="../resources/images/DEa77Bh.gif" alt="Depth Of Field" title="Depth Of Field">
 </p>
 
-<p>Like <a href="ssao.html">SSAO</a>, depth of field is an effect you
-can't live without once you've used it. Artistically, you can use it to
-draw your viewer's eye to a certain subject. But in general, depth of
-field adds a lot of realism for a little bit of effort.</p>
-<h3 id="in-focus">In Focus</h3>
-<p>The first step is to render your scene completely in focus. Be sure
-to render this into a framebuffer texture. This will be one of the
-inputs to the depth of field shader.</p>
-<h3 id="out-of-focus">Out Of Focus</h3>
-<p>The second step is to blur the scene as if it was completely out of
-focus. Like bloom and SSAO, you can use a <a href="blur.html#box-blur">box
-blur</a>. Be sure to render this out-of-focus-scene into a framebuffer
-texture. This will be one of the inputs to the depth of field
-shader.</p>
-<h4 id="bokeh">Bokeh</h4>
+<p>就像 <a href="ssao.html">SSAO</a>
+一样，一旦你使用了景深效果，就再也离不开它了。<br />
+从艺术角度来看，景深可以用来引导观众的视线聚焦在某个主体上。<br />
+而从整体效果而言，景深只需一点代价就能大幅提升画面的真实感。</p>
+<h3 id="对焦区域">对焦区域</h3>
+<p>第一步是完整渲染出一个完全对焦的场景。<br />
+请确保将其渲染到一个帧缓冲纹理中。<br />
+这个对焦图像将作为景深着色器的输入之一。</p>
+<h3 id="模糊区域">模糊区域</h3>
+<p>第二步是将整个场景模糊处理，模拟完全失焦的效果。<br />
+类似于 Bloom 和 SSAO，你可以使用 <a
+href="blur.html#box-blur">盒式模糊（Box Blur）</a>。<br />
+请确保将该模糊后的场景渲染到另一个帧缓冲纹理中。<br />
+这个失焦图像也将作为景深着色器的输入之一。</p>
+<h4 id="散景bokeh">散景（Bokeh）</h4>
 <p align="center">
 <img src="../resources/images/aQ9Ga8J.gif" alt="Bokeh" title="Bokeh">
 </p>
 
-<p>For a great bokeh effect, dilate the out of focus texture and use
-that as the out of focus input. See <a href="dilation.html">dilation</a>
-for more details.</p>
-<h3 id="mixing">Mixing</h3>
+<p>为了获得更好的散景效果，可以先对失焦纹理进行膨胀处理，然后将其作为失焦输入使用。<br />
+详见 <a href="dilation.html">膨胀操作</a>。</p>
+<h3 id="混合处理">混合处理</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> minDistance <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> maxDistance <span class="op">=</span> <span class="fl">3.0</span><span class="op">;</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Feel free to tweak these two parameters. All positions at or below
-<code>minDistance</code> will be completely in focus. All positions at
-or beyond <code>maxDistance</code> will be completely out of focus.</p>
+<p>你可以自由调整这两个参数。 所有小于等于 <code>minDistance</code>
+的位置将完全对焦； 所有大于等于 <code>maxDistance</code>
+的位置将完全失焦。</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  vec4 focusColor      <span class="op">=</span> texture<span class="op">(</span>focusTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  vec4 outOfFocusColor <span class="op">=</span> texture<span class="op">(</span>outOfFocusTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>You'll need the in focus and out of focus colors.</p>
+<p>你需要对焦图像和失焦图像中的颜色值。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  vec4 position <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>You'll also need the vertex position in view space. You can reuse the
-position framebuffer texture you used for <a
-href="ssao.html#vertex-positions">SSAO</a>.</p>
+<p>你还需要该片元在视图空间中的位置。<br />
+可以复用你在 <a href="ssao.html#vertex-positions">SSAO</a>
+中使用的位置帧缓冲纹理。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  vec4 focusPoint <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> mouseFocusPoint<span class="op">);</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The focus point is a position somewhere in your scene. All of the
-points in your scene are measured from the focus point.</p>
-<p>Choosing the focus point is up to you. The demo uses the scene
-position directly under the mouse when clicking the middle mouse button.
-However, it could be a constant distance from the camera or a static
-position.</p>
+<p>焦点是场景中的某个位置，所有场景中的点都将以此点为参考来计算距离。<br />
+焦点的位置由你自行决定。<br />
+演示中使用的是中键点击时鼠标下方的场景位置。<br />
+当然，你也可以设置一个固定的距离或静态位置。</p>
 <p align="center">
 <img src="../resources/images/idDZr62.png" alt="smoothstep" title="smoothstep">
 </p>
@@ -184,26 +180,23 @@ position.</p>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">);</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p><code>smoothstep</code> returns values from zero to one. The
-<code>minDistance</code> is the left-most edge. Any position less than
-the minimum distance, from the focus point, will be in focus or have a
-blur of zero. The <code>maxDistance</code> is the right-most edge. Any
-position greater than the maximum distance, from the focus point, will
-be out of focus or have a blur or one. For distances between the edges,
-blur will be between zero and one. These values are interpolated along a
-s-shaped curve.</p>
+<p><code>smoothstep</code> 返回一个介于 0 到 1 之间的值。<br />
+<code>minDistance</code>
+是左侧边界，表示低于该距离的区域将完全对焦，模糊度为 0；<br />
+<code>maxDistance</code>
+是右侧边界，表示高于该距离的区域将完全失焦，模糊度为 1；<br />
+在两者之间的距离，将根据 S 形曲线平滑插值，模糊度介于 0 到 1 之间。</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> mix<span class="op">(</span>focusColor<span class="op">,</span> outOfFocusColor<span class="op">,</span> blur<span class="op">);</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The <code>fragColor</code> is a mixture of the in focus and out of
-focus color. The closer <code>blur</code> is to one, the more it will
-use the <code>outOfFocusColor</code>. Zero <code>blur</code> means this
-fragment is entirely in focus. At <code>blur &gt;= 1</code>, this
-fragment is completely out of focus.</p>
-<h3 id="source">Source</h3>
+<p>最终的 <code>fragColor</code> 是对焦色与失焦色之间的混合。<br />
+<code>blur</code> 越接近 1，使用的失焦色越多；<br />
+<code>blur</code> 为 0 表示完全对焦；<br />
+<code>blur &gt;= 1</code> 时表示完全失焦。</p>
+<h3 id="源码参考">源码参考</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a
