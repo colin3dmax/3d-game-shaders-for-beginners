@@ -4,44 +4,43 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](flow-mapping.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门
 
-## Foam
+## 泡沫（Foam）
 
 <p align="center">
 <img src="../resources/images/SVLPYKn.gif" alt="Foam" title="Foam">
 </p>
 
-Foam is typically used when simulating some body of water.
-Anywhere the water's flow is disrupted, you add some foam.
-The foam isn't much by itself but it can really connect the water with the rest of the scene.
+泡沫通常用于模拟水体表面。  
+每当水流受到扰动，就可以添加一些泡沫。  
+虽然泡沫本身很简单，但它能很好地将水体与周围场景连接起来。
 
 <p align="center">
 <img src="../resources/images/HCqvd8c.gif" alt="Lava River" title="Lava River">
 </p>
 
-But don't stop at just water.
-You can use the same technique to make a river of lava for example.
+当然不必局限于水体。  
+例如你可以使用相同的技术来制作熔岩河流。
 
-### Vertex Positions
+### 顶点位置
 
-Like
-[screen space refraction](screen-space-refraction.md),
-you'll need both the foreground and background vertex positions.
-The foreground being the scene with the foamy surface
-and the background being the scene without the foamy surface.
-Referrer back to [SSAO](ssao.md#vertex-positions) for the details
-on how to acquire the vertex positions in view space.
+和 [屏幕空间折射](screen-space-refraction.md) 一样，  
+你需要获取前景和背景的顶点位置：  
+- 前景包含泡沫表面的场景  
+- 背景是不含泡沫的原始场景  
 
-### Mask
+关于如何获取视空间中的顶点位置，可以参考 [SSAO](ssao.md#vertex-positions) 章节。
+
+### 蒙版（Mask）
 
 <p align="center">
 <img src="../resources/images/N6TWBw8.gif" alt="Foam Mask" title="Foam Mask">
 </p>
 
-You'll need to texture your scene with a foam mask.
-The demo masks everything off except the water.
-For the water, it textures it with a foam pattern.
+你需要使用一张泡沫蒙版纹理来标记泡沫区域。  
+示例程序中将除水面以外的部分全部遮罩，  
+并在水面上贴图泡沫图案。
 
 ```c
 // ...
@@ -59,9 +58,9 @@ void main() {
 }
 ```
 
-Here you see the fragment shader that generates the foam mask.
-It takes a foam pattern texture and UV maps it to the scene's geometry using the diffuse UV coordinates.
-For every model, except the water, the shader is given a solid black texture as the `foamPatternTexture`.
+这段片元着色器生成泡沫蒙版。  
+它使用漫反射 UV 坐标将泡沫图案贴到几何体表面。  
+对除水面外的所有模型，shader 使用纯黑色纹理作为 `foamPatternTexture`。
 
 ```c
   // ...
@@ -71,9 +70,8 @@ For every model, except the water, the shader is given a solid black texture as 
   // ...
 ```
 
-The fragment color is converted to greyscale,
-as a precaution,
-since the foam shader expects the foam mask to be greyscale.
+将泡沫颜色转换为灰度值，这是为了安全起见，  
+因为后续泡沫着色器预期泡沫蒙版是灰度图。
 
 ### Uniforms
 
@@ -87,11 +85,12 @@ uniform sampler2D positionToTexture;
 // ...
 ```
 
-The foam shader accepts a mask texture,
-the foreground vertex positions (`positionFromTexture`),
-and the background vertex positions (`positionToTexture`).
+泡沫着色器接收：
+- 泡沫蒙版纹理
+- 前景顶点位置（`positionFromTexture`）
+- 背景顶点位置（`positionToTexture`）
 
-### Parameters
+### 参数设置
 
 ```c
   // ...
@@ -102,11 +101,10 @@ and the background vertex positions (`positionToTexture`).
   // ...
 ```
 
-The adjustable parameters for the foam shader are the foam depth and color.
-The foam depth controls how much foam is shown.
-As the foam depth increases, the amount of foam shown increases.
+你可以调整泡沫的“深度”和颜色。  
+`foamDepth` 控制泡沫出现的厚度，值越大，泡沫面积越大。
 
-### Distance
+### 距离计算
 
 ```c
   // ...
@@ -119,10 +117,10 @@ As the foam depth increases, the amount of foam shown increases.
   // ...
 ```
 
-Compute the distance from the foreground position to the background position.
-Since the positions are in view (camera) space, we only need the y value since it goes into the screen.
+计算前景与背景之间的距离。  
+由于这些位置是视空间下的坐标，因此只需要 Y 方向的分量。
 
-### Amount
+### 泡沫权重计算
 
 ```c
   // ...
@@ -135,7 +133,7 @@ Since the positions are in view (camera) space, we only need the y value since i
   // ...
 ```
 
-The amount of foam is based on the depth, the foam depth parameter, and the mask value.
+泡沫量（`amount`）取决于深度、泡沫深度参数和蒙版值。
 
 <p align="center">
 <img src="../resources/images/CDIPmin.png" alt="Easing equation." title="Easing equation.">
@@ -149,10 +147,10 @@ The amount of foam is based on the depth, the foam depth parameter, and the mask
         // ...
 ```
 
-Reshape the amount using the ease in and out easing function.
-This will give a lot of foam near depth zero and little to no foam near `foamDepth`.
+使用缓动函数（easing function）对泡沫量进行重塑，  
+可以让深度靠近 0 的区域拥有较多泡沫，接近 `foamDepth` 的区域几乎无泡沫。
 
-### Fragment Color
+### 设置片元颜色
 
 ```c
   // ...
@@ -162,9 +160,9 @@ This will give a lot of foam near depth zero and little to no foam near `foamDep
   // ...
 ```
 
-The fragment color is a mix between transparent black and the foam color based on the amount.
+最终的片元颜色是黑色透明与泡沫颜色的混合，按 `amount` 权重插值。
 
-### Source
+### 源码参考
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [base.vert](../demonstration/shaders/vertex/base.vert)
@@ -173,6 +171,7 @@ The fragment color is a mix between transparent black and the foam color based o
 - [foam-mask.frag](../demonstration/shaders/fragment/foam-mask.frag)
 - [foam.frag](../demonstration/shaders/fragment/foam.frag)
 - [base-combine.frag](../demonstration/shaders/fragment/base-combine.frag)
+
 
 ## Copyright
 

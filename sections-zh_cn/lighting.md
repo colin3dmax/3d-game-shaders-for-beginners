@@ -4,18 +4,18 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](blinn-phong.md)
 
-# 3D Game Shaders For Beginners
+# 3D游戏着色器入门
 
-## Lighting
+## 光照
 
 <p align="center">
 <img src="../resources/images/zQrA8tr.gif" alt="Lighting" title="Lighting">
 </p>
 
-Completing the lighting involves calculating and combining the ambient, diffuse, specular, and emission light aspects.
-The example code uses either Phong or Blinn-Phong lighting.
+完成光照计算需要计算并组合环境光、漫反射光、高光以及自发光部分。  
+示例代码使用的是Phong或Blinn-Phong光照模型。
 
-### Vertex
+### 顶点着色器
 
 ```c
 // ...
@@ -49,9 +49,9 @@ uniform struct p3d_LightSourceParameters
 // ...
 ```
 
-For every light, minus the ambient light, Panda3D gives you this convenient
-struct which is available to both the vertex and fragment shaders.
-The biggest convenience being the shadow map and shadow view matrix for transforming vertexes to shadow or light space.
+对于每个灯光（除环境光外），Panda3D会提供这个方便的结构体，  
+该结构体在顶点着色器和片元着色器中均可访问。  
+其中最方便的是阴影贴图和阴影视图矩阵，用于将顶点转换到阴影空间或光源空间。
 
 ```c
   // ...
@@ -67,16 +67,15 @@ The biggest convenience being the shadow map and shadow view matrix for transfor
   // ...
 ```
 
-Starting in the vertex shader, you'll need to transform and
-output the vertex from view space to shadow or light space for each light in your scene.
-You'll need this later in the fragment shader in order to render the shadows.
-Shadow or light space is where every coordinate is relative to the light position (the light is the origin).
+在顶点着色器中，需要把顶点位置从视图空间转换到每个光源的阴影空间或光源空间，  
+这一步后续在片元着色器中用于阴影渲染。  
+阴影空间或光源空间是以光源位置为原点的坐标系。
 
-### Fragment
+### 片元着色器
 
-The fragment shader is where most of the lighting calculations take place.
+大部分光照计算都发生在片元着色器中。
 
-#### Material
+#### 材质
 
 ```c
 // ...
@@ -93,9 +92,9 @@ uniform struct
 // ...
 ```
 
-Panda3D gives us the material (in the form of a struct) for the mesh or model you are currently rendering.
+Panda3D为当前渲染的网格或模型提供材质信息（结构体形式）。
 
-#### Multiple Lights
+#### 多灯光处理
 
 ```c
   // ...
@@ -106,7 +105,7 @@ Panda3D gives us the material (in the form of a struct) for the mesh or model yo
   // ...
 ```
 
-Before you loop through the scene's lights, create an accumulator for both the diffuse and specular colors.
+在遍历场景中的所有灯光前，先创建累加变量用于累计漫反射色和高光色。
 
 ```c
   // ...
@@ -118,19 +117,19 @@ Before you loop through the scene's lights, create an accumulator for both the d
   // ...
 ```
 
-Now you can loop through the lights, calculating the diffuse and specular colors for each one.
+现在可以遍历所有灯光，计算每个灯光贡献的漫反射色和高光色。
 
-#### Light Related Vectors
+#### 相关光照向量
 
 <p align="center">
 <img src="../resources/images/0pzNh5d.gif" alt="Phong Lighting Model" title="Phong Lighting Model">
 </p>
 
-Here you see the four major vectors you'll need to calculate the diffuse and specular colors contributed by each light.
-The light direction vector is the light blue arrow pointing to the light.
-The normal vector is the green arrow standing straight up.
-The reflection vector is the dark blue arrow mirroring the light direction vector.
-The eye or view vector is the orange arrow pointing towards the camera.
+下图展示了计算漫反射和高光所需的四个主要向量：  
+光线方向向量（浅蓝色箭头，指向光源），  
+法线向量（绿色箭头，垂直表面），  
+反射向量（深蓝色箭头，光线方向相对于法线的反射），  
+视线向量（橙色箭头，指向摄像机）。
 
 ```c
     // ...
@@ -143,13 +142,11 @@ The eye or view vector is the orange arrow pointing towards the camera.
     // ...
 ```
 
-The light direction is from the vertex's position to the light's position.
+光线方向向量是从顶点位置指向光源位置。
 
-Panda3D sets `p3d_LightSource[i].position.w` to zero if this is a directional light.
-Directional lights do not have a position as they only have a direction.
-So if this is a directional light,
-the light direction will be the negative or opposite direction of the light as Panda3D sets
-`p3d_LightSource[i].position.xyz` to be `-direction` for directional lights.
+Panda3D中，如果光源是方向光，`p3d_LightSource[i].position.w` 会被设为0。  
+方向光没有具体位置，只有方向。  
+此时，光线方向是方向光方向的相反方向（Panda3D中`p3d_LightSource[i].position.xyz`存储的是方向光的负方向）。
 
 ```c
   // ...
@@ -159,8 +156,7 @@ the light direction will be the negative or opposite direction of the light as P
   // ...
 ```
 
-You'll need the vertex normal to be a unit vector.
-Unit vectors have a length of magnitude of one.
+需要将顶点法线标准化为单位向量（长度为1）。
 
 ```c
     // ...
@@ -172,27 +168,19 @@ Unit vectors have a length of magnitude of one.
     // ...
 ```
 
-Next you'll need three more vectors.
+接着需要计算三个单位向量：
 
-You'll need to take the dot product involving the light direction so its best to normalize it.
-This gives it a distance or magnitude of one (unit vector).
+- 单位光线方向（标准化光线方向向量，长度为1），  
+- 视线方向（从顶点指向摄像机，顶点位置为视图空间坐标，故取负），  
+- 反射方向（光线方向相对于法线的反射向量，需取反使其指向视线方向）。
 
-The eye direction is the opposite of the vertex/fragment position since the vertex/fragment position is relative to the camera's position.
-Remember that the vertex/fragment position is in view space.
-So instead of going from the camera (eye) to the vertex/fragment, you go from the vertex/fragment to the eye (camera).
+[反射向量详解](http://asawicki.info/news_1301_reflect_and_refract_functions.html)  
+光线射向表面时，会按照入射角反射出去，反射角等于入射角。
 
-The
-[reflection vector](http://asawicki.info/news_1301_reflect_and_refract_functions.html)
-is a reflection of the light direction at the surface normal.
-As the light "ray" hits the surface, it bounces off at the same angle it came in at.
-The angle between the light direction vector and the normal is known as the "angle of incidence".
-The angle between the reflection vector and the normal is known as the "angle of reflection".
+反射向量需要取反，使其方向和视线向量一致。  
+反射向量用于计算高光强度。
 
-You'll have to negate the reflected light vector as it needs to point in the same direction as the eye vector.
-Remember the eye direction is from the vertex/fragment to the camera position.
-You'll use the reflection vector to calculate the intensity of the specular highlight.
-
-#### Diffuse
+#### 漫反射
 
 ```c
     // ...
@@ -204,16 +192,15 @@ You'll use the reflection vector to calculate the intensity of the specular high
     // ...
 ```
 
-The diffuse intensity is the dot product between the surface normal and the unit vector light direction.
-The dot product can range from negative one to one.
-If both vectors point in the same direction, the intensity is one.
-Any other case will be less than one.
+漫反射强度是法线与光线方向单位向量的点积。  
+点积范围是-1到1。  
+如果两个向量方向相同，点积为1；否则小于1。
 
 <p align="center">
 <img src="../resources/images/Nb78z96.gif" alt="The light direction versus the normal direction." title="The light direction versus the normal direction.">
 </p>
 
-As the light vector approaches the same direction as the normal, the diffuse intensity approaches one.
+光线方向越接近法线方向，漫反射强度越接近1。
 
 ```c
     // ...
@@ -223,7 +210,7 @@ As the light vector approaches the same direction as the normal, the diffuse int
     // ...
 ```
 
-If the diffuse intensity is zero or less, move on to the next light.
+漫反射强度小于等于0时，跳过当前灯光，继续下一灯光。
 
 ```c
     // ...
@@ -245,17 +232,17 @@ If the diffuse intensity is zero or less, move on to the next light.
     // ...
 ```
 
-You can now calculate the diffuse color contributed by this light.
-If the diffuse intensity is one, the diffuse color will be a mix between the diffuse texture color and the lights color.
-Any other intensity will cause the diffuse color to be darker.
+计算该灯光贡献的漫反射颜色。  
+漫反射强度为1时，漫反射颜色是漫反射贴图颜色和灯光颜色的乘积。  
+强度较小时，颜色更暗。
 
-Notice how I clamp the diffuse color to be only as bright as the diffuse texture color is.
-This will protect the scene from being over exposed.
-When creating your diffuse textures, make sure to create them as if they were fully lit.
+注意这里将漫反射颜色限制(clamp)为不超过漫反射贴图颜色，  
+避免场景过曝。  
+创建漫反射贴图时，假设它们是在完全照明下的颜色。
 
-#### Specular
+#### 高光
 
-After diffuse, comes specular.
+漫反射之后计算高光。
 
 <p align="center">
 <img src="../resources/images/FnOhXxv.gif" alt="Specular Intensity" title="Specular Intensity">
@@ -281,19 +268,18 @@ After diffuse, comes specular.
     // ...
 ```
 
-The specular intensity is the dot product between the eye vector and the reflection vector.
-As with the diffuse intensity, if the two vectors point in the same direction, the specular intensity is one.
-Any other intensity will diminish the amount of specular color contributed by this light.
+高光强度是视线方向与反射方向的点积（最大值不低于0）。  
+两个向量方向越一致，高光强度越大。
 
 <p align="center">
 <img src="../resources/images/4r6wqLP.gif" alt="Shininess" title="Shininess">
 </p>
 
-The material shininess determines how spread out the specular highlight is.
-This is typically set in a modeling program like Blender.
-In Blender it's known as the specular hardness.
+材质的高光强度指数（shininess）决定高光的集中程度，  
+数值越大，高光越集中。  
+一般在建模软件如Blender中设置，Blender里称为高光硬度。
 
-#### Spotlights
+#### 聚光灯
 
 ```c
     // ...
@@ -310,13 +296,10 @@ In Blender it's known as the specular hardness.
 }
 ```
 
-This snippet keeps fragments outside of a spotlight's cone or frustum from being affected by the light.
-Fortunately, Panda3D
-[sets up](https://github.com/panda3d/panda3d/blob/daa57733cb9b4ccdb23e28153585e8e20b5ccdb5/panda/src/display/graphicsStateGuardian.cxx#L1705)
-`spotDirection` and `spotCosCutoff` to also work for directional lights and points lights.
-Spotlights have both a position and direction.
-However, directional lights only have a direction and point lights only have a position.
-Still, this code works for all three lights avoiding the need for noisy if statements.
+这段代码用于剔除聚光灯光锥外的片元。  
+Panda3D同时设置了`spotDirection`和`spotCosCutoff`以支持方向光和点光。  
+聚光灯有位置和方向，方向光只有方向，点光只有位置。  
+这段代码统一支持三种灯光，避免大量条件判断。
 
 ```c
         // ...
@@ -326,20 +309,20 @@ Still, this code works for all three lights avoiding the need for noisy if state
         // ...
 ```
 
-You must negate `unitLightDirection`.
-`unitLightDirection` goes from the fragment to the spotlight and you need it to go from the spotlight to the fragment
-since the `spotDirection` goes directly down the center of the spotlight's frustum some distance away from the spotlight's position.
+这里对`unitLightDirection`取负。  
+`unitLightDirection`是从片元指向光源的方向，需要反向变为从光源指向片元，  
+因为`spotDirection`是聚光灯中心方向向外的单位向量。
+
 
 ```c
 spotCosCutoff = cosine(0.5 * spotlightLensFovAngle);
 ```
 
-For a spotlight, if the dot product between the fragment-to-light vector and the spotlight's direction vector is less than the cosine
-of half the spotlight's field of view angle, the shader disregards this light's influence.
+对于聚光灯，如果片元到光源方向向量与聚光灯方向向量的点积小于聚光灯视锥角一半余弦值，着色器将忽略该光源的影响。
 
-For directional lights and point lights, Panda3D sets `spotCosCutoff` to negative one.
-Recall that the dot product ranges from negative one to one.
-So it doesn't matter what the `unitLightDirectionDelta` is because it will always be greater than or equal to negative one.
+对于方向光和点光，Panda3D 会将 `spotCosCutoff` 设置为 -1。  
+点积范围是 -1 到 1，  
+所以无论 `unitLightDirectionDelta` 是多少，它总是大于或等于 -1。
 
 ```c
     // ...
@@ -349,12 +332,12 @@ So it doesn't matter what the `unitLightDirectionDelta` is because it will alway
     // ...
 ```
 
-Like the `unitLightDirectionDelta` snippet, this snippet also works for all three light types.
-For spotlights, this will make the fragments brighter as you move closer to the center of the spotlight's frustum.
-For directional lights and point lights, `spotExponent` is zero.
-Recall that anything to the power of zero is one so the diffuse color is one times itself meaning it is unchanged.
+和 `unitLightDirectionDelta` 判断类似，这段代码对所有三种光源都适用。  
+对于聚光灯，这会让靠近聚光灯中心的片元更亮。  
+对于方向光和点光，`spotExponent` 为 0，  
+任何数的 0 次方都为 1，漫反射颜色不变。
 
-#### Shadows
+#### 阴影
 
 ```c
     // ...
@@ -371,33 +354,28 @@ Recall that anything to the power of zero is one so the diffuse color is one tim
     // ...
 ```
 
-Panda3D makes applying shadows relatively easy by providing the shadow map and shadow transformation matrix for every scene light.
-To create the shadow transformation matrix yourself,
-you'll need to assemble a matrix that transforms view space coordinates to light space (coordinates are relative to the light's position).
-To create the shadow map yourself, you'll need to render the scene from the perspective of the light to a framebuffer texture.
-The framebuffer texture must hold the distances from the light to the fragments.
-This is known as a "depth map".
-Lastly, you'll need to manually give to your shader your DIY depth map as a `uniform sampler2DShadow`
-and your DIY shadow transformation matrix as a `uniform mat4`.
-At this point, you've recreated what Panda3D does for you automatically.
+Panda3D 为每个场景光源提供阴影贴图和阴影变换矩阵，使得应用阴影相对简单。  
+如果你想自己实现阴影变换矩阵，  
+需要构建一个矩阵，将视图空间坐标转换到光源空间（坐标以光源为原点）。  
+若要自己制作阴影贴图，需要从光源视角渲染场景到帧缓冲纹理，  
+该纹理存储从光源到片元的距离，称为“深度图”。  
+最后你需将自制的深度图作为 `uniform sampler2DShadow`，阴影变换矩阵作为 `uniform mat4` 传入着色器。  
+到这一步，你就重现了 Panda3D 自动帮你完成的功能。
 
-The shadow snippet shown uses `textureProj` which is different from the `texure` function shown earlier.
-`textureProj` first divides `vertexInShadowSpaces[i].xyz` by `vertexInShadowSpaces[i].w`.
-After this, it uses `vertexInShadowSpaces[i].xy` to locate the depth stored in the shadow map.
-Next it uses `vertexInShadowSpaces[i].z` to compare this vertex's depth against the shadow map depth at
-`vertexInShadowSpaces[i].xy`.
-If the comparison passes, `textureProj` will return one.
-Otherwise, it will return zero.
-Zero meaning this vertex/fragment is in the shadow and one meaning this vertex/fragment is not in the shadow.
+此处用到的 `textureProj` 与之前的 `texture` 函数不同，  
+`textureProj` 会先将 `vertexInShadowSpaces[i].xyz` 除以 `vertexInShadowSpaces[i].w`，  
+然后用 xy 坐标定位深度图中的深度值，  
+接着用 z 坐标将该片元的深度与深度图深度比较。  
+比较通过则返回 1，表示该片元未被阴影遮挡；否则返回 0，表示片元处于阴影中。
 
-`textureProj` can also return a value between zero and one depending on how the shadow map was set up.
-In this instance, `textureProj` performs multiple depth tests using neighboring depth values and returns a weighted average.
-This weighted average can give shadows a softer look.
+`textureProj` 也可能返回 0 到 1 之间的值，取决于阴影贴图的设置。  
+这种情况下，`textureProj` 会对邻近深度值进行多重深度测试，返回加权平均值，  
+从而获得更柔和的阴影效果。
 
-#### Attenuation
+#### 衰减
 
 <p align="center">
-<img src="../resources/images/jyatr7l.png" alt="Attenuation" title="Attenuation">
+<img src="../resources/images/jyatr7l.png" alt="衰减" title="衰减">
 </p>
 
 ```c
@@ -420,17 +398,16 @@ This weighted average can give shadows a softer look.
     // ...
 ```
 
-The light's distance is just the magnitude or length of the light direction vector.
-Notice it's not using the normalized light direction as that distance would be one.
+光源距离即光线方向向量的长度（不是归一化后的方向，否则长度恒为1）。
 
-You'll need the light distance to calculate the attenuation.
-Attenuation meaning the light's influence diminishes as you get further away from it.
+计算衰减时需要距离值，  
+衰减表示光照影响会随着距离增加而减弱。
 
-You can set `constantAttenuation`, `linearAttenuation`, and `quadraticAttenuation` to whatever values you would like.
-A good starting point is `constantAttenuation = 1`, `linearAttenuation = 0`, and `quadraticAttenuation = 1`.
-With these settings, the attenuation is one at the light's position and approaches zero as you move further away.
+你可以任意设置 `constantAttenuation`、`linearAttenuation` 和 `quadraticAttenuation`。  
+一个合理的起点是：`constantAttenuation = 1`，`linearAttenuation = 0`，`quadraticAttenuation = 1`。  
+这样设置时，光源位置处衰减为 1，远离光源时趋近于 0。
 
-#### Final Light Color
+#### 最终光照颜色
 
 ```c
     // ...
@@ -441,10 +418,10 @@ With these settings, the attenuation is one at the light's position and approach
     // ...
 ```
 
-To calculate the final light color, add the diffuse and specular together.
-Be sure to add this to the accumulator as you loop through the scene's lights.
+最终光照颜色是漫反射色和高光色的叠加。  
+遍历场景光源时，需将每个光源的贡献累加。
 
-#### Ambient
+#### 环境光
 
 ```c
 // ...
@@ -473,15 +450,14 @@ in vec2 diffuseCoord;
 // ...
 ```
 
-The ambient component to the lighting model is based on the material's ambient color,
-the ambient light's color, and the diffuse texture color.
+环境光部分基于材质的环境光颜色、环境光源颜色以及漫反射贴图颜色计算。
 
-There should only ever be one ambient light.
-Because of this, the ambient color calculation only needs to occur once.
-Contrast this with the diffuse and specular color which must be accumulated for each spot/directional/point light.
-When you reach [SSAO](ssao.md), you'll revisit the ambient color calculation.
+环境光在场景中通常只有一个，  
+因此环境光颜色计算只需进行一次，  
+与此不同的是漫反射和高光颜色需为每个点光、方向光和聚光灯累积。  
+当你学习[屏幕空间环境光遮蔽（SSAO）](ssao.md)时，会再次调整环境光计算。
 
-#### Putting It All Together
+#### 综合计算
 
 ```c
   // ...
@@ -491,13 +467,14 @@ When you reach [SSAO](ssao.md), you'll revisit the ambient color calculation.
   // ...
 ```
 
-The final color is the sum of the ambient color, diffuse color, specular color, and the emission color.
+最终输出颜色是环境光、漫反射、高光和自发光的颜色叠加。
 
-### Source
+### 资源链接
 
-- [main.cxx](../demonstration/src/main.cxx)
-- [base.vert](../demonstration/shaders/vertex/base.vert)
+- [main.cxx](../demonstration/src/main.cxx)  
+- [base.vert](../demonstration/shaders/vertex/base.vert)  
 - [base.frag](../demonstration/shaders/fragment/base.frag)
+
 
 ## Copyright
 

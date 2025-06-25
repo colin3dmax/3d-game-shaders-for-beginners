@@ -4,27 +4,29 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](outlining.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门
 
-## Flow Mapping
+## 流动贴图（Flow Mapping）
 
 <p align="center">
 <img src="../resources/images/3WDO9xW.gif" alt="Flow Mapping" title="Flow Mapping">
 </p>
 
-Flow mapping is useful when you need to animate some fluid material.
-Much like diffuse maps map UV coordinates to diffuse colors and normal maps map UV coordinates to normals,
-flow maps map UV coordinates to 2D translations or flows.
+流动贴图在你需要动画化液体材质时非常有用。  
+就像漫反射贴图将 UV 坐标映射到漫反射颜色，法线贴图将 UV 坐标映射到法线方向，  
+流动贴图将 UV 坐标映射到二维的偏移量（即流动方向）。
 
 <p align="center">
 <img src="../resources/images/b9Vw94N.png" alt="Flow Map" title="Flow Map">
 </p>
 
-Here you see a flow map that maps UV coordinates to translations in the positive y-axis direction.
-Flow maps use the red and green channels to store translations in the x and y direction.
-The red channel is for the x-axis and the green channel is the y-axis.
-Both range from zero to one which translates to flows that range from `(-1, -1)` to `(1, 1)`.
-This flow map is all one color consisting of 0.5 red and 0.6 green.
+上图是一个将 UV 坐标映射到正 Y 方向偏移的流动贴图。  
+流动贴图使用红色和绿色通道分别存储 X 和 Y 方向的偏移值：  
+- 红色通道表示 X 方向流动  
+- 绿色通道表示 Y 方向流动  
+
+这两个通道的值范围都是 `[0, 1]`，在经过换算后会映射到 `(-1, 1)` 的偏移范围。  
+上图中该贴图是单一颜色，R 为 0.5，G 为 0.6。
 
 ```c
 [r, g, b] =
@@ -32,8 +34,8 @@ This flow map is all one color consisting of 0.5 red and 0.6 green.
     [ x, y, z]
 ```
 
-Recall how the colors in a normal map are converted to actual normals.
-There is a similar process for flow maps.
+回顾法线贴图中的颜色到法线的转换方式，  
+流动贴图采用类似的转换逻辑。
 
 ```c
 // ...
@@ -46,8 +48,8 @@ uniform sampler2D flowTexture;
   // ...
 ```
 
-To convert a flow map color to a flow,
-you minus 0.5 from the channel (red and green) and multiply by two.
+要将流动贴图的颜色值转换为实际的流动向量，  
+只需将颜色通道值减去 0.5 并乘以 2。
 
 ```c
 (r, g) =
@@ -61,11 +63,10 @@ you minus 0.5 from the channel (red and green) and multiply by two.
       (0, 0.2)
 ```
 
-The flow map above maps each UV coordinate to the flow `(0, 0.2)`.
-This indicates zero movement in the x direction and a movement of 0.2 in the y direction.
+上面的流动贴图会将每个 UV 坐标映射为 `(0, 0.2)` 的偏移，  
+表示 X 方向无移动，Y 方向每单位时间偏移 0.2。
 
-The flows can be used to translate all sorts of things but they're typically used to
-offset the UV coordinates of a another texture.
+流动值通常用于偏移其他纹理的 UV 坐标，来模拟流动效果。
 
 <p align="center">
 <img src="../resources/images/N6TWBw8.gif" alt="Foam Mask" title="Foam Mask">
@@ -89,11 +90,9 @@ offset the UV coordinates of a another texture.
   // ...
 ```
 
-For example, the demo program uses a flow map to animate the water.
-Here you see the flow map being used to animate the
-[foam mask](foam.md#mask).
-This continuously moves the diffuse UV coordinates directly up,
-giving the foam mask the appearance of moving down stream.
+例如，示例程序使用流动贴图为水面添加动画。  
+在上图中，流动贴图被用于驱动 [泡沫遮罩](foam.md#mask) 的移动。  
+它会持续向上偏移 UV 坐标，从而让泡沫看起来像是顺流而下。
 
 ```c
           // ...
@@ -104,14 +103,12 @@ giving the foam mask the appearance of moving down stream.
           // ...
 ```
 
-You'll need how many seconds have passed since the first frame
-in order to animate the UV coordinates in the direction indicated by the flow.
-`osg_FrameTime` is
-[provided](https://github.com/panda3d/panda3d/blob/daa57733cb9b4ccdb23e28153585e8e20b5ccdb5/panda/src/display/graphicsStateGuardian.cxx#L930)
-by Panda3D.
-It is a timestamp of how many seconds have passed since the first frame.
+为了根据流动方向动画化 UV 坐标，你需要知道自第一帧以来经过了多少秒。  
+`osg_FrameTime` 是由 Panda3D 提供的变量，  
+[参考链接](https://github.com/panda3d/panda3d/blob/daa57733cb9b4ccdb23e28153585e8e20b5ccdb5/panda/src/display/graphicsStateGuardian.cxx#L930)，  
+它表示从第一帧开始过去的时间戳。
 
-### Source
+### 源码参考
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [base.vert](../demonstration/shaders/vertex/base.vert)

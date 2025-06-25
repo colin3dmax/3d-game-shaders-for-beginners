@@ -4,41 +4,36 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](setup.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门
 
-## Gamma Correction
+## 伽马校正（Gamma Correction）
 
 <p align="center">
 <img src="../resources/images/IG7A6cj.gif" alt="Gamma Correction" title="Gamma Correction">
 </p>
 
-Correcting for gamma will make your color calculations look correct.
-This isn't to say they'll look amazing but with gamma correction,
-you'll find that the colors meld together better,
-the shadows are more nuanced,
-and the highlights are more subtle.
-Without gamma correction,
-the shadowed areas tend to get crushed while the highlighted areas tend to get blown-out and
-over saturated making for a harsh contrast overall.
+伽马校正能让你的颜色计算看起来更合理。  
+这并不意味着画面一定惊艳，但校正后，颜色融合得更自然，  
+阴影更细腻，高光也更柔和。  
+如果没有伽马校正，阴影区域常常会被“压死”，  
+而高光区域则容易过曝、饱和度过高，导致对比度刺眼。
 
-If you're aiming for realism,
-gamma correction is especially important.
-As you perform more and more calculations,
-the tiny errors add up making it harder to achieve photorealism.
-The equations will be correct but the inputs and outputs will be wrong leaving you frustrated.
+如果你追求真实感，伽马校正尤为重要。  
+因为随着计算步骤的增多，微小的误差会累积，  
+让真实感难以实现。即使公式没错，输入输出的偏差也会让你挫败。
 
-It's easy to get twisted around when thinking about gamma correction
-but essentially it boils down to knowing what color space a color is in and how to convert that color to the color space you need.
-With those two pieces of the puzzle,
-gamma correction becomes a tedious yet simple chore you'll have to perform from time to time.
+伽马校正听起来很绕，但其实归根结底就是：  
+**弄清颜色所属的颜色空间，以及如何把它转换到你需要的颜色空间。**  
+理解了这两点，伽马校正就变成了一项繁琐但简单的日常工作。
 
-### Color Spaces
+### 颜色空间（Color Spaces）
 
 <p align="center">
 <img src="../resources/images/a1U5oBq.png" alt="sRGB vs RGB" title="sRGB vs RGB">
 </p>
 
-The two color spaces you'll need to be aware of are sRGB (standard Red Green Blue) and RGB or linear color space.
+你需要关注的两个颜色空间是：  
+**sRGB（标准红绿蓝）** 和 **RGB（线性色彩空间）**。
 
 ```bash
 identify -format "%[colorspace]\n" house-diffuse-srgb.png
@@ -48,27 +43,21 @@ identify -format "%[colorspace]\n" house-diffuse-rgb.png
 RGB
 ```
 
-Knowing what color space a color texture is in will determine how you handle it in your shaders.
-To determine the color space of a texture, use ImageMagick's `identify`.
-You'll find that most textures are in sRGB.
+想知道一张贴图属于哪个颜色空间，可以用 ImageMagick 的 `identify` 命令。  
+大部分贴图通常都是 sRGB 编码的。
 
 ```bash
 convert house-diffuse-srgb -colorspace rgb house-diffuse-rgb.png
 ```
 
-To convert a texture to a particular color space, use ImageMagick's `convert` program.
-Notice how a texture is darkened when transforming from sRGB to RGB.
+你也可以使用 `convert` 命令把贴图转换到目标颜色空间。  
+从 sRGB 转换到 RGB 后，贴图通常会变暗。
 
-### Decoding
+### 解码（Decoding）
 
-
-The red, green, and blue values in a sRGB color texture are encoded and cannot be modified directly.
-Modifying them directly would be like running spellcheck on an encrypted message.
-Before you can run spellcheck,
-you first have to decrypt the message.
-Similarly,
-to modify the values of an sRGB texture,
-you first have to decode or transform them to RGB or linear color space.
+sRGB 颜色贴图中的红绿蓝值是**经过编码的**，不能直接修改。  
+直接操作这些值，就像在加密邮件上运行拼写检查一样。  
+你得先“解密”它，才能正确修改。
 
 ```c
   // ...
@@ -79,62 +68,67 @@ you first have to decode or transform them to RGB or linear color space.
   // ...
 ```
 
-To decode a sRGB encoded color,
-raise the `rgb` values to the power of `2.2`.
-Once you have decoded the color,
-you are now free to add, subtract, multiply, and divide it.
+要解码一张 sRGB 颜色，  
+只需把其 `rgb` 分量提升到 `2.2` 次方。  
+完成解码后，你就可以对它进行加减乘除运算了。
 
-By raising the color values to the power of `2.2`,
-you're converting them from sRGB to RGB or linear color space.
-This conversion has the effect of darkening the colors.
+通过这种转换，  
+颜色会从 sRGB 空间变换到线性 RGB 空间，  
+颜色也会变得更暗一些。
 
 <p align="center">
 <img src="../resources/images/E5nkRfG.png" alt="Color Darkening" title="Color Darkening">
 </p>
 
-For example,
-`vec3(0.9, 0.2, 0.3)` becomes `vec3(0.793, 0.028, 0.07)`.
+例如：  
+`vec3(0.9, 0.2, 0.3)` 解码后变成 `vec3(0.793, 0.028, 0.07)`。
 
 <p align="center">
 <img src="../resources/images/TOEb0EC.gif" alt="Gamma Curves" title="Gamma Curves">
 </p>
 
-The `2.2` value is known as gamma.
-Loosely speaking, gamma can either be `1.0 / 2.2`, `2.2`, or `1.0`.
-As you've seen, `2.2` is for decoding sRGB encoded color textures.
-As you will see, `1.0 / 2.2` is for encoding linear or RGB color textures.
-And `1.0` is RGB or linear color space since `y = 1 * x + 0` and
-any base raised to the power of `1.0` is itself.
+`2.2` 就是所谓的伽马值（gamma）。  
+通俗来讲，gamma 可能取 `1.0 / 2.2`、`2.2` 或 `1.0`。  
+其中：
 
-#### Non-color Data
+- `2.2` 用于**解码** sRGB。
+- `1.0 / 2.2` 用于**编码** RGB。
+- `1.0` 表示已经是线性空间，没必要变换。
+
+#### 非颜色数据（Non-color Data）
 
 <p align="center">
 <img src="../resources/images/reA2qjs.png" alt="Non-color Data" title="Non-color Data">
 </p>
 
-One important exception to decoding is when the "colors" of a texture represent non-color data.
-Some examples of non-color data would be the normals in a normal map,
-the alpha channel,
-the heights in a height map,
-and the directions in a flow map.
-Only decode color related data or data that represents color.
-When dealing with non-color data,
-treat the sRGB color values as RGB or linear and skip the decoding process.
+有一种情况你**不应该解码**，  
+那就是贴图中的“颜色”其实代表的是非颜色数据，比如：
 
-### Encoding
+- 法线贴图（normal map）
+- Alpha 通道
+- 高度图（height map）
+- 流动图（flow map）
+
+这类数据虽然长得像颜色，但实则是向量或数值信息。  
+遇到这种情况，直接当作线性空间使用，**跳过解码**。
+
+### 编码（Encoding）
 
 <p align="center">
 <img src="../resources/images/tRxkKNe.gif" alt="Perceptually versus Actually Linear" title="Perceptually versus Actually Linear">
 </p>
 
-The necessity for encoding and decoding stems from the fact that humans do not perceive lightness linearly and
-most displays (like a monitor) lack the precision or number of bits to accurately show both lighter and darker tonal values or shades.
-With only so many bits to go around,
-colors are encoded in such a way that more bits are devoted to the darker shades than the lighter shades
-since humans are more sensitive to darker tones than lighter tones.
-Encoding it this way uses the limited number of bits more effectively for human perception.
-Still, the only thing to remember is that your display is expecting sRGB encoded values.
-Therefore, if you decoded a sRGB value, you have to encode it before it makes its way to your display.
+之所以需要编码/解码，是因为：
+
+1. **人眼对亮度的感知并不是线性的**；
+2. **大多数显示器色深有限，显示能力不够线性**。
+
+由于人类对暗部更敏感，  
+所以 sRGB 编码会在暗色区域分配更多比特数，  
+让有限的色彩信息更符合视觉感知。
+
+所以，**显示器期望接收到的是 sRGB 编码后的值。**  
+你一旦解码使用过，就必须在输出前重新编码。
 
 ```c
   // ...
@@ -145,20 +139,20 @@ Therefore, if you decoded a sRGB value, you have to encode it before it makes it
   // ...
 ```
 
-To encode a linear value or convert RGB to sRGB,
-raise the `rgb` values to the power of `1.0 / 2.2`.
-Notice how `1.1 / 2.2` is the reciprocal of `2.2` or `2.2 / 1.0`.
-Here you see the symmetry in decoding and encoding.
+编码方式与解码正好相反。  
+把颜色分量提升到 `1.0 / 2.2` 次方即可完成编码。  
+`1.0 / 2.2` 就是 `2.2` 的倒数。
 
 <p align="center">
 <img src="../resources/images/4km0pdv.gif" alt="Not Gamma Corrected versus Gamma Corrected" title="Not Gamma Corrected versus Gamma Corrected">
 </p>
 
-### Source
+### 源码参考
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [basic.vert](../demonstration/shaders/vertex/basic.vert)
 - [gamma-correction.frag](../demonstration/shaders/fragment/gamma-correction.frag)
+
 
 ## Copyright
 

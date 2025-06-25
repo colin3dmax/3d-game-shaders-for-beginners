@@ -4,37 +4,35 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](deferred-rendering.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门
 
-## Normal Mapping
+## 法线贴图（Normal Mapping）
 
 <p align="center">
 <img src="../resources/images/M4eHo9I.gif" alt="Normal Mapping" title="Normal Mapping">
 </p>
 
-Normal mapping allows you to add surface details without adding any geometry.
-Typically, in a modeling program like Blender, you create a high poly and a low poly version of your mesh.
-You take the vertex normals from the high poly mesh and bake them into a texture.
-This texture is the normal map.
-Then inside the fragment shader, you replace the low poly mesh's vertex normals with the
-high poly mesh's normals you baked into the normal map.
-Now when you light your mesh, it will appear to have more polygons than it really has.
-This will keep your FPS high while at the same time retain most of the details from the high poly version.
+法线贴图允许你在不增加几何体的情况下添加表面细节。  
+通常，你会在建模软件（如 Blender）中创建一个高模和一个低模版本的网格，  
+然后将高模的顶点法线烘焙到一张纹理中，这张纹理就是法线贴图。  
+在片元着色器中，你用这张法线贴图中的法线替代低模顶点的原始法线。  
+这样，当你对网格进行光照计算时，低模看起来就像是高模一样细致，  
+从而在保持高帧率的同时，呈现出高模的细节。
 
 <p align="center">
 <img src="../resources/images/nSY9AW4.gif" alt="From high to low poly with normal mapping." title="From high to low poly with normal mapping.">
 </p>
 
-Here you see the progression from the high poly model to the low poly model to the low poly model with the normal map applied.
+如图所示，这是从高模到低模，再到使用法线贴图的低模的渐进演示。
 
 <p align="center">
 <img src="../resources/images/jvkRPE7.gif" alt="Normal Map Illusion" title="Normal Map Illusion">
 </p>
 
-Keep in mind though, normal mapping is only an illusion.
-After a certain angle, the surface will look flat again.
+需要注意的是，法线贴图只是视觉上的假象。  
+从某些角度观察时，表面仍然会显得平坦。
 
-### Vertex
+### 顶点着色器
 
 ```c
 // ...
@@ -59,22 +57,17 @@ in vec3 p3d_Tangent;
   // ...
 ```
 
-Starting in the vertex shader,
-you'll need to output to the fragment shader the normal vector, binormal vector, and the tangent vector.
-These vectors are used, in the fragment shader, to transform the normal map normal from tangent space to view space.
+从顶点着色器开始，  
+你需要将法线向量、切线向量（tangent）和副切线向量（binormal）传递到片元着色器。  
+这些向量用于将法线贴图中的法线从切线空间（tangent space）变换到视图空间。
 
-`p3d_NormalMatrix` transforms the vertex normal, binormal, and tangent vectors to view space.
-Remember that in view space, all of the coordinates are relative to the camera's position.
+`p3d_NormalMatrix` 是用于将法线相关向量变换到视图空间的矩阵。  
+视图空间下的坐标都是相对于摄像机的位置。
 
-<blockquote>
-[p3d_NormalMatrix] is the upper 3x3 of the inverse transpose of the ModelViewMatrix.
-It is used to transform the normal vector into view-space coordinates.
-<br>
-<br>
-<footer>
-<a href="http://www.panda3d.org/manual/?title=List_of_GLSL_Shader_Inputs">Source</a>
-</footer>
-</blockquote>
+> `p3d_NormalMatrix` 是 `ModelViewMatrix` 的逆转置矩阵的前 3×3 部分，  
+> 用于将法线向量变换到视图空间。  
+>  
+> — [来源](http://www.panda3d.org/manual/?title=List_of_GLSL_Shader_Inputs)
 
 ```c
 // ...
@@ -96,13 +89,12 @@ out vec2 normalCoord;
 <img src="../resources/images/tLIA6Hu.gif" alt="Normal Maps" title="Normal Maps">
 </p>
 
-You'll also need to output, to the fragment shader, the UV coordinates for the normal map.
+你还需要将用于采样法线贴图的 UV 坐标传给片元着色器。
 
-### Fragment
+### 片元着色器
 
-Recall that the vertex normal was used to calculate the lighting.
-However, the normal map provides us with different normals to use when calculating the lighting.
-In the fragment shader, you need to swap out the vertex normals for the normals found in the normal map.
+记住，我们之前是使用顶点法线来进行光照计算的。  
+但现在有了法线贴图，我们将使用它提供的法线来替代原始的顶点法线。
 
 ```c
 // ...
@@ -121,7 +113,7 @@ in vec2 normalCoord;
   // ...
 ```
 
-Using the normal map coordinates the vertex shader sent, pull out the normal from the normal map.
+使用从顶点着色器传来的 UV 坐标，从法线贴图中采样法线。
 
 ```c
   // ...
@@ -141,8 +133,10 @@ Using the normal map coordinates the vertex shader sent, pull out the normal fro
     // ...
 ```
 
-Earlier I showed how the normals are mapped to colors to create the normal map.
-Now this process needs to be reversed so you can get back the original normals that were baked into the map.
+正如我们之前介绍的，法线贴图中将 `(x, y, z)` 映射为颜色 `(r, g, b)`，  
+这里要做的就是反过来，将颜色值还原为原始法线向量。
+
+公式如下：
 
 ```c
 (r, g, b) =
@@ -153,7 +147,7 @@ Now this process needs to be reversed so you can get back the original normals t
     (x, y, z)
 ```
 
-Here's the process for unpacking the normals from the normal map.
+这是从颜色空间解包回法线向量的过程。
 
 ```c
     // ...
@@ -172,26 +166,25 @@ Here's the process for unpacking the normals from the normal map.
     // ...
 ```
 
-The normals you get back from the normal map are typically in tangent space.
-They could be in another space, however.
-For example, Blender allows you to bake the normals in tangent, object, world, or camera space.
+通常，法线贴图中存储的法线是切线空间的法线。  
+当然，也有例外，比如 Blender 支持烘焙为切线空间、物体空间、世界空间或摄像机空间。
 
 <p align="center">
 <img src="../resources/images/EzHJPd4.gif" alt="Replacing the vertex normals with the normal map normals." title="Replacing the vertex normals with the normal map normals.">
 </p>
 
-To take the normal map normal from tangent space to view pace,
-construct a three by three matrix using the tangent, binormal, and vertex normal vectors.
-Multiply the normal by this matrix and be sure to normalize it.
+要将切线空间的法线变换到视图空间，  
+你需要用切线、binormal 和顶点法线构建一个 3×3 的变换矩阵。  
+将法线向量乘以这个矩阵并归一化即可。
 
-At this point, you're done.
-The rest of the lighting calculations are the same.
+至此替代法线就完成了，  
+后续的光照计算保持不变即可。
 
-### Source
+### 源码文件
 
-- [main.cxx](../demonstration/src/main.cxx)
-- [base.vert](../demonstration/shaders/vertex/base.vert)
-- [base.frag](../demonstration/shaders/fragment/base.frag)
+- [main.cxx](../demonstration/src/main.cxx)  
+- [base.vert](../demonstration/shaders/vertex/base.vert)  
+- [base.frag](../demonstration/shaders/fragment/base.frag)  
 
 ## Copyright
 

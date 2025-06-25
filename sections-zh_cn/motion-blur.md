@@ -4,24 +4,24 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](chromatic-aberration.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门
 
-## Motion Blur
+## 运动模糊（Motion Blur）
 
 <p align="center">
 <img src="../resources/images/eTnhpLr.gif" alt="Motion Blur" title="Motion Blur">
 </p>
 
-To really sell the illusion of speed, you can do no better than motion blur.
-From high speed car chases to moving at warp speed,
-motion blur greatly improves the look and feel of fast moving objects.
+为了更好地营造速度感，运动模糊是极佳的选择。  
+无论是高速追车，还是以光速穿梭，  
+运动模糊都能极大提升快速移动物体的观感与真实感。
 
-There are a few ways to implement motion blur as a screen space technique.
-The less involved implementation will only blur the scene in relation to the camera's movements
-while the more involved version will blur any moving objects even with the camera remaining still.
-The less involved technique is described below but the principle is the same.
+作为屏幕空间技术，有几种实现运动模糊的方法。  
+一种较简单的方法是仅根据相机的移动模糊整个场景；  
+更复杂的方法是，即使相机保持不动，也能模糊场景中移动的物体。  
+下面介绍的是较简单的方法，但其原理是通用的。
 
-### Textures
+### 纹理输入
 
 ```c
 uniform sampler2D positionTexture;
@@ -30,10 +30,12 @@ uniform sampler2D colorTexture;
 // ...
 ```
 
-The input textures needed are the vertex positions in view space and the scene's colors.
-Refer back to [SSAO](ssao.md#vertex-positions) for acquiring the vertex positions.
+所需输入的纹理包括：  
+- 顶点在视图空间中的位置（positionTexture）  
+- 场景颜色（colorTexture）  
+关于如何获取视图空间的顶点位置，可参考 [SSAO](ssao.md#vertex-positions)。
 
-### Matrices
+### 矩阵输入
 
 ```c
 // ...
@@ -45,13 +47,13 @@ uniform mat4 lensProjection;
 // ...
 ```
 
-The motion blur technique determines the blur direction by comparing
-the previous frame's vertex positions with the current frame's vertex positions.
-To do this, you'll need the previous frame's view-to-world matrix,
-the current frame's world-to-view matrix,
-and the camera lens' projection matrix.
+运动模糊通过比较当前帧与上一帧的顶点位置来确定模糊方向。  
+你需要以下矩阵：  
+- 上一帧的视图转世界矩阵（previousViewWorldMat）  
+- 当前帧的世界转视图矩阵（worldViewMat）  
+- 摄像机透视投影矩阵（lensProjection）
 
-### Parameters
+### 参数设置
 
 ```c
 // ...
@@ -67,13 +69,11 @@ void main() {
 // ...
 ```
 
-The adjustable parameters are `size` and `separation`.
-`size` controls how many samples are taken along the blur direction.
-Increasing `size` increases the amount of blur at the cost of performance.
-`separation` controls how spread out the samples are along the blur direction.
-Increasing `separation` increases the amount of blur at the cost of accuracy.
+可调参数包括 `size` 和 `separation`：  
+- `size` 控制在模糊方向上采样的次数，数值越大模糊越强，但性能开销越高  
+- `separation` 控制每次采样之间的间距，越大模糊越重，但准确度可能下降
 
-### Blur Direction
+### 模糊方向计算
 
 ```c
   // ...
@@ -87,15 +87,12 @@ Increasing `separation` increases the amount of blur at the cost of accuracy.
   // ...
 ```
 
-To determine which way to blur this fragment,
-you'll need to know where things were last frame and where things are this frame.
-To figure out where things are now,
-sample the current vertex position.
-To figure out where things were last frame,
-transform the current position from view space to world space,
-using the previous frame's view-to-world matrix,
-and then transform it back to view space from world space using this frame's world-to-view matrix.
-This transformed position is this fragment's previous interpolated vertex position.
+要确定该片元的模糊方向，  
+需知道它在上一帧的位置以及当前帧的位置。  
+- 当前帧的位置通过采样 `positionTexture` 获取  
+- 上一帧的位置通过变换 `position1`：  
+  - 首先用上一帧的 view-to-world 矩阵将其变换为世界空间  
+  - 然后用当前帧的 world-to-view 矩阵将其变换回视图空间
 
 <p align="center">
 <img src="../resources/images/oQqdxM9.gif" alt="Position Projection" title="Position Projection">
@@ -115,10 +112,8 @@ This transformed position is this fragment's previous interpolated vertex positi
   // ...
 ```
 
-Now that you have the current and previous positions,
-transform them to screen space.
-With the positions in screen space,
-you can trace out the 2D direction you'll need to blur the onscreen image.
+获得当前与上一帧的位置后，将它们变换到屏幕空间。  
+在屏幕空间中，便可以计算出需要沿哪个 2D 方向模糊图像。
 
 ```c
   // ...
@@ -131,9 +126,10 @@ you can trace out the 2D direction you'll need to blur the onscreen image.
   // ...
 ```
 
-The blur direction goes from the previous position to the current position.
+模糊方向是从上一帧的位置指向当前帧的位置的向量。  
+若方向为零（没有移动），就无需模糊。
 
-### Blurring
+### 执行模糊
 
 ```c
   // ...
@@ -143,8 +139,8 @@ The blur direction goes from the previous position to the current position.
   // ...
 ```
 
-Sample the current fragment's color.
-This will be the first of the colors blurred together.
+首先采样当前片元颜色，  
+这是第一个参与混合的颜色。
 
 ```c
   // ...
@@ -154,7 +150,7 @@ This will be the first of the colors blurred together.
   // ...
 ```
 
-Multiply the direction vector by the separation.
+将模糊方向乘以 separation 参数，控制采样间隔。
 
 ```c
   // ...
@@ -165,9 +161,9 @@ Multiply the direction vector by the separation.
   // ...
 ```
 
-For a more seamless blur,
-sample in the direction of the blur and in the opposite direction of the blur.
-For now, set the two vectors to the fragment's UV coordinate.
+为了更平滑的模糊效果，  
+在模糊方向和其反方向上同时采样。  
+初始时，两者都设置为当前片元的纹理坐标。
 
 ```c
   // ...
@@ -177,8 +173,8 @@ For now, set the two vectors to the fragment's UV coordinate.
   // ...
 ```
 
-`count` is used to average all of the samples taken.
-It starts at one since you've already sampled the current fragment's color.
+`count` 用于计算平均值，  
+初始值为1，因为已经采样了当前片元的颜色。
 
 ```c
   // ...
@@ -204,8 +200,8 @@ It starts at one since you've already sampled the current fragment's color.
   // ...
 ```
 
-Sample the screen's colors both in the forward and backward direction of the blur.
-Be sure to add these samples together as you travel along.
+沿模糊方向和反方向逐步采样屏幕颜色，  
+并将它们加和。
 
 ```c
   // ...
@@ -214,14 +210,14 @@ Be sure to add these samples together as you travel along.
 }
 ```
 
-The final fragment color is the average color of the samples taken.
+最终将采样结果平均，作为输出的颜色。
 
-### Source
+### 源码文件
 
-- [main.cxx](../demonstration/src/main.cxx)
-- [basic.vert](../demonstration/shaders/vertex/basic.vert)
-- [position.frag](../demonstration/shaders/fragment/position.frag)
-- [motion-blur.frag](../demonstration/shaders/fragment/motion-blur.frag)
+- [main.cxx](../demonstration/src/main.cxx)  
+- [basic.vert](../demonstration/shaders/vertex/basic.vert)  
+- [position.frag](../demonstration/shaders/fragment/position.frag)  
+- [motion-blur.frag](../demonstration/shaders/fragment/motion-blur.frag)  
 
 ## Copyright
 
