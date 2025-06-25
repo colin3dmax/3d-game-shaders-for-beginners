@@ -3,7 +3,8 @@
 [:arrow_up_small:](#)
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](bloom.md)
-# 3D Game Shaders For Beginners
+
+# 3D 游戏着色器入门教程教程
 
 ## 模糊（Blur）
 

@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](chromatic-aberration.md)
 
-# 3D 游戏着色器入门
+# 3D 游戏着色器入门教程
 
 ## 运动模糊（Motion Blur）
 

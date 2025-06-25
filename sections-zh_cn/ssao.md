@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](motion-blur.md)
 
-# 3D游戏着色器入门
+# 3D 游戏着色器入门教程
 
 ## 屏幕空间环境光遮蔽（SSAO）
 

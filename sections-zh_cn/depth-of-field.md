@@ -3,7 +3,8 @@
 [:arrow_up_small:](#)
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](posterization.md)
-# 3D 游戏着色器入门
+
+# 3D 游戏着色器入门教程
 
 ## 景深（Depth Of Field）
 

@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](foam.md)
 
-# 3D 游戏着色器入门
+# 3D 游戏着色器入门教程
 
 ## 屏幕空间折射 (SSR)
 

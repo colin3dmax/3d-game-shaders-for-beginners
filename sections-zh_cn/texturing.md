@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](lighting.md)
 
-# 3D游戏着色器入门
+# 3D 游戏着色器入门教程
 
 ## 贴图（Texturing）
 

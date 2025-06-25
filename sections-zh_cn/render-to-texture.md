@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](texturing.md)
 
-# 3D游戏着色器入门
+# 3D 游戏着色器入门教程
 
 ## 渲染到纹理（Render To Texture）
 

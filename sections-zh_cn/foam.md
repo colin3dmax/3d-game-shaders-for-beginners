@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](flow-mapping.md)
 
-# 3D 游戏着色器入门
+# 3D 游戏着色器入门教程
 
 ## 泡沫（Foam）
 

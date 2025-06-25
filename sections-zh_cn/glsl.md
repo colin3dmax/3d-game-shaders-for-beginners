@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](render-to-texture.md)
 
-# 3D 游戏着色器入门指南
+# 3D 游戏着色器入门教程指南
 
 ## GLSL
 

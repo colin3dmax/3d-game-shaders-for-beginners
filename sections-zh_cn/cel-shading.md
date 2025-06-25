@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](normal-mapping.md)
 
-# 3D游戏着色器入门
+# 3D 游戏着色器入门教程教程
 
 ## 卡通渲染（Cel Shading）
 

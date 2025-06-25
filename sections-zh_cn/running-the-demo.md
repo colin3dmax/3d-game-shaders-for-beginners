@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](reference-frames.md)
 
-# 3D 游戏着色器入门教程
+# 3D 游戏着色器入门教程教程
 
 ## 运行演示程序
 

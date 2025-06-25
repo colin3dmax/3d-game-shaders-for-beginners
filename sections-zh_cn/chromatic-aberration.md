@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](screen-space-reflection.md)
 
-# 3D 游戏着色器入门教程
+# 3D 游戏着色器入门教程教程
 
 ## 色差（Chromatic Aberration）
 

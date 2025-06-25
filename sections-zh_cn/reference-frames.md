@@ -3,7 +3,8 @@
 [:arrow_up_small:](#)
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](glsl.md)
-# 3D 游戏着色器入门教程
+
+# 3D 游戏着色器入门教程教程
 
 ## 参考坐标系
 

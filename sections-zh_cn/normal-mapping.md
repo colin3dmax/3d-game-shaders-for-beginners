@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](deferred-rendering.md)
 
-# 3D 游戏着色器入门
+# 3D 游戏着色器入门教程
 
 ## 法线贴图（Normal Mapping）
 

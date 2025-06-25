@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](blinn-phong.md)
 
-# 3D游戏着色器入门
+# 3D 游戏着色器入门教程
 
 ## 光照
 

@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](running-the-demo.md)
 
-# 3D 游戏着色器入门教程
+# 3D 游戏着色器入门教程教程
 
 ## 构建演示程序
 
