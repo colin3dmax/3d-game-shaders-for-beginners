@@ -105,109 +105,101 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="building-the-demo.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="setup">Setup</h2>
+<h1 id="3d游戏着色器入门">3D游戏着色器入门</h1>
+<h2 id="环境搭建">环境搭建</h2>
 <p align="center">
-<img src="../resources/images/fYpIWNk.gif" alt="Setup" title="Setup">
+<img src="../resources/images/fYpIWNk.gif" alt="环境搭建" title="环境搭建">
 </p>
 
-<p>Below is the setup used to develop and test the example code.</p>
-<h3 id="environment">Environment</h3>
-<p>The example code was developed and tested using the following
-environment.</p>
+<p>以下是用于开发和测试示例代码的环境配置。</p>
+<h3 id="开发环境">开发环境</h3>
+<p>示例代码是在以下环境中开发和测试的：</p>
 <ul>
 <li>Linux manjaro 5.10.42-1-MANJARO</li>
-<li>OpenGL renderer string: GeForce GTX 970/PCIe/SSE2</li>
-<li>OpenGL version string: 4.6.0 NVIDIA 465.31</li>
+<li>OpenGL 渲染器字符串：GeForce GTX 970/PCIe/SSE2</li>
+<li>OpenGL 版本字符串：4.6.0 NVIDIA 465.31</li>
 <li>g++ (GCC) 11.1.0</li>
 <li>Panda3D 1.10.9</li>
 </ul>
-<h3 id="materials">Materials</h3>
-<p>Each <a href="https://blender.org">Blender</a> material used to build
-<code>mill-scene.egg</code> has five textures in the following
-order.</p>
+<h3 id="材质">材质</h3>
+<p>每个用于构建 <code>mill-scene.egg</code> 的 <a
+href="https://blender.org">Blender</a>
+材质都有如下五种纹理，顺序如下：</p>
 <ul>
-<li>Diffuse</li>
-<li>Normal</li>
-<li>Specular</li>
-<li>Reflection</li>
-<li>Refraction</li>
+<li>Diffuse（漫反射）</li>
+<li>Normal（法线）</li>
+<li>Specular（镜面高光）</li>
+<li>Reflection（反射）</li>
+<li>Refraction（折射）</li>
 </ul>
-<p>By having the same maps in the same positions for all models, the
-shaders can be generalized, reducing the need to duplicate code.</p>
-<p>If an object uses its vertex normals, a "flat blue" normal map is
-used.</p>
+<p>所有模型都在相同位置使用相同类型的贴图，这样就可以使着色器通用化，从而减少重复编写代码的需求。</p>
+<p>如果某个物体使用的是其自身的顶点法线，则会使用一张“纯蓝色”的法线贴图。</p>
 <p align="center">
-<img src="../resources/images/tFmKgoH.png" alt="A flat normal map." title="A flat normal map.">
+<img src="../resources/images/tFmKgoH.png" alt="平面法线贴图" title="平面法线贴图">
 </p>
 
-<p>Here is an example of a flat normal map. The only color it contains
-is flat blue <code>(red = 128, green = 128, blue = 255)</code>. This
-color represents a unit (length one) normal pointing in the positive
-z-axis <code>(0, 0, 1)</code>.</p>
+<p>上图是一个平面法线贴图的示例。 它只包含一种颜色——纯蓝色
+<code>(red = 128, green = 128, blue = 255)</code>。
+这种颜色表示的是一个单位法线，方向为正 z 轴 <code>(0, 0, 1)</code>。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">)</span> <span class="op">=</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span> round<span class="op">((</span><span class="dv">0</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="dv">255</span><span class="op">)</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">,</span> round<span class="op">((</span><span class="dv">0</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="dv">255</span><span class="op">)</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">,</span> round<span class="op">((</span><span class="dv">1</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="dv">255</span><span class="op">)</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span> <span class="op">=</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span><span class="dv">128</span><span class="op">,</span> <span class="dv">128</span><span class="op">,</span> <span class="dv">255</span><span class="op">)</span> <span class="op">=</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">(</span> round<span class="op">(</span><span class="dv">128</span> <span class="op">/</span> <span class="dv">255</span> <span class="op">*</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span><span class="op">)</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">,</span> round<span class="op">(</span><span class="dv">128</span> <span class="op">/</span> <span class="dv">255</span> <span class="op">*</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span><span class="op">)</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">,</span> round<span class="op">(</span><span class="dv">255</span> <span class="op">/</span> <span class="dv">255</span> <span class="op">*</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span><span class="op">)</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>      <span class="op">)</span> <span class="op">=</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">)</span></span></code></pre></div>
-<p>Here you see the unit normal <code>(0, 0, 1)</code> converted to flat
-blue <code>(128, 128, 255)</code> and flat blue converted to the unit
-normal. You'll learn more about this in the <a
-href="normal-mapping.html">normal mapping</a> technique.</p>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">(</span> round<span class="op">((</span><span class="dv">0</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="dv">255</span><span class="op">)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="op">,</span> round<span class="op">((</span><span class="dv">0</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="dv">255</span><span class="op">)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">,</span> round<span class="op">((</span><span class="dv">1</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="dv">255</span><span class="op">)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">)</span> <span class="op">=</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="dv">128</span><span class="op">,</span> <span class="dv">128</span><span class="op">,</span> <span class="dv">255</span><span class="op">)</span> <span class="op">=</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="op">(</span> round<span class="op">(</span><span class="dv">128</span> <span class="op">/</span> <span class="dv">255</span> <span class="op">*</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span><span class="op">)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="op">,</span> round<span class="op">(</span><span class="dv">128</span> <span class="op">/</span> <span class="dv">255</span> <span class="op">*</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span><span class="op">)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="op">,</span> round<span class="op">(</span><span class="dv">255</span> <span class="op">/</span> <span class="dv">255</span> <span class="op">*</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span><span class="op">)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="op">)</span> <span class="op">=</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">)</span></span></code></pre></div>
+<p>这里你可以看到单位法线 <code>(0, 0, 1)</code> 是如何转换为纯蓝色
+<code>(128, 128, 255)</code> 的， 以及纯蓝色又是如何还原回单位法线的。
+你将在 <a href="normal-mapping.html">法线贴图</a>
+技术中深入学习这一过程。</p>
 <p align="center">
-<img src="../resources/images/R9FgZKx.png" alt="Specular Map" title="Specular Map">
+<img src="../resources/images/R9FgZKx.png" alt="高光贴图" title="高光贴图">
 </p>
 
-<p>Up above is one of the specular maps used. The red and blue channel
-work to control the amount of specular reflection seen based on the
-camera angle. The green channel controls the shininess factor. You'll
-learn more about this in the <a href="lighting.html">lighting</a> and <a
-href="fresnel-factor.html">fresnel factor</a> sections.</p>
-<p>The reflection and refraction textures mask off the objects that are
-either reflective, refractive, or both. For the reflection texture, the
-red channel controls the amount of reflection and the green channel
-controls how clear or blurry the reflection is.</p>
+<p>上图是其中一张使用的高光贴图。
+红色和蓝色通道会根据相机角度控制镜面反射的强度。
+绿色通道控制镜面的光滑度（高光锐利度）。 你将在 <a
+href="lighting.html">光照</a> 和 <a
+href="fresnel-factor.html">菲涅尔因子</a> 章节中进一步了解这部分内容。</p>
+<p>反射和折射贴图则用于遮罩出物体是否具备反射性、折射性或两者兼有。
+对于反射贴图，红色通道控制反射的强度，绿色通道控制反射的清晰度或模糊度。</p>
 <h3 id="panda3d">Panda3D</h3>
-<p>The example code uses <a href="https://www.panda3d.org/">Panda3D</a>
-as the glue between the shaders. This has no real influence over the
-techniques described, meaning you'll be able to take what you learn here
-and apply it to your stack or game engine of choice. Panda3D does
-provide some conveniences. I have pointed these out so you can either
-find an equivalent convenience provided by your stack or replicate it
-yourself, if your stack doesn't provide something equivalent.</p>
-<p>Three Panda3D configurations were changed for the purposes of the
-demo program. You can find these in <a
-href="../demonstration/config.prc">config.prc</a>. The configurations
-changed were <code>gl-coordinate-system default</code>,
-<code>textures-power-2 down</code>, and
-<code>textures-auto-power-2 1</code>. Refer to the <a
-href="http://www.panda3d.org/manual/?title=Configuring_Panda3D">Panda3D
-configuration</a> page in the manual for more details.</p>
-<p>Panda3D defaults to a z-up, right-handed coordinate system while
-OpenGL uses a y-up, right-handed system.
-<code>gl-coordinate-system default</code> keeps you from having to
-translate between the two inside your shaders.
-<code>textures-auto-power-2 1</code> allows us to use texture sizes that
-are not a power of two if the system supports it. This comes in handy
-when doing SSAO and other screen/window sized related techniques since
-the screen/window size is usually not a power of two.
-<code>textures-power-2 down</code> downsizes our textures to a power of
-two if the system only supports texture sizes being a power of two.</p>
-<h2 id="copyright">Copyright</h2>
+<p>示例代码使用了 <a href="https://www.panda3d.org/">Panda3D</a>
+作为连接着色器之间的“胶水”。 这对本文所介绍的技术本身没有直接影响，
+因此你可以将这里学到的知识应用到你所使用的任意引擎或技术栈中。</p>
+<p>Panda3D 确实提供了一些便利功能。 我会指出这些部分，
+以便你能在自己的技术栈中找到等效功能， 或者在没有的情况下自行实现。</p>
+<p>为了演示程序，Panda3D 的三个配置项被修改。 它们位于 <a
+href="../demonstration/config.prc">config.prc</a> 文件中。
+被修改的配置项如下：</p>
+<ul>
+<li><code>gl-coordinate-system default</code></li>
+<li><code>textures-power-2 down</code></li>
+<li><code>textures-auto-power-2 1</code></li>
+</ul>
+<p>关于详细说明，你可以参考 Panda3D 手册中的 <a
+href="http://www.panda3d.org/manual/?title=Configuring_Panda3D">配置说明页面</a>。</p>
+<p>Panda3D 默认使用 z 轴朝上的右手坐标系，而 OpenGL 使用的是 y
+轴朝上的右手坐标系。 <code>gl-coordinate-system default</code>
+设置可以避免你在着色器中手动进行坐标系转换。</p>
+<p><code>textures-auto-power-2 1</code> 表示在系统支持的情况下允许使用非
+2 的幂次方大小的纹理。 这对于 SSAO
+以及其他需要依赖屏幕/窗口尺寸的技术非常实用， 因为实际屏幕尺寸往往不是 2
+的幂次方。</p>
+<p><code>textures-power-2 down</code> 会在系统仅支持 2
+的幂次方纹理尺寸时，自动将纹理尺寸向下缩放为最近的 2 的幂。</p>
+<h2 id="版权声明">版权声明</h2>
 <p>(C) 2019 David Lettier <br> <a
 href="https://www.lettier.com">lettier.com</a></p>
 <p><a href="gamma-correction.html"><span class="emoji"
 data-emoji="arrow_backward">◀️</span></a> <a href="../README.md"><span
 class="emoji" data-emoji="arrow_double_up">⏫</span></a> <a
 href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
-<a href="#copyright"><span class="emoji"
+<a href="#版权声明"><span class="emoji"
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="building-the-demo.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>

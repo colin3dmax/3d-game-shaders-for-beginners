@@ -105,33 +105,30 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="running-the-demo.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="building-the-demo">Building The Demo</h2>
+<h1 id="3d-游戏着色器入门教程">3D 游戏着色器入门教程</h1>
+<h2 id="构建演示程序">构建演示程序</h2>
 <p align="center">
-<img src="../resources/images/PQcDnIu.gif" alt="Building The Demo" title="Building The Demo">
+<img src="../resources/images/PQcDnIu.gif" alt="构建演示程序" title="构建演示程序">
 </p>
 
-<p>Before you can try out the demo program, you'll have to build the
-example code first.</p>
-<h3 id="dependencies">Dependencies</h3>
-<p>Before you can compile the example code, you'll need to install <a
-href="https://www.panda3d.org/">Panda3D</a> for your platform. Panda3D
-is available for Linux, Mac, and Windows.</p>
+<p>在你尝试运行演示程序之前，需要先编译示例代码。</p>
+<h3 id="依赖项">依赖项</h3>
+<p>在你编译示例代码之前，需要先为你的平台安装<br />
+<a href="https://www.panda3d.org/">Panda3D</a>。<br />
+Panda3D 支持 Linux、Mac 和 Windows 平台。</p>
 <h3 id="linux">Linux</h3>
-<p>Start by <a
-href="https://www.panda3d.org/manual/?title=Installing_Panda3D_in_Linux">installing</a>
-the <a href="https://www.panda3d.org/download/sdk-1-10-9/">Panda3D
-SDK</a> for your distribution.</p>
-<p>Make sure to locate where the Panda3D headers and libraries are. The
-headers and libraries are most likely in
-<code>/usr/include/panda3d/</code> and <code>/usr/lib/panda3d/</code>
-respectively.</p>
-<p>Next clone this repository and change directory into it.</p>
+<p>首先，为你的发行版<a
+href="https://www.panda3d.org/manual/?title=Installing_Panda3D_in_Linux">安装</a><br />
+<a href="https://www.panda3d.org/download/sdk-1-10-9/">Panda3D
+SDK</a>。</p>
+<p>确保找到 Panda3D 的头文件和库文件路径。<br />
+头文件和库文件通常分别位于 <code>/usr/include/panda3d/</code> 和
+<code>/usr/lib/panda3d/</code>。</p>
+<p>接下来，克隆该代码仓库并切换到示例目录下：</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/lettier/3d-game-shaders-for-beginners.git</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> 3d-game-shaders-for-beginners/demonstration</span></code></pre></div>
-<p>Now compile the source code into an object file.</p>
+<p>现在将源代码编译为目标文件：</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">g++</span> <span class="dt">\</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-c</span> src/main.cxx <span class="dt">\</span></span>
@@ -140,8 +137,7 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-O2</span> <span class="dt">\</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-I</span>/path/to/python/include/ <span class="dt">\</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-I</span>/path/to/panda3d/include/</span></code></pre></div>
-<p>With the object file created, create the executable by linking the
-object file to its dependencies.</p>
+<p>完成目标文件编译后，通过链接依赖项生成可执行文件：</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">g++</span> <span class="dt">\</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  3d-game-shaders-for-beginners.o <span class="dt">\</span></span>
@@ -155,20 +151,20 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">-lp3dtoolconfig</span> <span class="dt">\</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">-lp3dtool</span> <span class="dt">\</span></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">-lpthread</span></span></code></pre></div>
-<p>For more help, see the <a
+<p>有关更多帮助，请参阅 <a
 href="https://www.panda3d.org/manual/?title=How_to_compile_a_C++_Panda3D_program_on_Linux">Panda3D
-manual</a>.</p>
+手册</a>。</p>
 <h3 id="mac">Mac</h3>
-<p>Start by installing the <a
-href="https://www.panda3d.org/download/sdk-1-10-9/">Panda3D SDK</a> for
-Mac.</p>
-<p>Make sure to locate where the Panda3D headers and libraries are.</p>
-<p>Next clone this repository and change directory into it.</p>
+<p>首先为 Mac 安装 <a
+href="https://www.panda3d.org/download/sdk-1-10-9/">Panda3D
+SDK</a>。</p>
+<p>确保找到 Panda3D 的头文件和库文件路径。</p>
+<p>接下来，克隆代码仓库并切换目录：</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/lettier/3d-game-shaders-for-beginners.git</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> 3d-game-shaders-for-beginners</span></code></pre></div>
-<p>Now compile the source code into an object file. You'll have to find
-where the Python 2.7 and Panda3D include directories are.</p>
+<p>然后将源代码编译为目标文件。 你需要找到 Python 2.7 和 Panda3D
+的头文件路径：</p>
 <div class="sourceCode" id="cb5"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">clang</span>++ <span class="dt">\</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-c</span> main.cxx <span class="dt">\</span></span>
@@ -178,9 +174,8 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-O2</span> <span class="dt">\</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-I</span>/path/to/python/include/ <span class="dt">\</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-I</span>/path/to/panda3d/include/</span></code></pre></div>
-<p>With the object file created, create the executable by linking the
-object file to its dependencies. You'll need to track down where the
-Panda3D libraries are located.</p>
+<p>创建目标文件后，通过链接依赖项生成可执行文件。 你需要定位 Panda3D
+的库文件位置：</p>
 <div class="sourceCode" id="cb6"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">clang</span>++ <span class="dt">\</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  3d-game-shaders-for-beginners.o <span class="dt">\</span></span>
@@ -194,22 +189,22 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">-lp3dtoolconfig</span> <span class="dt">\</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">-lp3dtool</span> <span class="dt">\</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">-lpthread</span></span></code></pre></div>
-<p>For more help, see the <a
+<p>有关更多帮助，请参阅 <a
 href="https://www.panda3d.org/manual/?title=How_to_compile_a_C++_Panda3D_program_on_macOS">Panda3D
-manual</a>.</p>
+手册</a>。</p>
 <h3 id="windows">Windows</h3>
-<p>Start by <a
-href="https://www.panda3d.org/manual/?title=Installing_Panda3D_in_Windows">installing</a>
-the <a href="https://www.panda3d.org/download/sdk-1-10-9/">Panda3D
-SDK</a> for Windows.</p>
-<p>Make sure to locate where the Panda3D headers and libraries are.</p>
-<p>Next clone this repository and change directory into it.</p>
+<p>首先为 <a
+href="https://www.panda3d.org/manual/?title=Installing_Panda3D_in_Windows">Windows
+安装</a> <a href="https://www.panda3d.org/download/sdk-1-10-9/">Panda3D
+SDK</a>。</p>
+<p>确保找到 Panda3D 的头文件和库文件路径。</p>
+<p>接下来，克隆该代码仓库并切换目录：</p>
 <div class="sourceCode" id="cb7"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/lettier/3d-game-shaders-for-beginners.git</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> 3d-game-shaders-for-beginners</span></code></pre></div>
-<p>For more help, see the <a
+<p>有关更多帮助，请参阅 <a
 href="https://www.panda3d.org/manual/?title=Running_your_Program&amp;language=cxx">Panda3D
-manual</a>.</p>
+手册</a>。</p>
 <h2 id="copyright">Copyright</h2>
 <p>(C) 2019 David Lettier <br> <a
 href="https://www.lettier.com">lettier.com</a></p>
