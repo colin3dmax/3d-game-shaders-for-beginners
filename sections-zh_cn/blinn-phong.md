@@ -3,20 +3,19 @@
 [:arrow_up_small:](#)
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](fresnel-factor.md)
+# 3D 游戏着色器入门教程
 
-# 3D Game Shaders For Beginners
-
-## Blinn-Phong
+## Blinn-Phong 模型
 
 <p align="center">
 <img src="../resources/images/CFWEeGK.gif" alt="Blinn-Phong" title="Blinn-Phong">
 </p>
 
-Blinn-Phong is a slight adjustment of the Phong model you saw in the [lighting](lighting.md) section.
-It provides more plausible or realistic specular reflections.
-You'll notice that Blinn-Phong produces elliptical or elongated specular reflections
-versus the spherical specular reflections produced by the Phong model.
-In certain cases, Blinn-Phong can be more efficient to calculate than Phong.
+Blinn-Phong 模型是你在 [光照](lighting.md) 一节中看到的 Phong 模型的一个小调整。
+它提供了更可信或更真实的镜面反射效果。
+你会注意到 Blinn-Phong 产生的是椭圆形或拉伸的镜面反射，
+而 Phong 模型产生的是球形的镜面反射。
+在某些情况下，Blinn-Phong 的计算效率也可能高于 Phong。
 
 ```c
   // ...
@@ -28,9 +27,9 @@ In certain cases, Blinn-Phong can be more efficient to calculate than Phong.
   // ...
 ```
 
-Instead of computing the reflection vector,
-compute the halfway or half angle vector.
-This vector is between the view/camera/eye and light direction vector.
+与其计算反射向量，
+不如计算 halfway（半角）向量。
+该向量位于视图/摄像机/观察方向向量和光照方向向量之间。
 
 <p align="center">
 <img src="../resources/images/vtqd1Ox.gif" alt="Blinn-Phong vs Phong" title="Blinn-Phong vs Phong">
@@ -44,25 +43,25 @@ This vector is between the view/camera/eye and light direction vector.
     // ...
 ```
 
-The specular intensity is now the dot product of the normal and halfway vector.
-In the Phong model, it is the dot product of the reflection and view vector.
+镜面强度现在是法线与半角向量的点积。
+而在 Phong 模型中，它是反射向量与视图向量的点积。
 
 <p align="center">
 <img src="../resources/images/WZQqxEH.png" alt="Full specular intensity." title="Full specular intensity.">
 </p>
 
-The half angle vector (magenta arrow) will point in the same direction as the normal (green arrow) when the
-view vector (orange arrow) points in the same direction as the reflection vector (magenta arrow).
-In this case, both the Blinn-Phong and Phong specular intensity will be one.
+当视图向量（橙色箭头）与反射向量（品红色箭头）方向一致时，
+半角向量（品红色箭头）将与法线（绿色箭头）方向一致。
+在这种情况下，Blinn-Phong 和 Phong 的镜面强度都会是 1。
 
 <p align="center">
 <img src="../resources/images/kiSdJzt.png" alt="Blinn-Phong vs Phong" title="Blinn-Phong vs Phong">
 </p>
 
-In other cases, the specular intensity for Blinn-Phong will be greater than zero
-while the specular intensity for Phong will be zero.
+在其他情况下，Blinn-Phong 的镜面强度会大于零，
+而 Phong 的镜面强度则为零。
 
-### Source
+### 源文件
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [base.vert](../demonstration/shaders/vertex/base.vert)

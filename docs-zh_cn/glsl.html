@@ -105,28 +105,26 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="render-to-texture.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
+<h1 id="3d-游戏着色器入门指南">3D 游戏着色器入门指南</h1>
 <h2 id="glsl">GLSL</h2>
 <p align="center">
 <img src="../resources/images/7b5MCBG.gif" alt="" title="">
 </p>
 
-<p>Instead of using the <a
-href="https://en.wikipedia.org/wiki/Fixed-function">fixed-function</a>
-pipeline, you'll be using the programmable GPU rendering pipeline. Since
-it is programmable, it is up to you to supply the programming in the
-form of shaders. A shader is a (typically small) program you write using
-a syntax reminiscent of C. The programmable GPU rendering pipeline has
-various different stages that you can program with shaders. The
-different types of shaders include vertex, tessellation, geometry,
-fragment, and compute. You'll only need to focus on the vertex and
-fragment stages for the techniques below.</p>
+<p>与其使用 <a
+href="https://en.wikipedia.org/wiki/Fixed-function">固定功能</a>
+渲染管线，<br />
+你将使用可编程的 GPU 渲染管线。<br />
+由于它是可编程的，因此你需要以着色器（shader）的形式提供程序逻辑。<br />
+着色器是你用类似 C 语言语法编写的（通常是小型的）程序。<br />
+可编程的 GPU 渲染管线包含多个可由着色器控制的阶段。<br />
+着色器的类型包括：顶点着色器（vertex）、细分着色器（tessellation）、几何着色器（geometry）、片段着色器（fragment）以及计算着色器（compute）。<br />
+在下面的技术中，你只需要关注顶点和片段两个阶段。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#</span><span class="er">version 150</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> main<span class="op">()</span> <span class="op">{}</span></span></code></pre></div>
-<p>Here is a bare-bones GLSL shader consisting of the GLSL version
-number and the main function.</p>
+<p>上面是一个极简的 GLSL 着色器，仅包含版本声明和主函数
+<code>main</code>。</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#</span><span class="er">version 150</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>uniform mat4 p3d_ModelViewProjectionMatrix<span class="op">;</span></span>
@@ -137,18 +135,19 @@ number and the main function.</p>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  gl_Position <span class="op">=</span> p3d_ModelViewProjectionMatrix <span class="op">*</span> p3d_Vertex<span class="op">;</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>Here is a stripped down GLSL vertex shader that transforms an
-incoming vertex to clip space and outputs this new position as the
-vertex's homogeneous position. The <code>main</code> procedure doesn't
-return anything since it is <code>void</code> and the
-<code>gl_Position</code> variable is a built-in output.</p>
-<p>Take note of the keywords <code>uniform</code> and <code>in</code>.
-The <code>uniform</code> keyword means this global variable is the same
-for all vertexes. Panda3D sets the
-<code>p3d_ModelViewProjectionMatrix</code> for you and it is the same
-matrix for each vertex. The <code>in</code> keyword means this global
-variable is being given to the shader. The vertex shader receives each
-vertex that makes up the geometry the vertex shader is attached to.</p>
+<p>这是一个简化版的 GLSL 顶点着色器，它将输入顶点转换为裁剪空间（clip
+space），<br />
+并将新位置作为该顶点的齐次坐标（homogeneous position）输出。<br />
+<code>main</code> 函数返回值为
+<code>void</code>，<code>gl_Position</code> 是一个内建的输出变量。</p>
+<p>请注意关键字 <code>uniform</code> 和 <code>in</code>：</p>
+<ul>
+<li><code>uniform</code> 表示该全局变量对所有顶点是相同的。<br />
+Panda3D 会为你设置
+<code>p3d_ModelViewProjectionMatrix</code>，该矩阵对所有顶点一致。</li>
+<li><code>in</code> 表示该变量是传入给着色器使用的。<br />
+顶点着色器会依次接收组成模型几何体的每一个顶点。</li>
+</ul>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#</span><span class="er">version 150</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>out vec4 fragColor<span class="op">;</span></span>
@@ -156,19 +155,19 @@ vertex that makes up the geometry the vertex shader is attached to.</p>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> main<span class="op">()</span> <span class="op">{</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> vec4<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>Here is a stripped down GLSL fragment shader that outputs the
-fragment color as solid green. Keep in mind that a fragment affects at
-most one screen pixel but a single pixel can be affected by many
-fragments.</p>
-<p>Take note of the <code>out</code> keyword. The <code>out</code>
-keyword means this global variable is being set by the shader. The name
-<code>fragColor</code> is arbitrary so feel free to choose a different
-one.</p>
+<p>这是一个简化的 GLSL 片段着色器（fragment
+shader），它将输出颜色设为纯绿色。<br />
+请记住，一个片段（fragment）最多影响一个屏幕像素，但一个像素可能被多个片段影响。</p>
+<p>注意关键字 <code>out</code>：</p>
+<ul>
+<li><code>out</code> 表示该全局变量是由着色器设置的。</li>
+<li><code>fragColor</code> 是一个自定义的变量名，你可以任意命名。</li>
+</ul>
 <p align="center">
 <img src="../resources/images/V25UzMa.gif" alt="Output of the stripped down shaders." title="Output of the stripped down shaders.">
 </p>
 
-<p>This is the output of the two shaders shown above.</p>
+<p>这是上述两个着色器的输出效果。</p>
 <h2 id="copyright">Copyright</h2>
 <p>(C) 2019 David Lettier <br> <a
 href="https://www.lettier.com">lettier.com</a></p>

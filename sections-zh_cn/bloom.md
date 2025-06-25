@@ -4,16 +4,16 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](ssao.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门
 
-## Bloom
+## Bloom（泛光）
 
 <p align="center">
 <img src="../resources/images/UxKRz2r.gif" alt="Bloom" title="Bloom">
 </p>
 
-Adding bloom to a scene can really sell the illusion of the lighting model.
-Light emitting objects are more believable and specular highlights get an extra dose of shimmer.
+给场景添加泛光效果可以很好地增强光照模型的真实感。
+发光物体显得更加可信，而高光也更具闪耀感。
 
 ```c
   //...
@@ -26,11 +26,11 @@ Light emitting objects are more believable and specular highlights get an extra 
   // ...
 ```
 
-These parameters control the look and feel.
-`size` determines how blurred the effect is.
-`separation` spreads out the blur.
-`threshold` controls which fragments are illuminated.
-And the last parameter, `amount`, controls how much bloom is outputted.
+这些参数控制泛光的外观和感觉。
+`size` 决定模糊的程度。
+`separation` 控制模糊的扩散范围。
+`threshold` 控制哪些片段被认为是发光的。
+最后一个参数 `amount` 控制泛光的强度。
 
 ```c
   // ...
@@ -52,10 +52,10 @@ And the last parameter, `amount`, controls how much bloom is outputted.
   // ...
 ```
 
-The technique starts by looping through a kernel/matrix/window centered over the current fragment.
-This is similar to the window used for [outlining](outlining.md).
-The size of the window is `size * 2 + 1` by `size * 2 + 1`.
-So for example, with a `size` setting of two, the window uses `(2 * 2 + 1)^2 = 25` samples per fragment.
+这个技术从循环一个以当前片段为中心的卷积核（窗口）开始。
+这类似于 [轮廓描边](outlining.md) 中使用的窗口。
+窗口的大小为 `size * 2 + 1` 乘以 `size * 2 + 1`。
+例如，`size = 2` 时，窗口使用 `(2 * 2 + 1)^2 = 25` 个采样。
 
 ```c
       // ...
@@ -78,10 +78,9 @@ So for example, with a `size` setting of two, the window uses `(2 * 2 + 1)^2 = 2
       // ...
 ```
 
-For each iteration,
-it retrieves the color from the input texture and turns the red, green, and blue values into a greyscale value.
-If this greyscale value is less than the threshold, it discards this color by making it solid black.
-After evaluating the sample's greyscale value, it adds its RGB values to `result`.
+每次迭代时，都会从输入纹理中获取颜色，并将其 RGB 值转为灰度值。
+如果灰度值小于阈值 `threshold`，就将该颜色置为黑色。
+然后将该样本的 RGB 值累加到 `result` 中。
 
 ```c
   // ...
@@ -93,22 +92,22 @@ After evaluating the sample's greyscale value, it adds its RGB values to `result
   // ...
 ```
 
-After it's done summing up the samples, it divides the sum of the color samples by the number of samples taken.
-The result is the average color of itself and its neighbors.
-By doing this for every fragment, you end up with a blurred image.
-This form of blurring is known as a [box blur](blur.md#box-blur).
+累加完成后，结果除以采样次数，得到当前片段及其邻域的平均颜色。
+对每个片段执行此操作，最终得到模糊图像。
+这种模糊形式被称为 [盒式模糊](blur.md#box-blur)。
 
 <p align="center">
 <img src="../resources/images/m4yedrM.gif" alt="Bloom progresssion." title="Bloom progresssion.">
 </p>
 
-Here you see the progression of the bloom algorithm.
+上图展示了泛光算法的渐进过程。
 
-### Source
+### 源码
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [basic.vert](../demonstration/shaders/vertex/basic.vert)
 - [bloom.frag](../demonstration/shaders/fragment/outline.frag)
+
 
 ## Copyright
 

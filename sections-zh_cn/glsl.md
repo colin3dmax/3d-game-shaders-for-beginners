@@ -4,7 +4,7 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](render-to-texture.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门指南
 
 ## GLSL
 
@@ -12,15 +12,13 @@
 <img src="../resources/images/7b5MCBG.gif" alt="" title="">
 </p>
 
-Instead of using the
-[fixed-function](https://en.wikipedia.org/wiki/Fixed-function)
-pipeline,
-you'll be using the programmable GPU rendering pipeline.
-Since it is programmable, it is up to you to supply the programming in the form of shaders.
-A shader is a (typically small) program you write using a syntax reminiscent of C.
-The programmable GPU rendering pipeline has various different stages that you can program with shaders.
-The different types of shaders include vertex, tessellation, geometry, fragment, and compute.
-You'll only need to focus on the vertex and fragment stages for the techniques below.
+与其使用 [固定功能](https://en.wikipedia.org/wiki/Fixed-function) 渲染管线，  
+你将使用可编程的 GPU 渲染管线。  
+由于它是可编程的，因此你需要以着色器（shader）的形式提供程序逻辑。  
+着色器是你用类似 C 语言语法编写的（通常是小型的）程序。  
+可编程的 GPU 渲染管线包含多个可由着色器控制的阶段。  
+着色器的类型包括：顶点着色器（vertex）、细分着色器（tessellation）、几何着色器（geometry）、片段着色器（fragment）以及计算着色器（compute）。  
+在下面的技术中，你只需要关注顶点和片段两个阶段。
 
 ```c
 #version 150
@@ -28,7 +26,7 @@ You'll only need to focus on the vertex and fragment stages for the techniques b
 void main() {}
 ```
 
-Here is a bare-bones GLSL shader consisting of the GLSL version number and the main function.
+上面是一个极简的 GLSL 着色器，仅包含版本声明和主函数 `main`。
 
 ```c
 #version 150
@@ -43,15 +41,15 @@ void main()
 }
 ```
 
-Here is a stripped down GLSL vertex shader that transforms an incoming vertex to clip space
-and outputs this new position as the vertex's homogeneous position.
-The `main` procedure doesn't return anything since it is `void` and the `gl_Position` variable is a built-in output.
+这是一个简化版的 GLSL 顶点着色器，它将输入顶点转换为裁剪空间（clip space），  
+并将新位置作为该顶点的齐次坐标（homogeneous position）输出。  
+`main` 函数返回值为 `void`，`gl_Position` 是一个内建的输出变量。
 
-Take note of the keywords `uniform` and `in`.
-The `uniform` keyword means this global variable is the same for all vertexes.
-Panda3D sets the `p3d_ModelViewProjectionMatrix` for you and it is the same matrix for each vertex.
-The `in` keyword means this global variable is being given to the shader.
-The vertex shader receives each vertex that makes up the geometry the vertex shader is attached to.
+请注意关键字 `uniform` 和 `in`：  
+- `uniform` 表示该全局变量对所有顶点是相同的。  
+  Panda3D 会为你设置 `p3d_ModelViewProjectionMatrix`，该矩阵对所有顶点一致。  
+- `in` 表示该变量是传入给着色器使用的。  
+  顶点着色器会依次接收组成模型几何体的每一个顶点。
 
 ```c
 #version 150
@@ -63,18 +61,18 @@ void main() {
 }
 ```
 
-Here is a stripped down GLSL fragment shader that outputs the fragment color as solid green.
-Keep in mind that a fragment affects at most one screen pixel but a single pixel can be affected by many fragments.
+这是一个简化的 GLSL 片段着色器（fragment shader），它将输出颜色设为纯绿色。  
+请记住，一个片段（fragment）最多影响一个屏幕像素，但一个像素可能被多个片段影响。
 
-Take note of the `out` keyword.
-The `out` keyword means this global variable is being set by the shader.
-The name `fragColor` is arbitrary so feel free to choose a different one.
+注意关键字 `out`：  
+- `out` 表示该全局变量是由着色器设置的。  
+- `fragColor` 是一个自定义的变量名，你可以任意命名。
 
 <p align="center">
 <img src="../resources/images/V25UzMa.gif" alt="Output of the stripped down shaders." title="Output of the stripped down shaders.">
 </p>
 
-This is the output of the two shaders shown above.
+这是上述两个着色器的输出效果。
 
 ## Copyright
 

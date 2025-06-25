@@ -4,18 +4,18 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](screen-space-reflection.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门教程
 
-## Chromatic Aberration
+## 色差（Chromatic Aberration）
 
 <p align="center">
 <img src="../resources/images/bawgERm.gif" alt="Chromatic Aberration" title="Chromatic Aberration">
 </p>
 
-Chromatic aberration is a screen space technique that simulates lens distortion.
-Use it to give your scene a cinematic, lo-fi analog feel or to emphasize a chaotic event.
+色差是一种屏幕空间技术，模拟镜头失真效果。
+你可以用它来为场景营造电影感、低保真模拟效果，或者强调混乱的事件。
 
-### Texture
+### 纹理
 
 ```c
 uniform sampler2D colorTexture;
@@ -23,9 +23,9 @@ uniform sampler2D colorTexture;
 // ...
 ```
 
-The input texture needed is the scene's colors captured into a framebuffer texture.
+此处需要的输入纹理是场景颜色被捕获到帧缓冲纹理中。
 
-### Parameters
+### 参数
 
 <p align="center">
 <img src="../resources/images/fNpMaPL.gif" alt="Chromatic Aberration" title="Chromatic Aberration">
@@ -41,11 +41,11 @@ The input texture needed is the scene's colors captured into a framebuffer textu
   // ...
 ```
 
-The adjustable parameters for this technique are the red, green, and blue offsets.
-Feel free to play around with these to get the particular color fringe you're looking for.
-These particular offsets produce a yellowish orange and blue fringe.
+该技术的可调参数是红色、绿色和蓝色的偏移量。
+你可以自由调整它们以获得理想的色彩边缘效果。
+这里的偏移量产生了黄色橙色和蓝色的色彩边缘。
 
-### Direction
+### 方向
 
 ```c
 // ...
@@ -62,11 +62,12 @@ uniform vec2 mouseFocusPoint;
   // ...
 ```
 
-The offsets can occur horizontally, vertically, or radially.
-One approach is to radiate out from the [depth of field](depth-of-field.md) focal point.
-As the scene gets more out of focus, the chromatic aberration increases.
+偏移可以沿水平、垂直或径向方向发生。
+一种思路是从[景深](depth-of-field.md) 的焦点位置向外辐射。
+随着场景越发模糊，色差效果越强。
 
-### Samples
+
+### 采样
 
 ```c
 // ...
@@ -81,11 +82,10 @@ out vec4 fragColor;
 }
 ```
 
-With the direction and offsets,
-make three samples of the scene's colors—one for the red, green, and blue channels.
-These will be the final fragment color.
+基于方向和偏移，分别对场景颜色进行三次采样，分别取红、绿、蓝通道的颜色值。
+这些采样结果组成最终的片元颜色输出。
 
-### Source
+### 源码
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [basic.vert](../demonstration/shaders/vertex/basic.vert)
