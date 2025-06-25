@@ -104,26 +104,23 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 <a href="#copyright"><span class="emoji"
 data-emoji="arrow_down_small">🔽</span></a> <a href="lighting.html"><span
 class="emoji" data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="texturing">Texturing</h2>
+<h1 id="3d游戏着色器入门">3D游戏着色器入门</h1>
+<h2 id="贴图texturing">贴图（Texturing）</h2>
 <p align="center">
-<img src="../resources/images/cqbgT8b.gif" alt="Diffuse Texture Only" title="Diffuse Texture Only">
+<img src="../resources/images/cqbgT8b.gif" alt="仅漫反射贴图" title="仅漫反射贴图">
 </p>
 
-<p>Texturing involves mapping some color or some other kind of vector to
-a fragment using UV coordinates. Both U and V range from zero to one.
-Each vertex gets a UV coordinate and this is outputted in the vertex
-shader.</p>
+<p>贴图就是使用 UV 坐标将某种颜色或其他向量映射到片元上。<br />
+U 和 V 都是在 0 到 1 之间的值。<br />
+每个顶点会有对应的 UV 坐标，这个坐标会在顶点着色器中输出。</p>
 <p align="center">
-<img src="../resources/images/JjAdNfk.png" alt="UV Interpolation" title="UV Interpolation">
+<img src="../resources/images/JjAdNfk.png" alt="UV插值" title="UV插值">
 </p>
 
-<p>The fragment shader receives the UV coordinate interpolated.
-Interpolated meaning the UV coordinate for the fragment is somewhere
-between the UV coordinates for the vertexes that make up the triangle
-face.</p>
-<h3 id="vertex">Vertex</h3>
+<p>片元着色器接收插值后的 UV 坐标。<br />
+插值的意思是，片元的 UV 坐标是在组成该片元的三角形顶点 UV
+坐标之间进行线性插值计算得到的。</p>
+<h3 id="顶点着色器">顶点着色器</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#</span><span class="er">version 150</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>uniform mat4 p3d_ModelViewProjectionMatrix<span class="op">;</span></span>
@@ -140,10 +137,9 @@ face.</p>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  gl_Position <span class="op">=</span> p3d_ModelViewProjectionMatrix <span class="op">*</span> p3d_Vertex<span class="op">;</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>Here you see the vertex shader outputting the texture coordinate to
-the fragment shader. Notice how it's a two dimensional vector. One
-dimension for U and one for V.</p>
-<h3 id="fragment">Fragment</h3>
+<p>这里顶点着色器将纹理坐标输出到片元着色器。<br />
+注意这是二维向量，一维是 U，另一维是 V。</p>
+<h3 id="片元着色器">片元着色器</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#</span><span class="er">version 150</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D p3d_Texture0<span class="op">;</span></span>
@@ -158,9 +154,8 @@ dimension for U and one for V.</p>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> texColor<span class="op">;</span></span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>Here you see the fragment shader looking up the color at its UV
-coordinate and outputting that as the fragment color.</p>
-<h4 id="screen-filled-texture">Screen Filled Texture</h4>
+<p>片元着色器根据 UV 坐标查找纹理颜色，并输出为片元颜色。</p>
+<h4 id="全屏贴图纹理">全屏贴图纹理</h4>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#</span><span class="er">version 150</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D screenSizedTexture<span class="op">;</span></span>
@@ -176,13 +171,13 @@ coordinate and outputting that as the fragment color.</p>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> texColor<span class="op">;</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>When performing render to texture, the mesh is a flat rectangle with
-the same aspect ratio as the screen. Because of this, you can calculate
-the UV coordinates knowing only A) the width and height of the screen
-sized texture being UV mapped to the rectangle and B) the fragment's x
-and y coordinate. To map x to U, divide x by the width of the input
-texture. Similarly, to map y to V, divide y by the height of the input
-texture. You'll see this technique used in the example code.</p>
+<p>在渲染到纹理时，网格是一个与屏幕宽高比相同的平面矩形。<br />
+因此，计算 UV 坐标只需要知道：<br />
+A) 这个屏幕大小的纹理的宽高，<br />
+B) 当前片元的屏幕坐标 x 和 y。</p>
+<p>将 x 除以纹理宽度即可得到 U，<br />
+将 y 除以纹理高度即可得到 V。</p>
+<p>你会在示例代码中见到这种用法。</p>
 <h2 id="copyright">Copyright</h2>
 <p>(C) 2019 David Lettier <br> <a
 href="https://www.lettier.com">lettier.com</a></p>

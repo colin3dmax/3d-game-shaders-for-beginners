@@ -105,81 +105,80 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 <a href="#copyright"><span class="emoji"
 data-emoji="arrow_down_small">🔽</span></a> <a href="foam.html"><span
 class="emoji" data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="screen-space-refraction-ssr">Screen Space Refraction (SSR)</h2>
+<h1 id="3d-游戏着色器入门">3D 游戏着色器入门</h1>
+<h2 id="屏幕空间折射-ssr">屏幕空间折射 (SSR)</h2>
 <p align="center">
-<img src="../resources/images/8Mdcn4y.gif" alt="Screen Space Refraction" title="Screen Space Refraction">
+<img src="../resources/images/8Mdcn4y.gif" alt="屏幕空间折射" title="屏幕空间折射">
 </p>
 
-<p>Screen space refraction, much like <a
-href="screen-space-reflection.html">screen space reflection</a>, adds a
-touch of realism you can't find anywhere else. Glass, plastic, water,
-and other transparent/translucent materials spring to life.</p>
-<p><a href="screen-space-reflection.html">Screen space reflection</a> and
-screen space refraction work almost identically expect for one major
-difference. Instead of using the reflected vector, screen space
-refraction uses the <a
-href="http://asawicki.info/news_1301_reflect_and_refract_functions.html">refracted
-vector</a>. It's a slight change in code but a big difference
-visually.</p>
-<h3 id="vertex-positions">Vertex Positions</h3>
-<p>Like SSAO, you'll need the vertex positions in view space. Referrer
-back to <a href="ssao.html#vertex-positions">SSAO</a> for details.</p>
-<p>However, unlike SSAO, you'll need the scene's vertex positions with
-and without the refractive objects. Refractive surfaces are translucent,
-meaning you can see through them. Since you can see through them, you'll
-need the vertex positions behind the refractive surface. Having both the
-foreground and background vertex positions will allow you to calculate
-UV coordinates and depth.</p>
-<h3 id="vertex-normals">Vertex Normals</h3>
-<p>To compute the refractions, you'll need the scene's foreground vertex
-normals in view space. The background vertex normals aren't needed
-unless you need to incorporate the background surface detail while
-calculating the refracted UV coordinates and distances. Referrer back to
-<a href="ssao.html#vertex-normals">SSAO</a> for details.</p>
+<p>屏幕空间折射，<br />
+就像<br />
+<a href="screen-space-reflection.html">屏幕空间反射</a>，<br />
+能为画面增添其他地方难以呈现的真实感。<br />
+玻璃、塑料、水和其他透明/半透明材质会栩栩如生。</p>
+<p><a href="screen-space-reflection.html">屏幕空间反射</a><br />
+和屏幕空间折射的实现几乎完全相同，唯一区别在于。<br />
+屏幕空间反射使用反射向量，<br />
+而屏幕空间折射使用<br />
+<a
+href="http://asawicki.info/news_1301_reflect_and_refract_functions.html">折射向量</a>。<br />
+代码改动细微，但视觉效果差别明显。</p>
+<h3 id="顶点位置">顶点位置</h3>
+<p>和 SSAO 一样，你需要视图空间中的顶点位置。<br />
+详情请参阅 <a href="ssao.html#vertex-positions">SSAO</a>。</p>
+<p>不过，<br />
+不同于 SSAO，<br />
+你需要场景中包含折射物体和去除折射物体两种状态下的顶点位置。<br />
+折射表面是半透明的，意味着你可以透过它看到背后的东西。<br />
+既然能看到背面，就必须获取折射表面背后的顶点位置。<br />
+同时拥有前景和背景顶点位置，才能计算出 UV 坐标和深度。</p>
+<h3 id="顶点法线">顶点法线</h3>
+<p>计算折射时，你需要视图空间中场景前景的顶点法线。<br />
+除非你想在计算折射 UV 坐标和距离时加入背景表面细节，<br />
+否则不需要背景顶点法线。<br />
+详情请参阅 <a href="ssao.html#vertex-normals">SSAO</a>。</p>
 <p align="center">
-<img src="../resources/images/MZ2R8I6.gif" alt="Normal maps versus no normal maps." title="Normal maps versus no normal maps.">
+<img src="../resources/images/MZ2R8I6.gif" alt="有法线贴图和无法线贴图的区别" title="有法线贴图和无法线贴图的区别">
 </p>
 
-<p>Here you see the water refracting the light with and without normal
-maps. If available, be sure to use the normal mapped normals instead of
-the vertex normals. The smoother and flatter the surface, the harder it
-is to tell the light is being refracted. There will be some distortion
-but not enough to make it worthwhile.</p>
-<p>To use the normal maps instead, you'll need to transform the normal
-mapped normals from tangent space to view space just like you did in the
-<a href="normal-mapping.html#fragment">lighting</a> calculations. You can
-see this being done in <a
-href="../demonstration/shaders/fragment/normal.frag">normal.frag</a>.</p>
-<h3 id="position-transformations">Position Transformations</h3>
+<p>上图展示了水面折射光线时，有无法线贴图的差别。<br />
+如果有法线贴图，一定要用法线贴图中的法线替代顶点法线。<br />
+表面越平滑越平坦，折射的光线变化越不明显。<br />
+会有一些形变，但不明显时没必要使用。</p>
+<p>若使用法线贴图，<br />
+你需要像<a href="normal-mapping.html#fragment">光照计算</a>中那样，<br />
+将法线贴图中的切线空间法线转换到视图空间。<br />
+可以参见 <a
+href="../demonstration/shaders/fragment/normal.frag">normal.frag</a>
+的实现。</p>
+<h3 id="位置变换">位置变换</h3>
 <p align="center">
-<img src="../resources/images/bXtXDyu.gif" alt="Position Transformations" title="Position Transformations">
+<img src="../resources/images/bXtXDyu.gif" alt="位置变换示意" title="位置变换示意">
 </p>
 
-<p>Just like <a href="ssao.html">SSAO</a> and <a
-href="screen-space-reflection.html">screen space reflection</a>, screen
-space refraction goes back and forth between the screen and view space.
-You'll need the camera lens' projection matrix to transform points in
-view space to clip space. From clip space, you'll have to transform the
-points again to UV space. Once in UV space, you can sample a
-vertex/fragment position from the scene which will be the closest
-position in the scene to your sample. This is the <em>screen space</em>
-part in <em>screen space refraction</em> since the "screen" is a texture
-UV mapped over a screen shaped rectangle.</p>
-<h3 id="refracted-uv-coordinates">Refracted UV Coordinates</h3>
-<p>Recall that UV coordinates range from zero to one for both U and V.
-The screen is just a 2D texture UV mapped over a screen-sized rectangle.
-Knowing this, the example code doesn't actually need the final rendering
-of the scene to compute the refraction. It can instead calculate what UV
-coordinate each screen pixel will eventually use. These calculated UV
-coordinates can be saved to a framebuffer texture and used later when
-the scene has been rendered.</p>
-<p>The process of refracting the UV coordinates is very similar to the
-process of <a
-href="screen-space-reflection.html#reflected-uv-coordinates">reflecting
-the UV coordinates</a>. Below are the adjustments you'll need to turn
-reflection into refraction.</p>
+<p>和<br />
+<a href="ssao.html">SSAO</a> 以及 <a
+href="screen-space-reflection.html">屏幕空间反射</a> 一样，<br />
+屏幕空间折射需要在屏幕空间和视图空间之间来回转换。<br />
+你需要相机镜头的投影矩阵，将视图空间点转换到裁剪空间。<br />
+从裁剪空间再转换到 UV 空间。<br />
+一旦进入 UV 空间，<br />
+你就能采样场景中的顶点或片元位置，<br />
+这表示离当前采样点最近的场景位置。<br />
+这就是“屏幕空间折射”中“屏幕空间”的含义，<br />
+因为“屏幕”就是映射在屏幕矩形上的二维纹理。</p>
+<h3 id="折射-uv-坐标">折射 UV 坐标</h3>
+<p>记住，UV 坐标的 U 和 V 都是从 0 到 1 之间。<br />
+屏幕就是一个映射在屏幕矩形上的二维纹理。<br />
+基于此，示例代码其实不需要最终渲染的场景就能计算折射。<br />
+它可以直接计算每个屏幕像素最终使用的 UV 坐标。<br />
+计算出的 UV 坐标可以保存到帧缓冲纹理，<br />
+然后在场景渲染完成后使用。</p>
+<p>折射 UV 坐标的计算过程和<br />
+<a href="screen-space-reflection.html#reflected-uv-coordinates">反射 UV
+坐标</a><br />
+非常相似。<br />
+下面是从反射转换到折射需要做的调整。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D positionFromTexture<span class="op">;</span></span>
@@ -187,65 +186,58 @@ reflection into refraction.</p>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>uniform sampler2D normalFromTexture<span class="op">;</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>Reflection only deals with what is in front of the reflective
-surface. Refraction, however, deals with what is behind the refractive
-surface. To accommodate this, you'll need both the vertex positions of
-the scene with the refracting surfaces taken out and the vertex
-positions of the scene with the refracting surfaces left in.</p>
+<p>反射只涉及反射表面前方的物体。<br />
+折射则涉及折射表面背后的物体。<br />
+为此，你需要两个场景的顶点位置：<br />
+包含折射物体的场景和去除折射物体的场景。</p>
 <p align="center">
-<img src="../resources/images/FjQtjsm.gif" alt="Without and with refractive surfaces." title="Without and with refractive surfaces.">
+<img src="../resources/images/FjQtjsm.gif" alt="含折射表面与去除折射表面" title="含折射表面与去除折射表面">
 </p>
 
-<p><code>positionFromTexture</code> are the scene's vertex positions
-with the refracting surfaces left in. <code>positionToTexture</code> are
-the scene's vertex positions with the refracting surfaces taken out.
-<code>normalFromTexture</code> are the scene's vertex normals with the
-refraction surfaces left in. There's no need for the vertex normals
-behind the refractive surfaces unless you want to incorporate the
-surface detail for the background geometry.</p>
+<p><code>positionFromTexture</code> 是包含折射物体的场景顶点位置。<br />
+<code>positionToTexture</code> 是去除折射物体的场景顶点位置。<br />
+<code>normalFromTexture</code> 是包含折射表面的场景顶点法线。<br />
+通常不需要折射表面背后的法线，除非你想把背景细节也考虑进折射。</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>uniform vec2 rior<span class="op">;</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>Refraction has one more adjustable parameter than reflection.
-<code>rior</code> is the relative index of refraction or relative
-refractive index. It is the ratio of the refraction indexes of two
-mediums. So for example, going from water to air is
-<code>1 / 1.33 ≈ 0.75</code>. The numerator is the refractive index of
-the medium the light is leaving and the denominator is the refractive
-index of the medium the light is entering. An <code>rior</code> of one
-means the light passes right through without being refracted or bent. As
-<code>rior</code> grows, the refraction will become a <a
-href="https://en.wikipedia.org/wiki/Total_internal_reflection">reflection</a>.</p>
-<p>There's no requirement that <code>rior</code> must adhere to the real
-world. The demo uses <code>1.05</code>. This is completely unrealistic
-(light does not travel faster through water than air) but the realistic
-setting produced too many artifacts. In the end, the distortion only has
-to be believable—not realistic.</p>
+<p>折射比反射多了一个调节参数。<br />
+<code>rior</code> 是相对折射率（相对折射指数）。<br />
+它是两个介质折射率的比值。<br />
+例如，从水到空气是 <code>1 / 1.33 ≈ 0.75</code>。<br />
+分子是光线离开的介质折射率，<br />
+分母是光线进入的介质折射率。<br />
+<code>rior</code> 为 1 表示光线直接穿过，无折射或偏折。<br />
+随着 <code>rior</code> 增大，折射效果会趋近于<br />
+<a
+href="https://en.wikipedia.org/wiki/Total_internal_reflection">全反射</a>。</p>
+<p><code>rior</code> 不必严格遵守现实物理。<br />
+演示中用了 <code>1.05</code>。<br />
+这不现实（光不会在水中比空气中快），<br />
+但现实设置会产生过多瑕疵。<br />
+最终，只需效果可信即可，不必完全真实。</p>
 <p align="center">
-<img src="../resources/images/dDOnobK.gif" alt="Adjusting the relative index of refraction." title="Adjusting the relative index of refraction.">
+<img src="../resources/images/dDOnobK.gif" alt="调整相对折射率" title="调整相对折射率">
 </p>
 
-<p><code>rior</code> values above one tend to elongate the refraction
-while numbers below one tend to shrink the refraction.</p>
-<p>As it was with screen space reflection, the screen doesn't have the
-entire geometry of the scene. A refracted ray may march through the
-screen space and never hit a captured surface. Or it may hit a surface
-but it's the backside not captured by the camera. When this happened
-during reflection, the fragment was left blank. This indicated no
-reflection or not enough information to determine a reflection. Leaving
-the fragment blank was fine for reflection since the reflective surface
-would fill in the gaps.</p>
+<p><code>rior</code> 大于 1 时，折射会被拉长；<br />
+小于 1 时，折射会被缩短。</p>
+<p>和屏幕空间反射一样，<br />
+屏幕空间没有完整的场景几何信息。<br />
+折射射线可能在屏幕空间内行进，但永远没击中捕获的表面，<br />
+或者击中了摄像机不可见的表面背面。<br />
+反射时，遇到这种情况片元会留空。<br />
+表示无反射或信息不足。<br />
+空白片元对反射来说没问题，因为反射表面会填充空白。</p>
 <p align="center">
-<img src="../resources/images/vcQDAYU.gif" alt="Refraction Holes" title="Refraction Holes">
+<img src="../resources/images/vcQDAYU.gif" alt="折射空洞" title="折射空洞">
 </p>
 
-<p>For refraction, however, we must set the fragment to some UV. If the
-fragment is left blank, the refractive surface will contain holes that
-let the detail behind it come through. This would be okay for a
-completely transparent surface but usually the refractive surface will
-have some tint to it, reflection, etc.</p>
+<p>但折射必须给片元赋予 UV。<br />
+若留空，折射表面会出现空洞，透出背后的细节。<br />
+这对完全透明的表面没问题，但通常折射表面会带有色彩、反射等。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  vec2 texSize  <span class="op">=</span> textureSize<span class="op">(</span>positionFromTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
@@ -254,18 +246,16 @@ have some tint to it, reflection, etc.</p>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  vec4 uv <span class="op">=</span> vec4<span class="op">(</span>texCoord<span class="op">.</span>xy<span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The best choice is to select the UV as if the <code>rior</code> was
-one. This will leave the UV coordinate unchanged, allowing the
-background to show through instead of there being a hole in the
-refractive surface.</p>
+<p>最佳方案是把 UV 设为 <code>rior</code> 为 1 时的值。<br />
+这会保持 UV 坐标不变，<br />
+让背景内容显示，而不会出现折射表面空洞。</p>
 <p align="center">
-<img src="../resources/images/9fybLUO.png" alt="Refraction UV Map" title="Refraction UV Map">
+<img src="../resources/images/9fybLUO.png" alt="折射 UV 贴图" title="折射 UV 贴图">
 </p>
 
-<p>Here you see the refracted UV texture for the mill scene. The wheel
-and waterway disturb what is otherwise a smooth gradient. The
-disruptions shift the UV coordinates from their screen position to their
-refracted screen position.</p>
+<p>这是磨坊场景的折射 UV 贴图。<br />
+轮子和水道扰乱了原本平滑的梯度，<br />
+将 UV 坐标从屏幕位置偏移到折射屏幕位置。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  vec3 unitPositionFrom <span class="op">=</span> normalize<span class="op">(</span>positionFrom<span class="op">.</span>xyz<span class="op">);</span></span>
@@ -273,10 +263,9 @@ refracted screen position.</p>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  vec3 pivot            <span class="op">=</span> normalize<span class="op">(</span>refract<span class="op">(</span>unitPositionFrom<span class="op">,</span> normalFrom<span class="op">,</span> rior<span class="op">.</span>x<span class="op">));</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The most important difference is the calculation of the refracted
-vector versus the reflected vector. Both use the unit position and
-normal but <code>refract</code> takes an additional parameter specifying
-the relative refractive index.</p>
+<p>最关键的区别是折射向量和反射向量的计算。<br />
+两者都用单位位置和法线，但 <code>refract</code>
+需要额外的相对折射率参数。</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    frag      <span class="op">+=</span> increment<span class="op">;</span></span>
@@ -284,42 +273,37 @@ the relative refractive index.</p>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    positionTo <span class="op">=</span> texture<span class="op">(</span>positionToTexture<span class="op">,</span> uv<span class="op">.</span>xy<span class="op">);</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>The <code>positionTo</code>, sampled by the <code>uv</code>
-coordinates, uses the <code>positionToTexture</code>. For reflection,
-you only need one framebuffer texture containing the scene's
-interpolated vertex positions in view space. However, for refraction,
-<code>positionToTexture</code> contains the vertex positions of the
-scene minus the refractive surfaces since the refraction ray typically
-goes behind the surface. If <code>positionFromTexture</code> and
-<code>positionToTexture</code> were the same for refraction, the
-refracted ray would hit the refractive surface instead of what is behind
-it.</p>
-<h3 id="refraction-mask">Refraction Mask</h3>
+<p>用 <code>uv</code> 坐标采样 <code>positionToTexture</code> 得到
+<code>positionTo</code>。<br />
+反射时，只需要一个包含视图空间顶点位置的帧缓冲纹理。<br />
+而折射时，<code>positionToTexture</code>
+是去除折射表面的顶点位置，<br />
+因为折射光线通常穿过折射表面到达背后。<br />
+如果 <code>positionFromTexture</code> 和 <code>positionToTexture</code>
+一样，<br />
+折射射线会撞到折射表面本身，而非背后的物体。</p>
+<h3 id="折射遮罩">折射遮罩</h3>
 <p align="center">
-<img src="../resources/images/iuFYVWB.gif" alt="Material Specular" title="Material Specular">
+<img src="../resources/images/iuFYVWB.gif" alt="材质高光" title="材质高光">
 </p>
 
-<p>You'll need a mask to filter out the non-refractive parts of the
-scene. This mask will determine which fragment does and does not receive
-a refracted color. You could use this mask during the refracted UV
-calculation step or later when you actually sample the colors at the
-refracted UV coordinates.</p>
-<p>The mill scene uses the models' material specular as a mask. For the
-demo's purposes, the specular map is sufficient but you may want to use
-a more specialized map. Refer back to <a
-href="screen-space-reflection.html#specular-map">screen space
-reflection</a> for how to render the specular map.</p>
-<h2 id="background-colors">Background Colors</h2>
+<p>你需要一个遮罩来筛选出非折射部分。<br />
+该遮罩决定哪些片元接收折射颜色，哪些不接收。<br />
+你可以在折射 UV 计算阶段使用遮罩，或在实际采样折射颜色时使用。</p>
+<p>磨坊场景使用模型的材质高光作为遮罩。<br />
+演示中用高光贴图足够，但你可能想用更专用的贴图。<br />
+详情请参考<a
+href="screen-space-reflection.html#specular-map">屏幕空间反射</a>中如何渲染高光贴图。</p>
+<h2 id="背景颜色">背景颜色</h2>
 <p align="center">
-<img src="../resources/images/AmT9RrU.gif" alt="Background Colors" title="Background Colors">
+<img src="../resources/images/AmT9RrU.gif" alt="背景颜色" title="背景颜色">
 </p>
 
-<p>You'll need to render the parts of the scene behind the refractive
-objects. This can be done by hiding the refractive objects and then
-rendering the scene to a framebuffer texture.</p>
-<h3 id="foreground-colors">Foreground Colors</h3>
+<p>你需要渲染折射物体背后的场景部分。<br />
+这可以通过隐藏折射物体，然后将场景渲染到帧缓冲纹理实现。</p>
+<h3 id="前景颜色">前景颜色</h3>
 <p align="center">
-<img src="../resources/images/6RPHULr.gif" alt="Foreground Colors" title="Foreground Colors">
+<img src="../resources/images/6RPHULr.gif" alt="前景颜色" title="前景颜色">
 </p>
 
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
@@ -331,22 +315,21 @@ rendering the scene to a framebuffer texture.</p>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>uniform sampler2D backgroundColorTexture<span class="op">;</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>To render the actual refractions or foreground colors, you'll need
-the refracted UV coordinates, refraction mask, the foreground and
-background vertex positions, and the background colors.</p>
+<p>渲染实际折射或前景颜色时，<br />
+你需要折射 UV 坐标、折射遮罩、前景和背景顶点位置，<br />
+以及背景颜色。</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  vec3  tintColor <span class="op">=</span> vec3<span class="op">(</span><span class="fl">0.27</span><span class="op">,</span> <span class="fl">0.58</span><span class="op">,</span> <span class="fl">0.92</span><span class="op">,</span> <span class="fl">0.3</span><span class="op">);</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> depthMax  <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p><code>tintColor</code> and <code>depthMax</code> are adjustable
-parameters. <code>tintColor</code> colorizes the background color.
-<code>depthMax</code> ranges from zero to infinity. When the distance
-between the foreground and background position reaches
-<code>depthMax</code>, the foreground color will be the fully tinted
-background color. At distance zero, the foreground will be the
-background color.</p>
+<p><code>tintColor</code> 和 <code>depthMax</code> 是可调参数。<br />
+<code>tintColor</code> 用于给背景颜色着色。<br />
+<code>depthMax</code> 范围从 0 到无穷大。<br />
+当前景和背景位置的距离达到 <code>depthMax</code>，<br />
+前景颜色为完全着色的背景色。<br />
+距离为 0 时，前景为背景色。</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  vec2 texSize  <span class="op">=</span> textureSize<span class="op">(</span>backgroundColorTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
@@ -361,10 +344,8 @@ background color.</p>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>refractionMask<span class="op">.</span>r <span class="op">&lt;=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span> fragColor <span class="op">=</span> vec4<span class="op">(</span><span class="dv">0</span><span class="op">);</span> <span class="cf">return</span><span class="op">;</span> <span class="op">}</span></span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Pull out the uv coordinates, mask, background position, foreground
-position, and the background color.</p>
-<p>If the refraction mask is turned off for this fragment, return
-nothing.</p>
+<p>获取 uv 坐标、遮罩、背景位置、前景位置和背景颜色。<br />
+如果折射遮罩关闭，则不渲染该片元。</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> depth   <span class="op">=</span> length<span class="op">(</span>positionTo<span class="op">.</span>xyz <span class="op">-</span> positionFrom<span class="op">.</span>xyz<span class="op">);</span></span>
@@ -376,25 +357,24 @@ nothing.</p>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
 <p align="center">
-<img src="../resources/images/IEFKerB.gif" alt="Refraction Depth" title="Refraction Depth">
+<img src="../resources/images/IEFKerB.gif" alt="折射深度" title="折射深度">
 </p>
 
-<p>Calculate the depth or distance between the foreground position and
-the background position. At zero depth, the foreground color will be the
-shallow color. At <code>depthMax</code>, the foreground color will be
-the deep color. The deep color is the background color tinted with
-<code>tintColor</code>.</p>
+<p>计算前景和背景位置间的深度或距离。<br />
+深度为 0 时，前景颜色为浅色（背景色）。<br />
+深度达到 <code>depthMax</code>
+时，前景颜色为深色（着色后的背景色）。<br />
+深色是将背景色按 <code>tintColor</code> 进行着色的结果。</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> mix<span class="op">(</span>vec4<span class="op">(</span><span class="dv">0</span><span class="op">),</span> vec4<span class="op">(</span>foregroundColor<span class="op">,</span> <span class="dv">1</span><span class="op">),</span> uv<span class="op">.</span>b<span class="op">);</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Recall that the blue channel, in the refracted UV texture, is set to
-the visibility. The visibility declines as the refracted ray points back
-at the camera. While the visibility should always be one, it is put here
-for completeness. As the visibility lessens, the fragment color will
-receive less and less of the foreground color.</p>
-<h3 id="source">Source</h3>
+<p>回想一下，折射 UV 纹理的蓝色通道存储了可见度。<br />
+当折射射线指向摄像机时，可见度会降低。<br />
+虽然可见度应始终为 1，这里保留是为了完整性。<br />
+可见度降低时，片元颜色接收的前景颜色也会相应减少。</p>
+<h3 id="来源">来源</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

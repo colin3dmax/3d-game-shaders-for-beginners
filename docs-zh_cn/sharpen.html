@@ -104,31 +104,30 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 <a href="#copyright"><span class="emoji"
 data-emoji="arrow_down_small">🔽</span></a> <a href="dilation.html"><span
 class="emoji" data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="sharpen">Sharpen</h2>
+<h1 id="3d游戏着色器入门">3D游戏着色器入门</h1>
+<h2 id="锐化效果sharpen">锐化效果（Sharpen）</h2>
 <p align="center">
-<img src="../resources/images/VFDKNvl.gif" alt="Sharpen" title="Sharpen">
+<img src="../resources/images/VFDKNvl.gif" alt="锐化效果" title="锐化效果">
 </p>
 
-<p>The sharpen effect increases the contrast at the edges of the image.
-This comes in handy when your graphics are bit too soft.</p>
+<p>锐化效果会增强图像边缘的对比度，<br />
+当你的图像看起来有点模糊时，这个效果非常有用。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> amount <span class="op">=</span> <span class="fl">0.8</span><span class="op">;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>You can control how sharp the result is by adjusting the amount. An
-amount of zero leaves the image untouched. Try negative values for an
-odd look.</p>
+<p>你可以通过调整 <code>amount</code> 来控制锐化的强度。<br />
+<code>amount</code> 为零时图像保持不变。<br />
+你也可以尝试负值，得到奇特的视觉效果。</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> neighbor <span class="op">=</span> amount <span class="op">*</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> center   <span class="op">=</span> amount <span class="op">*</span> <span class="dv">4</span> <span class="op">+</span> <span class="dv">1</span><span class="op">;</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Neighboring fragments are multiplied by <code>amount * -1</code>. The
-current fragment is multiplied by <code>amount * 4 + 1</code>.</p>
+<p>邻近像素的权重是 <code>amount * -1</code>，<br />
+当前像素的权重是 <code>amount * 4 + 1</code>。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  vec3 color <span class="op">=</span></span>
@@ -147,16 +146,15 @@ current fragment is multiplied by <code>amount * 4 + 1</code>.</p>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>      <span class="op">;</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The neighboring fragments are up, down, left, and right. After
-multiplying both the neighbors and the current fragment by their
-particular values, sum the result.</p>
+<p>邻近的像素是当前像素的上下左右四个方向。<br />
+对邻近像素和当前像素分别乘以它们的权重后，求和得到最终颜色。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> vec4<span class="op">(</span>color<span class="op">,</span> texture<span class="op">(</span>sharpenTexture<span class="op">,</span> texCoord<span class="op">).</span>a<span class="op">);</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>This sum is the final fragment color.</p>
-<h3 id="source">Source</h3>
+<p>这个和即为最终的片元颜色。</p>
+<h3 id="源码参考">源码参考</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

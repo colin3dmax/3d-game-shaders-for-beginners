@@ -4,136 +4,126 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](screen-space-refraction.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门
 
-## Screen Space Reflection (SSR)
+## 屏幕空间反射（SSR）
 
 <p align="center">
 <img src="../resources/images/AYG4tvg.gif" alt="Screen Space Reflections" title="Screen Space Reflections">
 </p>
 
-Adding reflections can really ground your scene.
-Wet and shiny objects spring to life as nothing makes
-something look wet or shiny quite like reflections.
-With reflections, you can really sell the illusion of water and metallic objects.
+添加反射可以让你的场景更具真实感。  
+湿润和有光泽的物体会变得生动起来，没有什么比反射更能让物体看起来湿润或闪亮了。  
+借助反射，你可以更好地营造出水面和金属物体的幻觉。
 
-In the [lighting](lighting.md) section, you simulated the reflected, mirror-like image of the light source.
-This was the process of rendering the specular reflection.
-Recall that the specular light was computed using the reflected light direction.
-Similarly, using screen space reflection or SSR, you can simulate the reflection of
-other objects in the scene instead of just the light source.
-Instead of the light ray coming from the source and bouncing off into the camera,
-the light ray comes from some object in the scene and bounces off into the camera.
+在[光照](lighting.md)部分，你模拟了光源的镜面反射图像。  
+这是渲染镜面反射的过程。  
+还记得我们是用反射光方向来计算镜面光的。  
+类似地，使用屏幕空间反射（SSR）你可以模拟场景中其他物体的反射，而不仅仅是光源。  
+这不再是从光源发出的光线反射进入摄像机，而是场景中某个物体发出的光线反射进入摄像机。
 
-SSR works by reflecting the screen image onto itself using only itself.
-Compare this to cube mapping which uses six screens or textures.
-In cube mapping, you reflect a ray from some point in your scene
-to some point on the inside of a cube surrounding your scene.
-In SSR, you reflect a ray from some point on your screen to some other point on your screen.
-By reflecting your screen onto itself, you can create the illusion of reflection.
-This illusion holds for the most part but SSR does fail in some cases as you'll see.
+SSR 的工作原理是使用屏幕图像自身来对自身进行反射。  
+这与使用六面贴图（立方体贴图）不同，后者使用六个视角的纹理。  
+在立方体贴图中，你从场景中某点发出一条射线，并反射到包围整个场景的立方体内部的某一点。  
+而在 SSR 中，你从屏幕上的一个点发出射线，并反射到屏幕上的另一个点。  
+通过将屏幕反射到自己上面，你可以制造出反射的幻觉。  
+这种幻觉在大多数情况下是有效的，但如你将看到的，它也有失效的时候。
 
-### Ray Marching
+### 光线步进（Ray Marching）
 
-Screen space reflection uses a technique known as ray marching to determine the reflection for each fragment.
-Ray marching is the process of iteratively extending or contracting the length or magnitude of some vector
-in order to probe or sample some space for information.
-The ray in screen space reflection is the position vector reflected about the normal.
+屏幕空间反射使用一种称为“光线步进”的技术来为每个片元确定反射。  
+光线步进是一种迭代延展或缩短某个向量的长度（或大小）来在空间中探测或采样信息的方法。  
+在屏幕空间反射中，反射光线是相对于法线方向反射后的位置向量。
 
-Intuitively, a light ray hits some point in the scene,
-bounces off,
-travels in the opposite direction of the reflected position vector,
-bounces off the current fragment,
-travels in the opposite direction of the position vector,
-and hits the camera lens allowing you to see the color of some point in the scene reflected in the current fragment.
-SSR is the process of tracing the light ray's path in reverse.
-It tries to find the reflected point the light ray bounced off of and hit the current fragment.
-With each iteration,
-the algorithm samples the scene's positions or depths,
-along the reflection ray,
-asking each time if the ray intersected with the scene's geometry.
-If there is an intersection,
-that position in the scene is a potential candidate for being reflected by the current fragment.
+直观上讲，一条光线打到场景中的某个点，  
+发生反射，  
+然后沿反射向量的相反方向传播，  
+打到当前片元，  
+再沿位置向量的相反方向传播，  
+最终击中摄像机镜头，从而让你在当前片元中看到场景中某点的反射颜色。  
+SSR 就是在反向追踪这条光线路径。  
+它试图找出光线反射并击中当前片元的那个反射点。  
+每次迭代时，  
+算法会沿着反射光线采样场景的位置或深度，  
+每次判断光线是否与场景几何体相交。  
+如果有相交，  
+那么这个位置就是当前片元可能反射的候选点。
 
-Ideally there would be some analytical method for determining the first intersection point exactly.
-This first intersection point is the only valid point to reflect in the current fragment.
-Instead, this method is more like a game of battleship.
-You can't see the intersections (if there are any) so you start at the base of the reflection ray and call out coordinates
-as you travel in the direction of the reflection.
-With each call, you get back an answer of whether or not you hit something.
-If you do hit something,
-you try points around that area hoping to find the exact point of intersection.
+理想情况下，应该有某种解析方法可以精确求出第一次相交的点。  
+因为这个第一次相交点才是当前片元应该反射的唯一有效点。  
+但实际上，这个方法更像是一场“战舰游戏”。  
+你看不到是否有相交点，因此只能从反射光线的起点开始，沿着方向一个一个坐标“喊出来”。  
+每喊一个，就看看是否“击中”。  
+如果击中，  
+你就围绕那个区域再尝试，希望找出准确的相交点。
 
 <p align="center">
 <img src="../resources/images/wnAC7NI.gif" alt="SSR Ray Marching" title="SSR Ray Marching">
 </p>
 
-Here you see ray marching being used to calculate each fragment's reflected point.
-The vertex normal is the bright green arrow,
-the position vector is the bright blue arrow,
-and the bright red vector is the reflection ray marching through view space.
+这里展示了如何使用光线步进来计算每个片元的反射点。  
+绿色亮箭头表示顶点法线，  
+蓝色亮箭头是位置向量，  
+红色亮箭头是通过视空间进行步进的反射射线。
 
-### Vertex Positions
+### 顶点位置
 
-Like SSAO, you'll need the vertex positions in view space.
-Referrer back to [SSAO](ssao.md#vertex-positions) for details.
+与 SSAO 一样，你需要将顶点位置转换到视空间中。  
+参见 [SSAO](ssao.md#vertex-positions) 章节获取更多细节。
 
-### Vertex Normals
+### 顶点法线
 
-To compute the reflections, you'll need the vertex normals in view space.
-Referrer back to [SSAO](ssao.md#vertex-normals) for details.
+为了计算反射，你也需要将顶点法线转换到视空间中。  
+参见 [SSAO](ssao.md#vertex-normals) 章节获取更多细节。
 
 <p align="center">
 <img src="../resources/images/1cE2vBY.gif" alt="SSR using normal maps." title="SSR using normal maps.">
 </p>
 
-Here you see SSR using the normal mapped normals instead of the vertex normals.
-Notice how the reflection follows the ripples in the water versus the more mirror
-like reflection shown earlier.
+这里展示的是使用法线贴图中的法线进行 SSR，  
+而不是使用顶点法线。  
+注意反射如何随着水面波纹而变化，  
+而不是之前所展示的那种镜面反射效果。
 
-To use the normal maps instead,
-you'll need to transform the normal mapped normals from tangent space to view space
-just like you did in the lighting calculations.
-You can see this being done in [normal.frag](../demonstration/shaders/fragment/normal.frag).
+要使用法线贴图，  
+你需要像在光照计算中那样将法线从切线空间变换到视空间。  
+可以在 [normal.frag](../demonstration/shaders/fragment/normal.frag) 中看到这个过程。
 
-### Position Transformations
+### 位置变换
 
 <p align="center">
 <img src="../resources/images/Qnsvkc0.gif" alt="Position Transformations" title="Position Transformations">
 </p>
 
-Just like
-[SSAO](ssao.md),
-SSR goes back and forth between the screen and view space.
-You'll need the camera lens' projection matrix to transform points in view space to clip space.
-From clip space, you'll have to transform the points again to UV space.
-Once in UV space,
-you can sample a vertex/fragment position from the scene
-which will be the closest position in the scene to your sample.
-This is the _screen space_ part in _screen space reflection_
-since the "screen" is a texture UV mapped over a screen shaped rectangle.
+与 [SSAO](ssao.md) 一样，SSR 也需要在屏幕空间和视空间之间来回转换。  
+你需要相机镜头的投影矩阵来将视空间中的点变换到裁剪空间（clip space）。  
+再从裁剪空间转换到 UV 空间。  
+在 UV 空间中，  
+你可以从场景中采样顶点或片元位置，  
+这些位置就是你采样点在场景中最接近的位置。  
+这就是“屏幕空间反射”中的“屏幕空间”部分，  
+因为“屏幕”本质上是一张映射到屏幕大小矩形上的 UV 纹理。
 
-### Reflected UV Coordinates
+### 反射的 UV 坐标
 
-There are a few ways you can implement SSR.
-The example code starts the reflection process by computing a reflected UV coordinate for each screen fragment.
-You could skip this part and go straight to computing the reflected color instead, using the final rendering of the scene.
+你可以用几种不同的方式来实现 SSR。  
+示例代码是从计算每个屏幕片元的反射 UV 坐标开始反射过程的。  
+你也可以跳过这一步，直接计算反射颜色，使用的是场景最终渲染的结果。
 
-Recall that UV coordinates range from zero to one for both U and V.
-The screen is just a 2D texture UV mapped over a screen-sized rectangle.
-Knowing this, the example code doesn't actually need the final rendering of the scene
-to compute the reflections.
-It can instead calculate what UV coordinate each screen pixel will eventually use.
-These calculated UV coordinates can be saved to a framebuffer texture
-and used later when the scene has been rendered.
+回忆一下，UV 坐标的 U 和 V 值范围都是从 0 到 1。  
+屏幕本质上是一张映射到屏幕大小矩形上的 2D 纹理。  
+知道这一点后，示例代码实际上不需要场景的最终渲染图像来计算反射。  
+它可以直接计算每个屏幕像素最终要使用的 UV 坐标。  
+这些计算出的 UV 坐标可以保存到帧缓冲纹理中，  
+在渲染完成后再使用。
 
 <p align="center">
 <img src="../resources/images/pkQcGkD.gif" alt="Reflected UVs" title="Reflected UVs">
 </p>
 
-Here you see the reflected UV coordinates.
-Without even rendering the scene yet,
-you can get a good feel for what the reflections will look like.
+上图显示的是反射后的 UV 坐标。  
+即使场景还没渲染出来，  
+你也可以预先感受到反射大致会是什么样子。
 
 ```c
 //...
@@ -146,192 +136,192 @@ uniform sampler2D normalTexture;
 //...
 ```
 
-You'll need the camera lens' projection matrix as well as the interpolated vertex positions and normals in view space.
+你需要相机镜头的投影矩阵，以及视空间中插值得到的顶点位置和法线。
 
 ```c
-  // ...
+// ...
 
-  float maxDistance = 15;
-  float resolution  = 0.3;
-  int   steps       = 10;
-  float thickness   = 0.5;
+float maxDistance = 15;
+float resolution  = 0.3;
+int   steps       = 10;
+float thickness   = 0.5;
 
-  // ...
+// ...
 ```
 
-Like the other effects, SSR has a few parameters you can adjust.
-Depending on the complexity of the scene, it may take you awhile to find the right settings.
-Getting screen space reflections to look just right tends to be difficult when reflecting complex geometry.
+与其他特效一样，SSR 有一些可以调节的参数。  
+根据场景的复杂度，找到合适设置可能需要一些时间。  
+当你要反射复杂几何体时，让 SSR 看起来“正确”会特别困难。
 
-The `maxDistance` parameter controls how far a fragment can reflect.
-In other words, it controls the maximum length or magnitude of the reflection ray.
+- `maxDistance` 控制片元最多可以反射多远，  
+  换句话说，它决定了反射射线的最大长度或大小。
 
-The `resolution` parameter controls how many fragments are skipped while traveling or marching the reflection ray during the first pass.
-This first pass is to find a point along the ray's direction where the ray enters or goes behind some geometry in the scene.
-Think of this first pass as the rough pass.
-Note that the `resolution` ranges from zero to one.
-Zero will result in no reflections while one will travel fragment-by-fragment along the ray's direction.
-A `resolution` of one can slow down your FPS considerably especially with a large `maxDistance`.
+- `resolution` 控制反射射线第一次遍历时跳过多少片元。  
+  这第一次遍历用于找到射线进入或穿过某个几何体的粗略位置。  
+  可以认为它是“粗步”。  
+  注意，`resolution` 的范围是 0 到 1。  
+  值为 0 会导致没有反射，而值为 1 会逐片元检查沿射线方向的所有点。  
+  在大 `maxDistance` 值下，使用 1 的 `resolution` 会显著降低帧率。
 
-The `steps` parameter controls how many iterations occur during the second pass.
-This second pass is to find the exact point along the reflection ray's direction
-where the ray immediately hits or intersects with some geometry in the scene.
-Think of this second pass as the refinement pass.
+- `steps` 控制第二次遍历中进行的迭代次数。  
+  这一次是为了找到射线与几何体精确相交的位置。  
+  可认为它是“精步”。
 
-The `thickness` controls the cutoff between what counts as a possible reflection hit and what does not.
-Ideally, you'd like to have the ray immediately stop at some camera-captured position or depth in the scene.
-This would be the exact point where the light ray bounced off, hit your current fragment, and then bounced off into the camera.
-Unfortunately the calculations are not always that precise so `thickness` provides some wiggle room or tolerance.
-You'll want the thickness to be as small as possible—just a short distance beyond a sampled position or depth.
+- `thickness` 决定哪些相交点算作命中，哪些不算。  
+  理想情况下，射线应该精确停在某个场景中的片元或深度位置上。  
+  那将是光线发生反射、打到当前片元、再进入相机的那个点。  
+  可惜计算不是总能精确命中，所以 `thickness` 给了我们一定的容差。  
+  你希望这个值尽可能小，只比采样位置或深度稍微大一点。
 
 <p align="center">
 <img src="../resources/images/W163Mfw.png" alt="Larger Thickness" title="Larger Thickness">
 </p>
 
-You'll find that as the thickness gets larger, the reflections tend to smear in places.
+你会发现 `thickness` 越大，反射越模糊、越容易“糊掉”。
 
 <p align="center">
 <img src="../resources/images/T6uH4Yu.png" alt="Smaller Thickness" title="Smaller Thickness">
 </p>
 
-Going in the other direction, as the thickness gets smaller,
-the reflections become noisy with tiny little holes and narrow gaps.
+相反地，如果 `thickness` 越小，  
+反射会变得充满噪点，出现许多小洞和细缝。
 
 ```c
-  // ...
+// ...
 
-  vec2 texSize  = textureSize(positionTexture, 0).xy;
-  vec2 texCoord = gl_FragCoord.xy / texSize;
+vec2 texSize  = textureSize(positionTexture, 0).xy;
+vec2 texCoord = gl_FragCoord.xy / texSize;
 
-  vec4 positionFrom     = texture(positionTexture, texCoord);
-  vec3 unitPositionFrom = normalize(positionFrom.xyz);
-  vec3 normal           = normalize(texture(normalTexture, texCoord).xyz);
-  vec3 pivot            = normalize(reflect(unitPositionFrom, normal));
+vec4 positionFrom     = texture(positionTexture, texCoord);
+vec3 unitPositionFrom = normalize(positionFrom.xyz);
+vec3 normal           = normalize(texture(normalTexture, texCoord).xyz);
+vec3 pivot            = normalize(reflect(unitPositionFrom, normal));
 
-  // ...
+// ...
 ```
 
-Gather the current fragment's position, normal, and reflection about the normal.
-`positionFrom` is a vector from the camera position to the current fragment position.
-`normal` is a vector pointing in the direction of the interpolated vertex normal for the current fragment.
-`pivot` is the reflection ray or vector pointing in the reflected direction of the `positionFrom` vector.
-It currently has a length or magnitude of one.
-
+获取当前片元的位置、法线以及关于法线的反射向量。  
+`positionFrom` 是从摄像机到当前片元的向量。  
+`normal` 是当前片元插值得到的法线方向。  
+`pivot` 是将 `positionFrom` 相对于法线反射后得到的反射向量，  
+其长度为 1。
 
 ```c
-  // ...
+// ...
 
-  vec4 startView = vec4(positionFrom.xyz + (pivot *           0), 1);
-  vec4 endView   = vec4(positionFrom.xyz + (pivot * maxDistance), 1);
+vec4 startView = vec4(positionFrom.xyz + (pivot *           0), 1);
+vec4 endView   = vec4(positionFrom.xyz + (pivot * maxDistance), 1);
 
-  // ...
+// ...
 ```
 
-Calculate the start and end point of the reflection ray in view space.
+计算视空间中反射射线的起点和终点。
 
 ```c
-  // ...
+// ...
 
-  vec4 startFrag      = startView;
-       // Project to screen space.
-       startFrag      = lensProjection * startFrag;
-       // Perform the perspective divide.
-       startFrag.xyz /= startFrag.w;
-       // Convert the screen-space XY coordinates to UV coordinates.
-       startFrag.xy   = startFrag.xy * 0.5 + 0.5;
-       // Convert the UV coordinates to fragment/pixel coordnates.
-       startFrag.xy  *= texSize;
+vec4 startFrag      = startView;
+     // 投影到屏幕空间
+     startFrag      = lensProjection * startFrag;
+     // 透视除法
+     startFrag.xyz /= startFrag.w;
+     // 屏幕空间 XY 转换为 UV 坐标
+     startFrag.xy   = startFrag.xy * 0.5 + 0.5;
+     // UV 转换为片元坐标
+     startFrag.xy  *= texSize;
 
-  vec4 endFrag      = endView;
-       endFrag      = lensProjection * endFrag;
-       endFrag.xyz /= endFrag.w;
-       endFrag.xy   = endFrag.xy * 0.5 + 0.5;
-       endFrag.xy  *= texSize;
+vec4 endFrag      = endView;
+     endFrag      = lensProjection * endFrag;
+     endFrag.xyz /= endFrag.w;
+     endFrag.xy   = endFrag.xy * 0.5 + 0.5;
+     endFrag.xy  *= texSize;
 
-  // ...
+// ...
 ```
 
-Project or transform these start and end points from view space to screen space.
-These points are now fragment positions which correspond to pixel positions on the screen.
-Now that you know where the ray starts and ends on the screen, you can travel or march along its direction in screen space.
-Think of the ray as a line drawn on the screen.
-You'll travel along this line using it to sample the fragment positions stored in the position framebuffer texture.
+将起点和终点从视空间投影到屏幕空间。  
+这两个点现在对应于屏幕上的片元像素位置。  
+你可以在屏幕空间中沿着这条射线方向遍历。  
+可以将这条射线想象成屏幕上的一条线，  
+你将在这条线上进行步进，并在位置帧缓冲纹理中采样对应的片元位置。
 
 <p align="center">
 <img src="../resources/images/MpBR225.png" alt="Screen space versus view space." title="Screen space versus view space.">
 </p>
 
-Note that you could march the ray through view space
-but this may under or over sample scene positions found in the position framebuffer texture.
-Recall that the position framebuffer texture is the size and shape of the screen.
-Every screen fragment or pixel corresponds to some position captured by the camera.
-A reflection ray may travel a long distance in view space, but in screen space, it may only travel through a few pixels.
-You can only sample the screen's pixels for positions
-so it is inefficient to potentially sample the same pixels over and over again while marching in view space.
-By marching in screen space, you'll more efficiently sample the fragments or pixels the ray actually occupies or covers.
+注意你可以在视空间中进行步进，  
+但这样可能会对位置纹理进行欠采样或过采样。  
+要记住位置帧缓冲纹理的尺寸和形状就是屏幕本身。  
+每个屏幕像素对应摄像机拍摄到的某个位置。  
+反射射线在视空间中可能走得很远，  
+但在屏幕空间中可能只覆盖少量像素。  
+你只能对屏幕像素进行采样，  
+因此在视空间中步进可能会多次采样同一个像素，效率很低。  
+而在屏幕空间中步进会更高效地采样真正覆盖到的像素。
 
 ```c
-  // ...
+// ...
 
-  vec2 frag  = startFrag.xy;
-       uv.xy = frag / texSize;
+vec2 frag  = startFrag.xy;
+     uv.xy = frag / texSize;
 
-  // ...
+// ...
 ```
 
-The first pass will begin at the starting fragment position of the reflection ray.
-Convert the fragment position to a UV coordinate by dividing the fragment's coordinates by the position texture's dimensions.
+第一步从反射射线的起点片元位置开始。  
+将片元坐标除以位置纹理的尺寸，转换为 UV 坐标。
 
 ```c
-  // ...
+// ...
 
-  float deltaX    = endFrag.x - startFrag.x;
-  float deltaY    = endFrag.y - startFrag.y;
+float deltaX    = endFrag.x - startFrag.x;
+float deltaY    = endFrag.y - startFrag.y;
 
-  // ...
+// ...
 ```
 
-Calculate the delta or difference between the X and Y coordinates of the end and start fragments.
-This will be how many pixels the ray line occupies in the X and Y dimension of the screen.
+计算终点和起点之间的 X、Y 坐标差值（delta）。  
+这代表射线在屏幕空间中 X 和 Y 方向上占了多少像素。
 
 <p align="center">
 <img src="../resources/images/Um4dzgL.png" alt="The reflection ray in screen space." title="The reflection ray in screen space.">
 </p>
 
 ```c
-  // ...
+// ...
 
-  float useX      = abs(deltaX) >= abs(deltaY) ? 1 : 0;
-  float delta     = mix(abs(deltaY), abs(deltaX), useX) * clamp(resolution, 0, 1);
+float useX      = abs(deltaX) >= abs(deltaY) ? 1 : 0;
+float delta     = mix(abs(deltaY), abs(deltaX), useX) * clamp(resolution, 0, 1);
 
-  // ...
+// ...
 ```
 
-To handle all of the various different ways (vertical, horizontal, diagonal, etc.) the line can be oriented,
-you'll need to keep track of and use the larger difference.
-The larger difference will help you determine
-how much to travel in the X and Y direction each iteration,
-how many iterations are needed to travel the entire line,
-and what percentage of the line does the current position represent.
+为了适配各种方向（垂直、水平、斜线等），  
+你需要判断哪个方向的差值更大。  
+较大的那个差值决定：
 
-`useX` is either one or zero.
-It is used to pick the X or Y dimension depending on which delta is bigger.
-`delta` is the larger delta of the two X and Y deltas.
-It is used to determine how much to march in either dimension each iteration and how many iterations to take during the first pass.
+- 每次迭代在 X 和 Y 上移动的量；
+- 需要迭代多少次才能走完整条射线；
+- 当前点在线上的相对位置百分比。
+
+`useX` 是 0 或 1，  
+用来选择 X 轴还是 Y 轴。  
+`delta` 是两个差值中较大的一个，  
+用于控制每次步进时的增量和总步数。
 
 ```c
-  // ...
+// ...
 
-  vec2  increment = vec2(deltaX, deltaY) / max(delta, 0.001);
+vec2  increment = vec2(deltaX, deltaY) / max(delta, 0.001);
 
-  // ...
+// ...
 ```
 
-Calculate how much to increment the X and Y position by using the larger of the two deltas.
-If the two deltas are the same, each will increment by one each iteration.
-If one delta is larger than the other, the larger delta will increment by one while the smaller one will increment by less than one.
-This assumes the `resolution` is one.
-If the resolution is less than one, the algorithm will skip over fragments.
+根据较大的 delta 值计算每次 X 和 Y 上的增量。  
+如果两个 delta 一样大，则每次都加 1。  
+否则，大的那一维加 1，小的那一维加 <1。  
+假设 `resolution = 1`，  
+当 `resolution < 1` 时，算法就会跳过某些像素。
 
 ```c
 startFrag  = ( 1,  4)
@@ -349,9 +339,8 @@ increment  = (deltaX, deltaY) / delta
            = ( 9 / 5,      2)
 ```
 
-For example, say the `resolution` is 0.5.
-The larger dimension will increment by two fragments instead of one.
-
+例如，`resolution` 为 0.5 时，  
+较大的维度每步进 2 像素而不是 1。
 
 ```c
   // ...
@@ -362,20 +351,20 @@ The larger dimension will increment by two fragments instead of one.
   // ...
 ```
 
-To move from the start fragment to the end fragment, the algorithm uses linear interpolation.
+为了从起始片元移动到结束片元，算法使用线性插值：
 
 ```c
 current position x = (start x) * (1 - search1) + (end x) * search1;
 current position y = (start y) * (1 - search1) + (end y) * search1;
 ```
 
-`search1` ranges from zero to one.
-When `search1` is zero, the current position is the start fragment.
-When `search1` is one, the current position is the end fragment.
-For any other value, the current position is somewhere between the start and end fragment.
+`search1` 的取值范围是 0 到 1。  
+- 当 `search1` 为 0 时，当前坐标等于起始片元；  
+- 当 `search1` 为 1 时，当前坐标等于结束片元；  
+- 当 `search1` 为其他值时，当前坐标在起始和结束片元之间。
 
-`search0` is used to remember the last position on the line where the ray missed or didn't intersect with any geometry.
-The algorithm will later use `search0` in the second pass to help refine the point at which the ray touches the scene's geometry.
+`search0` 用来记录上一次光线没有命中场景几何体的位置。  
+第二遍遍历时，算法会使用 `search0` 来帮助细化射线首次接触场景的位置。
 
 ```c
   // ...
@@ -386,8 +375,8 @@ The algorithm will later use `search0` in the second pass to help refine the poi
   // ...
 ```
 
-`hit0` indicates there was an intersection during the first pass.
-`hit1` indicates there was an intersection during the second pass.
+- `hit0` 表示第一次遍历期间发生了碰撞；
+- `hit1` 表示第二次遍历期间发生了碰撞。
 
 ```c
   // ...
@@ -398,18 +387,17 @@ The algorithm will later use `search0` in the second pass to help refine the poi
   // ...
 ```
 
-The `viewDistance` value is how far away from the camera the current point on the ray is.
-Recall that for Panda3D, the Y dimension goes in and out of the screen in view space.
-For other systems, the Z dimension goes in and out of the screen in view space.
-In any case, `viewDistance` is how far away from the camera the ray currently is.
-Note that if you use the depth buffer, instead of the vertex positions in view space, the `viewDistance` would be the Z depth.
+`viewDistance` 是当前光线点离摄像机的距离。  
+在 Panda3D 中，视空间的 Y 轴表示从屏幕外向内；  
+在其他系统中，通常是 Z 轴。  
+不管哪种方式，`viewDistance` 表示光线在当前点离摄像机的远近程度。
 
-Make sure not to confuse the `viewDistance` value with the Y dimension of the line being traveled across the screen.
-The `viewDistance` goes from the camera into scene while the Y dimension of the line travels up or down the screen.
+注意不要将 `viewDistance` 与屏幕上的 Y 轴混淆。  
+`viewDistance` 表示的是视空间中的深度；  
+而 Y 轴是在屏幕平面上上下移动。
 
-The `depth` is the view distance difference between the current ray point and scene position.
-It tells you how far behind or in front of the scene the ray currently is.
-Remember that the scene positions are the interpolated vertex positions stored in the position framebuffer texture.
+`depth` 是当前光线点的视距离与场景采样位置视距离之间的差值，  
+用于判断该点是位于场景前方还是后方。
 
 ```c
   // ...
@@ -419,10 +407,9 @@ Remember that the scene positions are the interpolated vertex positions stored i
   // ...
 ```
 
-You can now begin the first pass.
-The first pass runs while `i` is less than the `delta` value.
-When `i` reaches `delta`, the algorithm has traveled the entire length of the line.
-Remember that `delta` is the larger of the two X and Y deltas.
+现在可以开始第一次遍历了。  
+第一次遍历在 `i < delta` 时持续。  
+当 `i == delta` 时，算法已经走完了整条反射线。
 
 <p align="center">
 <img src="../resources/images/Qnsvkc0.gif" alt="Screen Space Transformations" title="Screen Space Transformations">
@@ -438,8 +425,8 @@ Remember that `delta` is the larger of the two X and Y deltas.
     // ...
 ```
 
-Advance the current fragment position closer to the end fragment.
-Use this new fragment position to look up a scene position stored in the position framebuffer texture.
+将当前片元位置推进，靠近终点片元。  
+使用这个新位置在位置贴图中采样场景的位置。
 
 ```c
     // ...
@@ -454,17 +441,12 @@ Use this new fragment position to look up a scene position stored in the positio
     // ...
 ```
 
-Calculate the percentage or portion of the line the current fragment represents.
-If `useX` is zero, use the Y dimension of the line.
-If `useX` is one, use the X dimension of the line.
+计算当前片元所占的线段百分比。  
+如果 `useX == 0`，使用 Y 方向；否则使用 X 方向。
 
-When `frag` equals `startFrag`,
-`search1` equals zero since `frag - startFrag` is zero.
-When `frag` equals `endFrag`,
-`search1` is one since `frag - startFrag` equals `delta`.
-
-`search1` is the percentage or portion of the line the current position represents.
-You'll need this to interpolate between the ray's view-space start and end distances from the camera.
+- 当 `frag == startFrag`，`search1 == 0`；
+- 当 `frag == endFrag`，`search1 == 1`；
+- 中间值表示当前在射线线段上的相对位置。
 
 ```c
     // ...
@@ -474,22 +456,20 @@ You'll need this to interpolate between the ray's view-space start and end dista
     // ...
 ```
 
-Using `search1`,
-interpolate the view distance (distance from the camera in view space) for the current position you're at on the reflection ray.
+使用 `search1` 来插值当前点在视空间中的距离。
 
 ```c
-// Incorrect.
+// 错误方式
 viewDistance = mix(startView.y, endView.y, search1);
 
-// Correct.
+// 正确方式
 viewDistance = (startView.y * endView.y) / mix(endView.y, startView.y, search1);
 ```
 
-You may be tempted to just interpolate between the view distances of the start and end view-space positions
-but this will give you the wrong view distance for the current position on the reflection ray.
-Instead, you'll need to perform
-[perspective-correct interpolation](https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf)
-which you see here.
+尽管你可能会尝试直接用 `mix` 插值视距离，但这会导致误差。  
+应使用透视修正插值（perspective-correct interpolation）。
+
+参考：[Perspective-Correct Interpolation](https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf)
 
 ```c
     // ...
@@ -499,7 +479,7 @@ which you see here.
     // ...
 ```
 
-Calculate the difference between the ray's view distance at this point and the sampled view distance of the scene at this point.
+计算光线当前点的视距与场景采样位置的视距之间的差值。
 
 ```c
     // ...
@@ -514,13 +494,9 @@ Calculate the difference between the ray's view distance at this point and the s
     // ...
 ```
 
-If the difference is between zero and the thickness,
-this is a hit.
-Set `hit0` to one and exit the first pass.
-If the difference is not between zero and the thickness,
-this is a miss.
-Set `search0` to equal `search1` to remember this position as the last known miss.
-Continue marching the ray towards the end fragment.
+如果差值在 0 和 `thickness` 之间，说明碰撞发生了。  
+设置 `hit0 = 1`，并跳出第一次遍历。  
+否则记录当前 `search1` 为 `search0`，继续步进。
 
 ```c
   // ...
@@ -530,8 +506,7 @@ Continue marching the ray towards the end fragment.
   // ...
 ```
 
-At this point you have finished the first pass.
-Set the `search1` position to be halfway between the position of the last miss and the position of the last hit.
+第一次遍历结束后，将 `search1` 设为最后一次 miss 与 hit 之间的中点。
 
 ```c
   // ...
@@ -543,8 +518,7 @@ Set the `search1` position to be halfway between the position of the last miss a
   // ...
 ```
 
-You can now begin the second pass.
-If the reflection ray didn't hit anything in the first pass, skip the second pass.
+开始第二次遍历。如果第一次遍历没有碰撞（`hit0 == 0`），跳过这一步。
 
 ```c
     // ...
@@ -556,8 +530,7 @@ If the reflection ray didn't hit anything in the first pass, skip the second pas
     // ...
 ```
 
-As you did in the first pass,
-use the current position on the ray line to sample a position from the scene.
+像第一次遍历那样，采样当前射线位置对应的场景坐标。
 
 ```c
     // ...
@@ -568,8 +541,7 @@ use the current position on the ray line to sample a position from the scene.
     // ...
 ```
 
-Interpolate the view distance for the current ray line position
-and calculate the camera distance difference between the ray at this point and the scene.
+计算当前点的视距，并与场景视距做差。
 
 ```c
     // ...
@@ -586,12 +558,9 @@ and calculate the camera distance difference between the ray at this point and t
     // ...
 ```
 
-If the depth is within bounds, this is a hit.
-Set `hit1` to one and set `search1` to be halfway between the last known miss position and this current hit position.
-If the depth is not within bounds, this is a miss.
-Set `search1` to be halfway between this current miss position and the last known hit position.
-Move `search0` to this current miss position.
-Continue this back and forth search while `i` is less than `steps`.
+若深度差值在合法范围内，说明命中；设置 `hit1 = 1`，  
+更新 `search1` 为 miss 和当前 hit 的中点。  
+如果没有命中，更新 `search0` 和 `search1`，继续二分。
 
 ```c
   // ...
@@ -602,10 +571,9 @@ Continue this back and forth search while `i` is less than `steps`.
   // ...
 ```
 
-You're now done with the second and final pass but before you can output the reflected UV coordinates,
-you'll need to calculate the `visibility` of the reflection.
-The `visibility` ranges from zero to one.
-If there wasn't a hit in the second pass, the `visibility` is zero.
+第二次遍历结束，准备计算最终反射的可见性（visibility）。  
+`visibility` 的取值范围是 0 到 1；  
+若未命中，值为 0。
 
 ```c
   // ...
@@ -615,9 +583,8 @@ If there wasn't a hit in the second pass, the `visibility` is zero.
   // ...
 ```
 
-If the reflected scene position's alpha or `w` component is zero,
-the `visibility` is zero.
-Note that if `w` is zero, there was no scene position at that point.
+如果采样点的 alpha 分量为 0（即 `w == 0`），则说明没有场景信息。  
+此时 `visibility == 0`。
 
 <p align="center">
 <img src="../resources/images/7e2cOdZ.gif" alt="Reflection ray pointing towards the camera position." title="Reflection ray pointing towards the camera position.">
@@ -636,19 +603,11 @@ Note that if `w` is zero, there was no scene position at that point.
   // ...
 ```
 
-One of the ways in which screen space reflection can fail is when the reflection ray points in the general direction of the camera.
-If the reflection ray points towards the camera and hits something, it's most likely hitting the back side of something facing away
-from the camera.
+当反射向量朝向摄像机时，可能会出现 SSR 错误。  
+为了解决这一问题，使用 dot 值对反射做渐变衰减。
 
-To handle this failure case, you'll need to gradually fade out the reflection based
-on how much the reflection vector points to the camera's position.
-If the reflection vector points directly in the opposite direction of the position vector,
-the visibility is zero.
-Any other direction results in the visibility being greater than zero.
-
-Remember to normalize both vectors when taking the dot product.
-`unitPositionFrom` is the normalized position vector.
-It has a length or magnitude of one.
+- dot 为 -1（完全相反）时，`visibility = 1`  
+- dot 为 1（完全相同方向）时，`visibility = 0`
 
 ```c
   // ...
@@ -664,10 +623,7 @@ It has a length or magnitude of one.
   // ...
 ```
 
-As you sample scene positions along the reflection ray,
-you're hoping to find the exact point where the reflection ray first intersects with the scene's geometry.
-Unfortunately, you may not find this particular point.
-Fade out the reflection the further it is from the intersection point you did find.
+如果你没能准确找到交点，可以根据差值与 `thickness` 的比值进行模糊衰减。
 
 ```c
   // ...
@@ -684,13 +640,12 @@ Fade out the reflection the further it is from the intersection point you did fi
   // ...
 ```
 
-Fade out the reflection based on how far way the reflected point is from the initial starting point.
-This will fade out the reflection instead of it ending abruptly as it reaches `maxDistance`.
+根据反射点与起点之间的距离进行进一步衰减，  
+避免反射突然中断。
 
 <p align="center">
 <img src="../resources/images/i0btBna.gif" alt="Reflection ray exiting the frustum." title="Reflection ray exiting the frustum.">
 </p>
-
 
 ```c
   // ...
@@ -701,8 +656,7 @@ This will fade out the reflection instead of it ending abruptly as it reaches `m
   // ...
 ```
 
-If the reflected UV coordinates are out of bounds, set the `visibility` to zero.
-This occurs when the reflection ray travels outside the camera's frustum.
+如果 UV 坐标超出了 [0, 1] 范围，表示光线跑出视锥体，`visibility = 0`。
 
 ```c
   visibility = clamp(visibility, 0, 1);
@@ -710,7 +664,7 @@ This occurs when the reflection ray travels outside the camera's frustum.
   uv.ba = vec2(visibility);
 ```
 
-Set the blue and alpha component to the visibility as the UV coordinates only need the RG or XY components of the final vector.
+将 visibility 存储在 uv 向量的蓝色和 alpha 分量中；红绿分量是 UV 坐标。
 
 ```c
   // ...
@@ -720,16 +674,17 @@ Set the blue and alpha component to the visibility as the UV coordinates only ne
   // ...
 ```
 
-The final fragment color is the reflected UV coordinates and the visibility.
+最终片元颜色即为反射 UV 坐标（uv.rg）以及其可见性（uv.ba）。
 
-### Specular Map
+
+### 高光贴图（Specular Map）
 
 <p align="center">
 <img src="../resources/images/iuFYVWB.gif" alt="Specular Map" title="Specular Map">
 </p>
 
-In addition to the reflected UV coordinates, you'll also need a specular map.
-The example code creates one using the fragment's material specular properties.
+除了反射 UV 坐标之外，你还需要一个高光贴图。  
+示例代码使用片元材质的高光属性来创建它：
 
 ```c
 // ...
@@ -753,38 +708,41 @@ void main() {
 }
 ```
 
-The specular fragment shader is quite simple.
-Using the fragment's material,
-the shader outputs the specular color and uses the alpha channel for the shininess.
-The shininess is mapped to a range of zero to one.
-In Blender, the maximum specular hardness or shininess is 511.
-When exporting from Blender to Panda3D, 511 is exported as 127.75.
-Feel free to adjust the shininess to range of zero to one however you see fit for your particular stack.
+这个高光片元着色器非常简单。  
+它使用片元的材质信息输出高光颜色，并将 alpha 通道用于光泽度（shininess）。  
+光泽度被映射到 0 到 1 的范围内。  
+在 Blender 中，最高的高光硬度（shininess）是 511，  
+从 Blender 导出到 Panda3D 时，511 被转换为 127.75。  
+你可以根据自己的需求调整这个值，使它落在 0 到 1 的范围内。
 
-The example code generates a specular map from the material specular properties but you
-could create one in GIMP, for example, and attach that as a texture to your 3D model.
-For instance,
-say your 3D treasure chest has shiny brackets on it but nothing else should reflect the environment.
-You can paint the brackets some shade of gray and the rest of the treasure chest black.
-This will mask off the brackets, allowing your shader to render the reflections on only the brackets
-and nothing else.
+示例代码根据材质高光属性生成高光贴图，  
+但你也可以在 GIMP 等软件中手动绘制，并作为纹理附加到你的 3D 模型上。
 
-### Scene Colors
+比如：  
+假设你的 3D 宝箱上有一些闪亮的金属扣件，但其它部分不需要反射环境。  
+你可以将扣件绘制为灰色，而将其它区域涂成黑色。  
+这样，shader 就会只在扣件区域渲染反射，而忽略其它部分。
+
+---
+
+### 场景颜色（Scene Colors）
 
 <p align="center">
 <img src="../resources/images/diBSxPI.png" alt="Scene Colors" title="Scene Colors">
 </p>
 
-You'll need to render the parts of the scene you wish to reflect and store this in a framebuffer texture.
-This is typically just the scene without any reflections.
+你需要渲染场景中希望被反射的部分，并将其存储到一个 framebuffer 纹理中。  
+这通常是未加反射效果的场景。
 
-### Reflected Scene Colors
+---
+
+### 被反射的场景颜色（Reflected Scene Colors）
 
 <p align="center">
 <img src="../resources/images/UPvgfDU.gif" alt="Reflected Scene Colors" title="Reflected Scene Colors">
 </p>
 
-Here you see the reflected colors saved to a framebuffer texture.
+上图展示了保存到 framebuffer 纹理中的反射颜色。
 
 ```c
 // ...
@@ -795,8 +753,10 @@ uniform sampler2D colorTexture;
 // ...
 ```
 
-Once you have the reflected UV coordinates, looking up the reflected colors is fairly easy.
-You'll need the reflected UV coordinates texture and the color texture containing the colors you wish to reflect.
+一旦你得到了反射的 UV 坐标，查找反射颜色就很简单了。  
+你需要：
+- 一个反射 UV 坐标纹理（`uvTexture`）；
+- 一个包含待反射颜色的颜色纹理（`colorTexture`）。
 
 ```c
   // ...
@@ -810,7 +770,7 @@ You'll need the reflected UV coordinates texture and the color texture containin
   // ...
 ```
 
-Using the UV coordinates for the current fragment, look up the reflected color.
+使用当前片元的 UV 坐标，在颜色纹理中查找反射颜色。
 
 ```c
   // ...
@@ -820,8 +780,8 @@ Using the UV coordinates for the current fragment, look up the reflected color.
   // ...
 ```
 
-Recall that the reflected UV texture stored the visibility in the B or blue component.
-This is the alpha channel for the reflected colors framebuffer texture.
+回忆一下：反射 UV 纹理将可见性（visibility）存储在蓝色（B）通道中。  
+这将作为反射颜色 framebuffer 的 alpha 通道。
 
 ```c
   // ...
@@ -831,125 +791,191 @@ This is the alpha channel for the reflected colors framebuffer texture.
   // ...
 ```
 
-The fragment color is a mix between no reflection and the reflected color based on the visibility.
-The visibility was computed during the reflected UV coordinates step.
+最终的片元颜色是根据可见性 `alpha` 在黑色与反射颜色之间进行插值的结果。  
+可见性值是在反射 UV 坐标计算步骤中求出的。
 
-### Blurred Reflected Scene Colors
+### 高光贴图（Specular Map）
+
+<p align="center">
+<img src="../resources/images/iuFYVWB.gif" alt="Specular Map" title="Specular Map">
+</p>
+
+除了反射 UV 坐标之外，你还需要一个高光贴图。示例代码使用片元的材质高光属性创建该贴图：
+
+```c
+\#define MAX\_SHININESS 127.75
+
+uniform struct
+{ vec3 specular
+; float shininess
+;
+} p3d\_Material;
+
+out vec4 fragColor;
+
+void main() {
+fragColor =
+vec4
+( p3d\_Material.specular
+, clamp(p3d\_Material.shininess / MAX\_SHININESS, 0, 1)
+);
+}
+```
+
+该高光着色器非常简单。使用材质的高光颜色作为输出的 RGB 值，
+并将光泽度（shininess）通过映射后的 alpha 值输出。
+光泽度被映射到 0 到 1 范围内。Blender 中最大 shininess 是 511，
+但导出到 Panda3D 时会转换为 127.75。你可以根据具体需求调整这个范围。
+
+上述代码是通过材质的高光属性动态生成高光贴图，
+但你也可以使用 GIMP 等工具手动绘制灰度图作为贴图。
+
+例如：
+你的 3D 宝箱模型中只有金属扣件需要反射，其它部分不需要。
+你可以将金属扣件区域涂成灰色，其它区域涂成黑色。
+Shader 将根据这个贴图，仅在灰色区域渲染反射效果。
+
+---
+
+### 场景颜色（Scene Colors）
+
+<p align="center">
+<img src="../resources/images/diBSxPI.png" alt="Scene Colors" title="Scene Colors">
+</p>
+
+你需要渲染希望被反射的场景部分，并将其存入 framebuffer 纹理中。
+通常该场景不包含反射，仅是基本渲染结果。
+
+---
+
+### 被反射的场景颜色（Reflected Scene Colors）
+
+<p align="center">
+<img src="../resources/images/UPvgfDU.gif" alt="Reflected Scene Colors" title="Reflected Scene Colors">
+</p>
+
+下图展示了保存反射颜色的 framebuffer 纹理：
+
+```c
+uniform sampler2D uvTexture;
+uniform sampler2D colorTexture;
+```
+
+获取反射颜色的方式是：
+
+* 读取反射 UV 坐标纹理 `uvTexture`；
+* 用该坐标在颜色纹理 `colorTexture` 中查找颜色。
+
+```c
+vec2 texSize  = textureSize(uvTexture, 0).xy;
+vec2 texCoord = gl\_FragCoord.xy / texSize;
+
+vec4 uv    = texture(uvTexture,    texCoord);
+vec4 color = texture(colorTexture, uv.xy);
+```
+
+当前片元坐标用作查找反射 UV 的索引，再利用反射 UV 查找反射颜色。
+
+```c
+float alpha = clamp(uv.b, 0, 1);
+```
+
+反射 UV 纹理的 B（蓝色）通道存储的是 visibility 值，
+该值在反射颜色纹理中作为 alpha 通道使用。
+
+```c
+fragColor = vec4(mix(vec3(0), color.rgb, alpha), alpha);
+```
+
+最终颜色是在黑色和反射颜色之间基于 visibility 的插值。
+这个 visibility 是在计算反射 UV 坐标阶段确定的。
+
+---
+
+### 模糊的反射颜色（Blurred Reflected Scene Colors）
 
 <p align="center">
 <img src="../resources/images/gVvx1Ei.png" alt="Blurred Reflected Scene Colors" title="Blurred Reflected Scene Colors">
 </p>
 
-Now blur the reflected scene colors and store this in a framebuffer texture.
-The blurring is done using a box blur.
-Refer to the [SSAO blurring](ssao.md#blurring) step for details.
+现在对反射颜色进行模糊处理，并将其写入 framebuffer。模糊使用 box blur 算法，
+参考 [SSAO 模糊处理](ssao.md#blurring) 一节。
 
-The blurred reflected colors are used for surfaces that have a less than mirror like finish.
-These surfaces have tiny little hills and valleys that tend to diffuse or blur the reflection.
-I'll cover this more during the roughness calculation.
+模糊反射颜色用于非镜面材质表面，例如表面有细微粗糙度时，反射应被模糊处理。
+这部分将在 roughness 粗糙度计算时进一步讨论。
 
-### Reflections
+---
+
+### 最终反射合成（Reflections）
 
 ```c
-// ...
-
 uniform sampler2D colorTexture;
 uniform sampler2D colorBlurTexture;
 uniform sampler2D specularTexture;
-
-// ...
 ```
 
-To generate the final reflections, you'll need the three framebuffer textures computed earlier.
-You'll need the reflected colors, the blurred reflected colors, and the specular map.
+最终合成需要三个纹理：反射颜色、模糊反射颜色和高光贴图。
 
 ```c
-  // ...
-
-  vec4 specular  = texture(specularTexture,  texCoord);
-  vec4 color     = texture(colorTexture,     texCoord);
-  vec4 colorBlur = texture(colorBlurTexture, texCoord);
-
-  // ...
+vec4 specular  = texture(specularTexture,  texCoord);
+vec4 color     = texture(colorTexture,     texCoord);
+vec4 colorBlur = texture(colorBlurTexture, texCoord);
 ```
 
-Look up the specular amount and shininess, the reflected scene color, and the blurred reflected scene color.
+获取当前像素的高光信息、反射颜色和模糊反射颜色。
 
 ```c
-  // ...
+float specularAmount = dot(specular.rgb, vec3(1)) / 3;
 
-  float specularAmount = dot(specular.rgb, vec3(1)) / 3;
-
-  if (specularAmount <= 0) { fragColor = vec4(0); return; }
-
-  // ...
+if (specularAmount <= 0) {
+fragColor = vec4(0);
+return;
+}
 ```
 
-Map the specular color to a greyscale value.
-If the specular amount is none, set the frag color to nothing and return.
-
-Later on, you'll multiply the final reflection color by the specular amount.
-Multiplying by the specular amount allows you to control how much a material reflects its environment
-simply by brightening or darkening the greyscale value in the specular map.
+将 RGB 高光颜色转为灰度值作为反射强度。
+如果该值为 0，则不显示反射。
 
 ```c
-  dot(specular.rgb, vec3(1)) == (specular.r + specular.g + specular.b);
+dot(specular.rgb, vec3(1)) == (specular.r + specular.g + specular.b);
 ```
 
-Using the dot product to produce the greyscale value is just a short way of summing the three color components.
+使用点积简写将 RGB 三通道相加转为灰度值。
 
 ```c
-  // ...
-
-  float roughness = 1 - min(specular.a, 1);
-
-  // ...
+float roughness = 1 - min(specular.a, 1);
 ```
 
-Calculate the roughness based on the shininess value set during the specular map step.
-Recall that the shininess value was saved in the alpha channel of the specular map.
-The shininess determined how spread out or blurred the specular reflection was.
-Similarly, the `roughness` determines how blurred the reflection is.
-A roughness of one will produce the blurred reflection color.
-A roughness of zero will produce the non-blurred reflection color.
-Doing it this way allows you to control how blurred the reflection is just by changing
-the material's shininess value.
+利用高光贴图的 alpha 通道（存储的是 shininess）计算粗糙度 roughness。
+shininess 越大，反射越锐利，roughness 越小；shininess 越小，反射越模糊。
 
-The example code generates a roughness map from the material specular properties but you
-could create one in GIMP, for example, and attach that as a texture to your 3D model.
-For instance, say you have a tiled floor that has polished tiles and scratched up tiles.
-The polished tiles could be painted a more translucent white while the scratched up tiles could be painted a more opaque white.
-The more translucent/transparent the greyscale value, the more the shader will use the blurred reflected color.
-The scratched tiles will have a blurry reflection while the polished tiles will have a mirror like reflection.
+你也可以通过绘制 roughness 贴图（例如在 GIMP 中），标识哪些区域表面光滑，哪些区域粗糙。
+例如一块瓷砖地面有些区域抛光，有些区域刮花。
+可将抛光区域设为接近黑色（低 roughness），刮花区域设为接近白色（高 roughness）。
+shader 会据此决定使用清晰反射还是模糊反射。
 
 ```c
-  // ...
-
-  fragColor = mix(color, colorBlur, roughness) * specularAmount;
-
-  // ...
+fragColor = mix(color, colorBlur, roughness) \* specularAmount;
 ```
 
-Mix the reflected color and blurred reflected color based on the roughness.
-Multiply that vector by the specular amount and then set that value as the fragment color.
+使用 roughness 在 color（清晰反射）和 colorBlur（模糊反射）之间插值。
+再乘以 specularAmount 得到最终颜色。
 
-The reflection color is a mix between the reflected scene color and the blurred reflected scene color based on the roughness.
-A high roughness will produce a blurry reflection meaning the surface is rough.
-A low roughness will produce a clear reflection meaning the surface is smooth.
+---
 
-### Source
+### 源码参考
 
-- [main.cxx](../demonstration/src/main.cxx)
-- [base.vert](../demonstration/shaders/vertex/base.vert)
-- [basic.vert](../demonstration/shaders/vertex/basic.vert)
-- [position.frag](../demonstration/shaders/fragment/position.frag)
-- [normal.frag](../demonstration/shaders/fragment/normal.frag)
-- [material-specular.frag](../demonstration/shaders/fragment/material-specular.frag)
-- [screen-space-reflection.frag](../demonstration/shaders/fragment/screen-space-reflection.frag)
-- [reflection-color.frag](../demonstration/shaders/fragment/reflection-color.frag)
-- [reflection.frag](../demonstration/shaders/fragment/reflection.frag)
-- [box-blur.frag](../demonstration/shaders/fragment/box-blur.frag)
-- [base-combine.frag](../demonstration/shaders/fragment/base-combine.frag)
+* [main.cxx](../demonstration/src/main.cxx)
+* [base.vert](../demonstration/shaders/vertex/base.vert)
+* [basic.vert](../demonstration/shaders/vertex/basic.vert)
+* [position.frag](../demonstration/shaders/fragment/position.frag)
+* [normal.frag](../demonstration/shaders/fragment/normal.frag)
+* [material-specular.frag](../demonstration/shaders/fragment/material-specular.frag)
+* [screen-space-reflection.frag](../demonstration/shaders/fragment/screen-space-reflection.frag)
+* [reflection-color.frag](../demonstration/shaders/fragment/reflection-color.frag)
+* [reflection.frag](../demonstration/shaders/fragment/reflection.frag)
+* [box-blur.frag](../demonstration/shaders/fragment/box-blur.frag)
+* [base-combine.frag](../demonstration/shaders/fragment/base-combine.frag)
 
 ## Copyright
 

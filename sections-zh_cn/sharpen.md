@@ -4,16 +4,16 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](dilation.md)
 
-# 3D Game Shaders For Beginners
+# 3D游戏着色器入门
 
-## Sharpen
+## 锐化效果（Sharpen）
 
 <p align="center">
-<img src="../resources/images/VFDKNvl.gif" alt="Sharpen" title="Sharpen">
+<img src="../resources/images/VFDKNvl.gif" alt="锐化效果" title="锐化效果">
 </p>
 
-The sharpen effect increases the contrast at the edges of the image.
-This comes in handy when your graphics are bit too soft.
+锐化效果会增强图像边缘的对比度，  
+当你的图像看起来有点模糊时，这个效果非常有用。
 
 ```c
   // ...
@@ -23,9 +23,9 @@ This comes in handy when your graphics are bit too soft.
   // ...
 ```
 
-You can control how sharp the result is by adjusting the amount.
-An amount of zero leaves the image untouched.
-Try negative values for an odd look.
+你可以通过调整 `amount` 来控制锐化的强度。  
+`amount` 为零时图像保持不变。  
+你也可以尝试负值，得到奇特的视觉效果。
 
 ```c
   // ...
@@ -36,8 +36,8 @@ Try negative values for an odd look.
   // ...
 ```
 
-Neighboring fragments are multiplied by `amount * -1`.
-The current fragment is multiplied by `amount * 4 + 1`.
+邻近像素的权重是 `amount * -1`，  
+当前像素的权重是 `amount * 4 + 1`。
 
 ```c
   // ...
@@ -60,8 +60,8 @@ The current fragment is multiplied by `amount * 4 + 1`.
   // ...
 ```
 
-The neighboring fragments are up, down, left, and right.
-After multiplying both the neighbors and the current fragment by their particular values, sum the result.
+邻近的像素是当前像素的上下左右四个方向。  
+对邻近像素和当前像素分别乘以它们的权重后，求和得到最终颜色。
 
 ```c
     // ...
@@ -71,13 +71,14 @@ After multiplying both the neighbors and the current fragment by their particula
     // ...
 ```
 
-This sum is the final fragment color.
+这个和即为最终的片元颜色。
 
-### Source
+### 源码参考
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [basic.vert](../demonstration/shaders/vertex/basic.vert)
 - [sharpen.frag](../demonstration/shaders/fragment/sharpen.frag)
+
 
 ## Copyright
 

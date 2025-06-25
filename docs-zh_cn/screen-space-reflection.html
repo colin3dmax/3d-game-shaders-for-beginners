@@ -106,120 +106,111 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="screen-space-refraction.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="screen-space-reflection-ssr">Screen Space Reflection (SSR)</h2>
+<h1 id="3d-游戏着色器入门">3D 游戏着色器入门</h1>
+<h2 id="屏幕空间反射ssr">屏幕空间反射（SSR）</h2>
 <p align="center">
 <img src="../resources/images/AYG4tvg.gif" alt="Screen Space Reflections" title="Screen Space Reflections">
 </p>
 
-<p>Adding reflections can really ground your scene. Wet and shiny
-objects spring to life as nothing makes something look wet or shiny
-quite like reflections. With reflections, you can really sell the
-illusion of water and metallic objects.</p>
-<p>In the <a href="lighting.html">lighting</a> section, you simulated the
-reflected, mirror-like image of the light source. This was the process
-of rendering the specular reflection. Recall that the specular light was
-computed using the reflected light direction. Similarly, using screen
-space reflection or SSR, you can simulate the reflection of other
-objects in the scene instead of just the light source. Instead of the
-light ray coming from the source and bouncing off into the camera, the
-light ray comes from some object in the scene and bounces off into the
-camera.</p>
-<p>SSR works by reflecting the screen image onto itself using only
-itself. Compare this to cube mapping which uses six screens or textures.
-In cube mapping, you reflect a ray from some point in your scene to some
-point on the inside of a cube surrounding your scene. In SSR, you
-reflect a ray from some point on your screen to some other point on your
-screen. By reflecting your screen onto itself, you can create the
-illusion of reflection. This illusion holds for the most part but SSR
-does fail in some cases as you'll see.</p>
-<h3 id="ray-marching">Ray Marching</h3>
-<p>Screen space reflection uses a technique known as ray marching to
-determine the reflection for each fragment. Ray marching is the process
-of iteratively extending or contracting the length or magnitude of some
-vector in order to probe or sample some space for information. The ray
-in screen space reflection is the position vector reflected about the
-normal.</p>
-<p>Intuitively, a light ray hits some point in the scene, bounces off,
-travels in the opposite direction of the reflected position vector,
-bounces off the current fragment, travels in the opposite direction of
-the position vector, and hits the camera lens allowing you to see the
-color of some point in the scene reflected in the current fragment. SSR
-is the process of tracing the light ray's path in reverse. It tries to
-find the reflected point the light ray bounced off of and hit the
-current fragment. With each iteration, the algorithm samples the scene's
-positions or depths, along the reflection ray, asking each time if the
-ray intersected with the scene's geometry. If there is an intersection,
-that position in the scene is a potential candidate for being reflected
-by the current fragment.</p>
-<p>Ideally there would be some analytical method for determining the
-first intersection point exactly. This first intersection point is the
-only valid point to reflect in the current fragment. Instead, this
-method is more like a game of battleship. You can't see the
-intersections (if there are any) so you start at the base of the
-reflection ray and call out coordinates as you travel in the direction
-of the reflection. With each call, you get back an answer of whether or
-not you hit something. If you do hit something, you try points around
-that area hoping to find the exact point of intersection.</p>
+<p>添加反射可以让你的场景更具真实感。<br />
+湿润和有光泽的物体会变得生动起来，没有什么比反射更能让物体看起来湿润或闪亮了。<br />
+借助反射，你可以更好地营造出水面和金属物体的幻觉。</p>
+<p>在<a
+href="lighting.html">光照</a>部分，你模拟了光源的镜面反射图像。<br />
+这是渲染镜面反射的过程。<br />
+还记得我们是用反射光方向来计算镜面光的。<br />
+类似地，使用屏幕空间反射（SSR）你可以模拟场景中其他物体的反射，而不仅仅是光源。<br />
+这不再是从光源发出的光线反射进入摄像机，而是场景中某个物体发出的光线反射进入摄像机。</p>
+<p>SSR 的工作原理是使用屏幕图像自身来对自身进行反射。<br />
+这与使用六面贴图（立方体贴图）不同，后者使用六个视角的纹理。<br />
+在立方体贴图中，你从场景中某点发出一条射线，并反射到包围整个场景的立方体内部的某一点。<br />
+而在 SSR
+中，你从屏幕上的一个点发出射线，并反射到屏幕上的另一个点。<br />
+通过将屏幕反射到自己上面，你可以制造出反射的幻觉。<br />
+这种幻觉在大多数情况下是有效的，但如你将看到的，它也有失效的时候。</p>
+<h3 id="光线步进ray-marching">光线步进（Ray Marching）</h3>
+<p>屏幕空间反射使用一种称为“光线步进”的技术来为每个片元确定反射。<br />
+光线步进是一种迭代延展或缩短某个向量的长度（或大小）来在空间中探测或采样信息的方法。<br />
+在屏幕空间反射中，反射光线是相对于法线方向反射后的位置向量。</p>
+<p>直观上讲，一条光线打到场景中的某个点，<br />
+发生反射，<br />
+然后沿反射向量的相反方向传播，<br />
+打到当前片元，<br />
+再沿位置向量的相反方向传播，<br />
+最终击中摄像机镜头，从而让你在当前片元中看到场景中某点的反射颜色。<br />
+SSR 就是在反向追踪这条光线路径。<br />
+它试图找出光线反射并击中当前片元的那个反射点。<br />
+每次迭代时，<br />
+算法会沿着反射光线采样场景的位置或深度，<br />
+每次判断光线是否与场景几何体相交。<br />
+如果有相交，<br />
+那么这个位置就是当前片元可能反射的候选点。</p>
+<p>理想情况下，应该有某种解析方法可以精确求出第一次相交的点。<br />
+因为这个第一次相交点才是当前片元应该反射的唯一有效点。<br />
+但实际上，这个方法更像是一场“战舰游戏”。<br />
+你看不到是否有相交点，因此只能从反射光线的起点开始，沿着方向一个一个坐标“喊出来”。<br />
+每喊一个，就看看是否“击中”。<br />
+如果击中，<br />
+你就围绕那个区域再尝试，希望找出准确的相交点。</p>
 <p align="center">
 <img src="../resources/images/wnAC7NI.gif" alt="SSR Ray Marching" title="SSR Ray Marching">
 </p>
 
-<p>Here you see ray marching being used to calculate each fragment's
-reflected point. The vertex normal is the bright green arrow, the
-position vector is the bright blue arrow, and the bright red vector is
-the reflection ray marching through view space.</p>
-<h3 id="vertex-positions">Vertex Positions</h3>
-<p>Like SSAO, you'll need the vertex positions in view space. Referrer
-back to <a href="ssao.html#vertex-positions">SSAO</a> for details.</p>
-<h3 id="vertex-normals">Vertex Normals</h3>
-<p>To compute the reflections, you'll need the vertex normals in view
-space. Referrer back to <a href="ssao.html#vertex-normals">SSAO</a> for
-details.</p>
+<p>这里展示了如何使用光线步进来计算每个片元的反射点。<br />
+绿色亮箭头表示顶点法线，<br />
+蓝色亮箭头是位置向量，<br />
+红色亮箭头是通过视空间进行步进的反射射线。</p>
+<h3 id="顶点位置">顶点位置</h3>
+<p>与 SSAO 一样，你需要将顶点位置转换到视空间中。<br />
+参见 <a href="ssao.html#vertex-positions">SSAO</a> 章节获取更多细节。</p>
+<h3 id="顶点法线">顶点法线</h3>
+<p>为了计算反射，你也需要将顶点法线转换到视空间中。<br />
+参见 <a href="ssao.html#vertex-normals">SSAO</a> 章节获取更多细节。</p>
 <p align="center">
 <img src="../resources/images/1cE2vBY.gif" alt="SSR using normal maps." title="SSR using normal maps.">
 </p>
 
-<p>Here you see SSR using the normal mapped normals instead of the
-vertex normals. Notice how the reflection follows the ripples in the
-water versus the more mirror like reflection shown earlier.</p>
-<p>To use the normal maps instead, you'll need to transform the normal
-mapped normals from tangent space to view space just like you did in the
-lighting calculations. You can see this being done in <a
-href="../demonstration/shaders/fragment/normal.frag">normal.frag</a>.</p>
-<h3 id="position-transformations">Position Transformations</h3>
+<p>这里展示的是使用法线贴图中的法线进行 SSR，<br />
+而不是使用顶点法线。<br />
+注意反射如何随着水面波纹而变化，<br />
+而不是之前所展示的那种镜面反射效果。</p>
+<p>要使用法线贴图，<br />
+你需要像在光照计算中那样将法线从切线空间变换到视空间。<br />
+可以在 <a
+href="../demonstration/shaders/fragment/normal.frag">normal.frag</a>
+中看到这个过程。</p>
+<h3 id="位置变换">位置变换</h3>
 <p align="center">
 <img src="../resources/images/Qnsvkc0.gif" alt="Position Transformations" title="Position Transformations">
 </p>
 
-<p>Just like <a href="ssao.html">SSAO</a>, SSR goes back and forth between
-the screen and view space. You'll need the camera lens' projection
-matrix to transform points in view space to clip space. From clip space,
-you'll have to transform the points again to UV space. Once in UV space,
-you can sample a vertex/fragment position from the scene which will be
-the closest position in the scene to your sample. This is the <em>screen
-space</em> part in <em>screen space reflection</em> since the "screen"
-is a texture UV mapped over a screen shaped rectangle.</p>
-<h3 id="reflected-uv-coordinates">Reflected UV Coordinates</h3>
-<p>There are a few ways you can implement SSR. The example code starts
-the reflection process by computing a reflected UV coordinate for each
-screen fragment. You could skip this part and go straight to computing
-the reflected color instead, using the final rendering of the scene.</p>
-<p>Recall that UV coordinates range from zero to one for both U and V.
-The screen is just a 2D texture UV mapped over a screen-sized rectangle.
-Knowing this, the example code doesn't actually need the final rendering
-of the scene to compute the reflections. It can instead calculate what
-UV coordinate each screen pixel will eventually use. These calculated UV
-coordinates can be saved to a framebuffer texture and used later when
-the scene has been rendered.</p>
+<p>与 <a href="ssao.html">SSAO</a> 一样，SSR
+也需要在屏幕空间和视空间之间来回转换。<br />
+你需要相机镜头的投影矩阵来将视空间中的点变换到裁剪空间（clip
+space）。<br />
+再从裁剪空间转换到 UV 空间。<br />
+在 UV 空间中，<br />
+你可以从场景中采样顶点或片元位置，<br />
+这些位置就是你采样点在场景中最接近的位置。<br />
+这就是“屏幕空间反射”中的“屏幕空间”部分，<br />
+因为“屏幕”本质上是一张映射到屏幕大小矩形上的 UV 纹理。</p>
+<h3 id="反射的-uv-坐标">反射的 UV 坐标</h3>
+<p>你可以用几种不同的方式来实现 SSR。<br />
+示例代码是从计算每个屏幕片元的反射 UV 坐标开始反射过程的。<br />
+你也可以跳过这一步，直接计算反射颜色，使用的是场景最终渲染的结果。</p>
+<p>回忆一下，UV 坐标的 U 和 V 值范围都是从 0 到 1。<br />
+屏幕本质上是一张映射到屏幕大小矩形上的 2D 纹理。<br />
+知道这一点后，示例代码实际上不需要场景的最终渲染图像来计算反射。<br />
+它可以直接计算每个屏幕像素最终要使用的 UV 坐标。<br />
+这些计算出的 UV 坐标可以保存到帧缓冲纹理中，<br />
+在渲染完成后再使用。</p>
 <p align="center">
 <img src="../resources/images/pkQcGkD.gif" alt="Reflected UVs" title="Reflected UVs">
 </p>
 
-<p>Here you see the reflected UV coordinates. Without even rendering the
-scene yet, you can get a good feel for what the reflections will look
-like.</p>
+<p>上图显示的是反射后的 UV 坐标。<br />
+即使场景还没渲染出来，<br />
+你也可以预先感受到反射大致会是什么样子。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">//...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>uniform mat4 lensProjection<span class="op">;</span></span>
@@ -228,177 +219,159 @@ like.</p>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>uniform sampler2D normalTexture<span class="op">;</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">//...</span></span></code></pre></div>
-<p>You'll need the camera lens' projection matrix as well as the
-interpolated vertex positions and normals in view space.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<p>你需要相机镜头的投影矩阵，以及视空间中插值得到的顶点位置和法线。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> maxDistance <span class="op">=</span> <span class="dv">15</span><span class="op">;</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> resolution  <span class="op">=</span> <span class="fl">0.3</span><span class="op">;</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>   steps       <span class="op">=</span> <span class="dv">10</span><span class="op">;</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> thickness   <span class="op">=</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> maxDistance <span class="op">=</span> <span class="dv">15</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> resolution  <span class="op">=</span> <span class="fl">0.3</span><span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span>   steps       <span class="op">=</span> <span class="dv">10</span><span class="op">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> thickness   <span class="op">=</span> <span class="fl">0.5</span><span class="op">;</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Like the other effects, SSR has a few parameters you can adjust.
-Depending on the complexity of the scene, it may take you awhile to find
-the right settings. Getting screen space reflections to look just right
-tends to be difficult when reflecting complex geometry.</p>
-<p>The <code>maxDistance</code> parameter controls how far a fragment
-can reflect. In other words, it controls the maximum length or magnitude
-of the reflection ray.</p>
-<p>The <code>resolution</code> parameter controls how many fragments are
-skipped while traveling or marching the reflection ray during the first
-pass. This first pass is to find a point along the ray's direction where
-the ray enters or goes behind some geometry in the scene. Think of this
-first pass as the rough pass. Note that the <code>resolution</code>
-ranges from zero to one. Zero will result in no reflections while one
-will travel fragment-by-fragment along the ray's direction. A
-<code>resolution</code> of one can slow down your FPS considerably
-especially with a large <code>maxDistance</code>.</p>
-<p>The <code>steps</code> parameter controls how many iterations occur
-during the second pass. This second pass is to find the exact point
-along the reflection ray's direction where the ray immediately hits or
-intersects with some geometry in the scene. Think of this second pass as
-the refinement pass.</p>
-<p>The <code>thickness</code> controls the cutoff between what counts as
-a possible reflection hit and what does not. Ideally, you'd like to have
-the ray immediately stop at some camera-captured position or depth in
-the scene. This would be the exact point where the light ray bounced
-off, hit your current fragment, and then bounced off into the camera.
-Unfortunately the calculations are not always that precise so
-<code>thickness</code> provides some wiggle room or tolerance. You'll
-want the thickness to be as small as possible—just a short distance
-beyond a sampled position or depth.</p>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>与其他特效一样，SSR 有一些可以调节的参数。<br />
+根据场景的复杂度，找到合适设置可能需要一些时间。<br />
+当你要反射复杂几何体时，让 SSR 看起来“正确”会特别困难。</p>
+<ul>
+<li><p><code>maxDistance</code> 控制片元最多可以反射多远，<br />
+换句话说，它决定了反射射线的最大长度或大小。</p></li>
+<li><p><code>resolution</code>
+控制反射射线第一次遍历时跳过多少片元。<br />
+这第一次遍历用于找到射线进入或穿过某个几何体的粗略位置。<br />
+可以认为它是“粗步”。<br />
+注意，<code>resolution</code> 的范围是 0 到 1。<br />
+值为 0 会导致没有反射，而值为 1 会逐片元检查沿射线方向的所有点。<br />
+在大 <code>maxDistance</code> 值下，使用 1 的 <code>resolution</code>
+会显著降低帧率。</p></li>
+<li><p><code>steps</code> 控制第二次遍历中进行的迭代次数。<br />
+这一次是为了找到射线与几何体精确相交的位置。<br />
+可认为它是“精步”。</p></li>
+<li><p><code>thickness</code> 决定哪些相交点算作命中，哪些不算。<br />
+理想情况下，射线应该精确停在某个场景中的片元或深度位置上。<br />
+那将是光线发生反射、打到当前片元、再进入相机的那个点。<br />
+可惜计算不是总能精确命中，所以 <code>thickness</code>
+给了我们一定的容差。<br />
+你希望这个值尽可能小，只比采样位置或深度稍微大一点。</p></li>
+</ul>
 <p align="center">
 <img src="../resources/images/W163Mfw.png" alt="Larger Thickness" title="Larger Thickness">
 </p>
 
-<p>You'll find that as the thickness gets larger, the reflections tend
-to smear in places.</p>
+<p>你会发现 <code>thickness</code> 越大，反射越模糊、越容易“糊掉”。</p>
 <p align="center">
 <img src="../resources/images/T6uH4Yu.png" alt="Smaller Thickness" title="Smaller Thickness">
 </p>
 
-<p>Going in the other direction, as the thickness gets smaller, the
-reflections become noisy with tiny little holes and narrow gaps.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<p>相反地，如果 <code>thickness</code> 越小，<br />
+反射会变得充满噪点，出现许多小洞和细缝。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  vec2 texSize  <span class="op">=</span> textureSize<span class="op">(</span>positionTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  vec2 texCoord <span class="op">=</span> gl_FragCoord<span class="op">.</span>xy <span class="op">/</span> texSize<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>vec2 texSize  <span class="op">=</span> textureSize<span class="op">(</span>positionTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>vec2 texCoord <span class="op">=</span> gl_FragCoord<span class="op">.</span>xy <span class="op">/</span> texSize<span class="op">;</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  vec4 positionFrom     <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  vec3 unitPositionFrom <span class="op">=</span> normalize<span class="op">(</span>positionFrom<span class="op">.</span>xyz<span class="op">);</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  vec3 normal           <span class="op">=</span> normalize<span class="op">(</span>texture<span class="op">(</span>normalTexture<span class="op">,</span> texCoord<span class="op">).</span>xyz<span class="op">);</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  vec3 pivot            <span class="op">=</span> normalize<span class="op">(</span>reflect<span class="op">(</span>unitPositionFrom<span class="op">,</span> normal<span class="op">));</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>vec4 positionFrom     <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>vec3 unitPositionFrom <span class="op">=</span> normalize<span class="op">(</span>positionFrom<span class="op">.</span>xyz<span class="op">);</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>vec3 normal           <span class="op">=</span> normalize<span class="op">(</span>texture<span class="op">(</span>normalTexture<span class="op">,</span> texCoord<span class="op">).</span>xyz<span class="op">);</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>vec3 pivot            <span class="op">=</span> normalize<span class="op">(</span>reflect<span class="op">(</span>unitPositionFrom<span class="op">,</span> normal<span class="op">));</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Gather the current fragment's position, normal, and reflection about
-the normal. <code>positionFrom</code> is a vector from the camera
-position to the current fragment position. <code>normal</code> is a
-vector pointing in the direction of the interpolated vertex normal for
-the current fragment. <code>pivot</code> is the reflection ray or vector
-pointing in the reflected direction of the <code>positionFrom</code>
-vector. It currently has a length or magnitude of one.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>获取当前片元的位置、法线以及关于法线的反射向量。<br />
+<code>positionFrom</code> 是从摄像机到当前片元的向量。<br />
+<code>normal</code> 是当前片元插值得到的法线方向。<br />
+<code>pivot</code> 是将 <code>positionFrom</code>
+相对于法线反射后得到的反射向量，<br />
+其长度为 1。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  vec4 startView <span class="op">=</span> vec4<span class="op">(</span>positionFrom<span class="op">.</span>xyz <span class="op">+</span> <span class="op">(</span>pivot <span class="op">*</span>           <span class="dv">0</span><span class="op">),</span> <span class="dv">1</span><span class="op">);</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  vec4 endView   <span class="op">=</span> vec4<span class="op">(</span>positionFrom<span class="op">.</span>xyz <span class="op">+</span> <span class="op">(</span>pivot <span class="op">*</span> maxDistance<span class="op">),</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>vec4 startView <span class="op">=</span> vec4<span class="op">(</span>positionFrom<span class="op">.</span>xyz <span class="op">+</span> <span class="op">(</span>pivot <span class="op">*</span>           <span class="dv">0</span><span class="op">),</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>vec4 endView   <span class="op">=</span> vec4<span class="op">(</span>positionFrom<span class="op">.</span>xyz <span class="op">+</span> <span class="op">(</span>pivot <span class="op">*</span> maxDistance<span class="op">),</span> <span class="dv">1</span><span class="op">);</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Calculate the start and end point of the reflection ray in view
-space.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>计算视空间中反射射线的起点和终点。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  vec4 startFrag      <span class="op">=</span> startView<span class="op">;</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>       <span class="co">// Project to screen space.</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>       startFrag      <span class="op">=</span> lensProjection <span class="op">*</span> startFrag<span class="op">;</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>       <span class="co">// Perform the perspective divide.</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>       startFrag<span class="op">.</span>xyz <span class="op">/=</span> startFrag<span class="op">.</span>w<span class="op">;</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>       <span class="co">// Convert the screen-space XY coordinates to UV coordinates.</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>       startFrag<span class="op">.</span>xy   <span class="op">=</span> startFrag<span class="op">.</span>xy <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">;</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>       <span class="co">// Convert the UV coordinates to fragment/pixel coordnates.</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>       startFrag<span class="op">.</span>xy  <span class="op">*=</span> texSize<span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>vec4 startFrag      <span class="op">=</span> startView<span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>     <span class="co">// 投影到屏幕空间</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>     startFrag      <span class="op">=</span> lensProjection <span class="op">*</span> startFrag<span class="op">;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>     <span class="co">// 透视除法</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>     startFrag<span class="op">.</span>xyz <span class="op">/=</span> startFrag<span class="op">.</span>w<span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>     <span class="co">// 屏幕空间 XY 转换为 UV 坐标</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>     startFrag<span class="op">.</span>xy   <span class="op">=</span> startFrag<span class="op">.</span>xy <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>     <span class="co">// UV 转换为片元坐标</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>     startFrag<span class="op">.</span>xy  <span class="op">*=</span> texSize<span class="op">;</span></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  vec4 endFrag      <span class="op">=</span> endView<span class="op">;</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>       endFrag      <span class="op">=</span> lensProjection <span class="op">*</span> endFrag<span class="op">;</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>       endFrag<span class="op">.</span>xyz <span class="op">/=</span> endFrag<span class="op">.</span>w<span class="op">;</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>       endFrag<span class="op">.</span>xy   <span class="op">=</span> endFrag<span class="op">.</span>xy <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">;</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>       endFrag<span class="op">.</span>xy  <span class="op">*=</span> texSize<span class="op">;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>vec4 endFrag      <span class="op">=</span> endView<span class="op">;</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>     endFrag      <span class="op">=</span> lensProjection <span class="op">*</span> endFrag<span class="op">;</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>     endFrag<span class="op">.</span>xyz <span class="op">/=</span> endFrag<span class="op">.</span>w<span class="op">;</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>     endFrag<span class="op">.</span>xy   <span class="op">=</span> endFrag<span class="op">.</span>xy <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>     endFrag<span class="op">.</span>xy  <span class="op">*=</span> texSize<span class="op">;</span></span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Project or transform these start and end points from view space to
-screen space. These points are now fragment positions which correspond
-to pixel positions on the screen. Now that you know where the ray starts
-and ends on the screen, you can travel or march along its direction in
-screen space. Think of the ray as a line drawn on the screen. You'll
-travel along this line using it to sample the fragment positions stored
-in the position framebuffer texture.</p>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>将起点和终点从视空间投影到屏幕空间。<br />
+这两个点现在对应于屏幕上的片元像素位置。<br />
+你可以在屏幕空间中沿着这条射线方向遍历。<br />
+可以将这条射线想象成屏幕上的一条线，<br />
+你将在这条线上进行步进，并在位置帧缓冲纹理中采样对应的片元位置。</p>
 <p align="center">
 <img src="../resources/images/MpBR225.png" alt="Screen space versus view space." title="Screen space versus view space.">
 </p>
 
-<p>Note that you could march the ray through view space but this may
-under or over sample scene positions found in the position framebuffer
-texture. Recall that the position framebuffer texture is the size and
-shape of the screen. Every screen fragment or pixel corresponds to some
-position captured by the camera. A reflection ray may travel a long
-distance in view space, but in screen space, it may only travel through
-a few pixels. You can only sample the screen's pixels for positions so
-it is inefficient to potentially sample the same pixels over and over
-again while marching in view space. By marching in screen space, you'll
-more efficiently sample the fragments or pixels the ray actually
-occupies or covers.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<p>注意你可以在视空间中进行步进，<br />
+但这样可能会对位置纹理进行欠采样或过采样。<br />
+要记住位置帧缓冲纹理的尺寸和形状就是屏幕本身。<br />
+每个屏幕像素对应摄像机拍摄到的某个位置。<br />
+反射射线在视空间中可能走得很远，<br />
+但在屏幕空间中可能只覆盖少量像素。<br />
+你只能对屏幕像素进行采样，<br />
+因此在视空间中步进可能会多次采样同一个像素，效率很低。<br />
+而在屏幕空间中步进会更高效地采样真正覆盖到的像素。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  vec2 frag  <span class="op">=</span> startFrag<span class="op">.</span>xy<span class="op">;</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>       uv<span class="op">.</span>xy <span class="op">=</span> frag <span class="op">/</span> texSize<span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>vec2 frag  <span class="op">=</span> startFrag<span class="op">.</span>xy<span class="op">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>     uv<span class="op">.</span>xy <span class="op">=</span> frag <span class="op">/</span> texSize<span class="op">;</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The first pass will begin at the starting fragment position of the
-reflection ray. Convert the fragment position to a UV coordinate by
-dividing the fragment's coordinates by the position texture's
-dimensions.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>第一步从反射射线的起点片元位置开始。<br />
+将片元坐标除以位置纹理的尺寸，转换为 UV 坐标。</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> deltaX    <span class="op">=</span> endFrag<span class="op">.</span>x <span class="op">-</span> startFrag<span class="op">.</span>x<span class="op">;</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> deltaY    <span class="op">=</span> endFrag<span class="op">.</span>y <span class="op">-</span> startFrag<span class="op">.</span>y<span class="op">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> deltaX    <span class="op">=</span> endFrag<span class="op">.</span>x <span class="op">-</span> startFrag<span class="op">.</span>x<span class="op">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> deltaY    <span class="op">=</span> endFrag<span class="op">.</span>y <span class="op">-</span> startFrag<span class="op">.</span>y<span class="op">;</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Calculate the delta or difference between the X and Y coordinates of
-the end and start fragments. This will be how many pixels the ray line
-occupies in the X and Y dimension of the screen.</p>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>计算终点和起点之间的 X、Y 坐标差值（delta）。<br />
+这代表射线在屏幕空间中 X 和 Y 方向上占了多少像素。</p>
 <p align="center">
 <img src="../resources/images/Um4dzgL.png" alt="The reflection ray in screen space." title="The reflection ray in screen space.">
 </p>
 
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> useX      <span class="op">=</span> abs<span class="op">(</span>deltaX<span class="op">)</span> <span class="op">&gt;=</span> abs<span class="op">(</span>deltaY<span class="op">)</span> <span class="op">?</span> <span class="dv">1</span> <span class="op">:</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> delta     <span class="op">=</span> mix<span class="op">(</span>abs<span class="op">(</span>deltaY<span class="op">),</span> abs<span class="op">(</span>deltaX<span class="op">),</span> useX<span class="op">)</span> <span class="op">*</span> clamp<span class="op">(</span>resolution<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> useX      <span class="op">=</span> abs<span class="op">(</span>deltaX<span class="op">)</span> <span class="op">&gt;=</span> abs<span class="op">(</span>deltaY<span class="op">)</span> <span class="op">?</span> <span class="dv">1</span> <span class="op">:</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> delta     <span class="op">=</span> mix<span class="op">(</span>abs<span class="op">(</span>deltaY<span class="op">),</span> abs<span class="op">(</span>deltaX<span class="op">),</span> useX<span class="op">)</span> <span class="op">*</span> clamp<span class="op">(</span>resolution<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>To handle all of the various different ways (vertical, horizontal,
-diagonal, etc.) the line can be oriented, you'll need to keep track of
-and use the larger difference. The larger difference will help you
-determine how much to travel in the X and Y direction each iteration,
-how many iterations are needed to travel the entire line, and what
-percentage of the line does the current position represent.</p>
-<p><code>useX</code> is either one or zero. It is used to pick the X or
-Y dimension depending on which delta is bigger. <code>delta</code> is
-the larger delta of the two X and Y deltas. It is used to determine how
-much to march in either dimension each iteration and how many iterations
-to take during the first pass.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>为了适配各种方向（垂直、水平、斜线等），<br />
+你需要判断哪个方向的差值更大。<br />
+较大的那个差值决定：</p>
+<ul>
+<li>每次迭代在 X 和 Y 上移动的量；</li>
+<li>需要迭代多少次才能走完整条射线；</li>
+<li>当前点在线上的相对位置百分比。</li>
+</ul>
+<p><code>useX</code> 是 0 或 1，<br />
+用来选择 X 轴还是 Y 轴。<br />
+<code>delta</code> 是两个差值中较大的一个，<br />
+用于控制每次步进时的增量和总步数。</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  vec2  increment <span class="op">=</span> vec2<span class="op">(</span>deltaX<span class="op">,</span> deltaY<span class="op">)</span> <span class="op">/</span> max<span class="op">(</span>delta<span class="op">,</span> <span class="fl">0.001</span><span class="op">);</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>vec2  increment <span class="op">=</span> vec2<span class="op">(</span>deltaX<span class="op">,</span> deltaY<span class="op">)</span> <span class="op">/</span> max<span class="op">(</span>delta<span class="op">,</span> <span class="fl">0.001</span><span class="op">);</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Calculate how much to increment the X and Y position by using the
-larger of the two deltas. If the two deltas are the same, each will
-increment by one each iteration. If one delta is larger than the other,
-the larger delta will increment by one while the smaller one will
-increment by less than one. This assumes the <code>resolution</code> is
-one. If the resolution is less than one, the algorithm will skip over
-fragments.</p>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>根据较大的 delta 值计算每次 X 和 Y 上的增量。<br />
+如果两个 delta 一样大，则每次都加 1。<br />
+否则，大的那一维加 1，小的那一维加 &lt;1。<br />
+假设 <code>resolution = 1</code>，<br />
+当 <code>resolution &lt; 1</code> 时，算法就会跳过某些像素。</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>startFrag  <span class="op">=</span> <span class="op">(</span> <span class="dv">1</span><span class="op">,</span>  <span class="dv">4</span><span class="op">)</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>endFrag    <span class="op">=</span> <span class="op">(</span><span class="dv">10</span><span class="op">,</span> <span class="dv">14</span><span class="op">)</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -412,69 +385,63 @@ fragments.</p>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>increment  <span class="op">=</span> <span class="op">(</span>deltaX<span class="op">,</span> deltaY<span class="op">)</span> <span class="op">/</span> delta</span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>           <span class="op">=</span> <span class="op">(</span>     <span class="dv">9</span><span class="op">,</span>     <span class="dv">10</span><span class="op">)</span> <span class="op">/</span> <span class="dv">5</span></span>
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>           <span class="op">=</span> <span class="op">(</span> <span class="dv">9</span> <span class="op">/</span> <span class="dv">5</span><span class="op">,</span>      <span class="dv">2</span><span class="op">)</span></span></code></pre></div>
-<p>For example, say the <code>resolution</code> is 0.5. The larger
-dimension will increment by two fragments instead of one.</p>
+<p>例如，<code>resolution</code> 为 0.5 时，<br />
+较大的维度每步进 2 像素而不是 1。</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> search0 <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> search1 <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>To move from the start fragment to the end fragment, the algorithm
-uses linear interpolation.</p>
+<p>为了从起始片元移动到结束片元，算法使用线性插值：</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>current position x <span class="op">=</span> <span class="op">(</span>start x<span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="dv">1</span> <span class="op">-</span> search1<span class="op">)</span> <span class="op">+</span> <span class="op">(</span>end x<span class="op">)</span> <span class="op">*</span> search1<span class="op">;</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>current position y <span class="op">=</span> <span class="op">(</span>start y<span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="dv">1</span> <span class="op">-</span> search1<span class="op">)</span> <span class="op">+</span> <span class="op">(</span>end y<span class="op">)</span> <span class="op">*</span> search1<span class="op">;</span></span></code></pre></div>
-<p><code>search1</code> ranges from zero to one. When
-<code>search1</code> is zero, the current position is the start
-fragment. When <code>search1</code> is one, the current position is the
-end fragment. For any other value, the current position is somewhere
-between the start and end fragment.</p>
-<p><code>search0</code> is used to remember the last position on the
-line where the ray missed or didn't intersect with any geometry. The
-algorithm will later use <code>search0</code> in the second pass to help
-refine the point at which the ray touches the scene's geometry.</p>
+<p><code>search1</code> 的取值范围是 0 到 1。</p>
+<ul>
+<li>当 <code>search1</code> 为 0 时，当前坐标等于起始片元；</li>
+<li>当 <code>search1</code> 为 1 时，当前坐标等于结束片元；</li>
+<li>当 <code>search1</code>
+为其他值时，当前坐标在起始和结束片元之间。</li>
+</ul>
+<p><code>search0</code>
+用来记录上一次光线没有命中场景几何体的位置。<br />
+第二遍遍历时，算法会使用 <code>search0</code>
+来帮助细化射线首次接触场景的位置。</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> hit0 <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> hit1 <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p><code>hit0</code> indicates there was an intersection during the
-first pass. <code>hit1</code> indicates there was an intersection during
-the second pass.</p>
+<ul>
+<li><code>hit0</code> 表示第一次遍历期间发生了碰撞；</li>
+<li><code>hit1</code> 表示第二次遍历期间发生了碰撞。</li>
+</ul>
 <div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> viewDistance <span class="op">=</span> startView<span class="op">.</span>y<span class="op">;</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> depth        <span class="op">=</span> thickness<span class="op">;</span></span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The <code>viewDistance</code> value is how far away from the camera
-the current point on the ray is. Recall that for Panda3D, the Y
-dimension goes in and out of the screen in view space. For other
-systems, the Z dimension goes in and out of the screen in view space. In
-any case, <code>viewDistance</code> is how far away from the camera the
-ray currently is. Note that if you use the depth buffer, instead of the
-vertex positions in view space, the <code>viewDistance</code> would be
-the Z depth.</p>
-<p>Make sure not to confuse the <code>viewDistance</code> value with the
-Y dimension of the line being traveled across the screen. The
-<code>viewDistance</code> goes from the camera into scene while the Y
-dimension of the line travels up or down the screen.</p>
-<p>The <code>depth</code> is the view distance difference between the
-current ray point and scene position. It tells you how far behind or in
-front of the scene the ray currently is. Remember that the scene
-positions are the interpolated vertex positions stored in the position
-framebuffer texture.</p>
+<p><code>viewDistance</code> 是当前光线点离摄像机的距离。<br />
+在 Panda3D 中，视空间的 Y 轴表示从屏幕外向内；<br />
+在其他系统中，通常是 Z 轴。<br />
+不管哪种方式，<code>viewDistance</code>
+表示光线在当前点离摄像机的远近程度。</p>
+<p>注意不要将 <code>viewDistance</code> 与屏幕上的 Y 轴混淆。<br />
+<code>viewDistance</code> 表示的是视空间中的深度；<br />
+而 Y 轴是在屏幕平面上上下移动。</p>
+<p><code>depth</code>
+是当前光线点的视距离与场景采样位置视距离之间的差值，<br />
+用于判断该点是位于场景前方还是后方。</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span>i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dt">int</span><span class="op">(</span>delta<span class="op">);</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>You can now begin the first pass. The first pass runs while
-<code>i</code> is less than the <code>delta</code> value. When
-<code>i</code> reaches <code>delta</code>, the algorithm has traveled
-the entire length of the line. Remember that <code>delta</code> is the
-larger of the two X and Y deltas.</p>
+<p>现在可以开始第一次遍历了。<br />
+第一次遍历在 <code>i &lt; delta</code> 时持续。<br />
+当 <code>i == delta</code> 时，算法已经走完了整条反射线。</p>
 <p align="center">
 <img src="../resources/images/Qnsvkc0.gif" alt="Screen Space Transformations" title="Screen Space Transformations">
 </p>
@@ -486,9 +453,8 @@ larger of the two X and Y deltas.</p>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    positionTo <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> uv<span class="op">.</span>xy<span class="op">);</span></span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>Advance the current fragment position closer to the end fragment. Use
-this new fragment position to look up a scene position stored in the
-position framebuffer texture.</p>
+<p>将当前片元位置推进，靠近终点片元。<br />
+使用这个新位置在位置贴图中采样场景的位置。</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    search1 <span class="op">=</span></span>
@@ -499,43 +465,36 @@ position framebuffer texture.</p>
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">);</span></span>
 <span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>Calculate the percentage or portion of the line the current fragment
-represents. If <code>useX</code> is zero, use the Y dimension of the
-line. If <code>useX</code> is one, use the X dimension of the line.</p>
-<p>When <code>frag</code> equals <code>startFrag</code>,
-<code>search1</code> equals zero since <code>frag - startFrag</code> is
-zero. When <code>frag</code> equals <code>endFrag</code>,
-<code>search1</code> is one since <code>frag - startFrag</code> equals
-<code>delta</code>.</p>
-<p><code>search1</code> is the percentage or portion of the line the
-current position represents. You'll need this to interpolate between the
-ray's view-space start and end distances from the camera.</p>
+<p>计算当前片元所占的线段百分比。<br />
+如果 <code>useX == 0</code>，使用 Y 方向；否则使用 X 方向。</p>
+<ul>
+<li>当 <code>frag == startFrag</code>，<code>search1 == 0</code>；</li>
+<li>当 <code>frag == endFrag</code>，<code>search1 == 1</code>；</li>
+<li>中间值表示当前在射线线段上的相对位置。</li>
+</ul>
 <div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    viewDistance <span class="op">=</span> <span class="op">(</span>startView<span class="op">.</span>y <span class="op">*</span> endView<span class="op">.</span>y<span class="op">)</span> <span class="op">/</span> mix<span class="op">(</span>endView<span class="op">.</span>y<span class="op">,</span> startView<span class="op">.</span>y<span class="op">,</span> search1<span class="op">);</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>Using <code>search1</code>, interpolate the view distance (distance
-from the camera in view space) for the current position you're at on the
-reflection ray.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Incorrect.</span></span>
+<p>使用 <code>search1</code> 来插值当前点在视空间中的距离。</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 错误方式</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>viewDistance <span class="op">=</span> mix<span class="op">(</span>startView<span class="op">.</span>y<span class="op">,</span> endView<span class="op">.</span>y<span class="op">,</span> search1<span class="op">);</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Correct.</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">// 正确方式</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>viewDistance <span class="op">=</span> <span class="op">(</span>startView<span class="op">.</span>y <span class="op">*</span> endView<span class="op">.</span>y<span class="op">)</span> <span class="op">/</span> mix<span class="op">(</span>endView<span class="op">.</span>y<span class="op">,</span> startView<span class="op">.</span>y<span class="op">,</span> search1<span class="op">);</span></span></code></pre></div>
-<p>You may be tempted to just interpolate between the view distances of
-the start and end view-space positions but this will give you the wrong
-view distance for the current position on the reflection ray. Instead,
-you'll need to perform <a
-href="https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf">perspective-correct
-interpolation</a> which you see here.</p>
+<p>尽管你可能会尝试直接用 <code>mix</code>
+插值视距离，但这会导致误差。<br />
+应使用透视修正插值（perspective-correct interpolation）。</p>
+<p>参考：<a
+href="https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf">Perspective-Correct
+Interpolation</a></p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    depth        <span class="op">=</span> viewDistance <span class="op">-</span> positionTo<span class="op">.</span>y<span class="op">;</span></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>Calculate the difference between the ray's view distance at this
-point and the sampled view distance of the scene at this point.</p>
+<p>计算光线当前点的视距与场景采样位置的视距之间的差值。</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>depth <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> depth <span class="op">&lt;</span> thickness<span class="op">)</span> <span class="op">{</span></span>
@@ -546,20 +505,17 @@ point and the sampled view distance of the scene at this point.</p>
 <span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>If the difference is between zero and the thickness, this is a hit.
-Set <code>hit0</code> to one and exit the first pass. If the difference
-is not between zero and the thickness, this is a miss. Set
-<code>search0</code> to equal <code>search1</code> to remember this
-position as the last known miss. Continue marching the ray towards the
-end fragment.</p>
+<p>如果差值在 0 和 <code>thickness</code> 之间，说明碰撞发生了。<br />
+设置 <code>hit0 = 1</code>，并跳出第一次遍历。<br />
+否则记录当前 <code>search1</code> 为
+<code>search0</code>，继续步进。</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  search1 <span class="op">=</span> search0 <span class="op">+</span> <span class="op">((</span>search1 <span class="op">-</span> search0<span class="op">)</span> <span class="op">/</span> <span class="dv">2</span><span class="op">);</span></span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>At this point you have finished the first pass. Set the
-<code>search1</code> position to be halfway between the position of the
-last miss and the position of the last hit.</p>
+<p>第一次遍历结束后，将 <code>search1</code> 设为最后一次 miss 与 hit
+之间的中点。</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  steps <span class="op">*=</span> hit0<span class="op">;</span></span>
@@ -567,8 +523,7 @@ last miss and the position of the last hit.</p>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span>i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> steps<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>You can now begin the second pass. If the reflection ray didn't hit
-anything in the first pass, skip the second pass.</p>
+<p>开始第二次遍历。如果第一次遍历没有碰撞（<code>hit0 == 0</code>），跳过这一步。</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    frag       <span class="op">=</span> mix<span class="op">(</span>startFrag<span class="op">.</span>xy<span class="op">,</span> endFrag<span class="op">.</span>xy<span class="op">,</span> search1<span class="op">);</span></span>
@@ -576,17 +531,14 @@ anything in the first pass, skip the second pass.</p>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    positionTo <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> uv<span class="op">.</span>xy<span class="op">);</span></span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>As you did in the first pass, use the current position on the ray
-line to sample a position from the scene.</p>
+<p>像第一次遍历那样，采样当前射线位置对应的场景坐标。</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    viewDistance <span class="op">=</span> <span class="op">(</span>startView<span class="op">.</span>y <span class="op">*</span> endView<span class="op">.</span>y<span class="op">)</span> <span class="op">/</span> mix<span class="op">(</span>endView<span class="op">.</span>y<span class="op">,</span> startView<span class="op">.</span>y<span class="op">,</span> search1<span class="op">);</span></span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    depth        <span class="op">=</span> viewDistance <span class="op">-</span> positionTo<span class="op">.</span>y<span class="op">;</span></span>
 <span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>Interpolate the view distance for the current ray line position and
-calculate the camera distance difference between the ray at this point
-and the scene.</p>
+<p>计算当前点的视距，并与场景视距做差。</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>depth <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> depth <span class="op">&lt;</span> thickness<span class="op">)</span> <span class="op">{</span></span>
@@ -599,33 +551,27 @@ and the scene.</p>
 <span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>If the depth is within bounds, this is a hit. Set <code>hit1</code>
-to one and set <code>search1</code> to be halfway between the last known
-miss position and this current hit position. If the depth is not within
-bounds, this is a miss. Set <code>search1</code> to be halfway between
-this current miss position and the last known hit position. Move
-<code>search0</code> to this current miss position. Continue this back
-and forth search while <code>i</code> is less than
-<code>steps</code>.</p>
+<p>若深度差值在合法范围内，说明命中；设置 <code>hit1 = 1</code>，<br />
+更新 <code>search1</code> 为 miss 和当前 hit 的中点。<br />
+如果没有命中，更新 <code>search0</code> 和
+<code>search1</code>，继续二分。</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> visibility <span class="op">=</span></span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>      hit1</span>
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>You're now done with the second and final pass but before you can
-output the reflected UV coordinates, you'll need to calculate the
-<code>visibility</code> of the reflection. The <code>visibility</code>
-ranges from zero to one. If there wasn't a hit in the second pass, the
-<code>visibility</code> is zero.</p>
+<p>第二次遍历结束，准备计算最终反射的可见性（visibility）。<br />
+<code>visibility</code> 的取值范围是 0 到 1；<br />
+若未命中，值为 0。</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span> positionTo<span class="op">.</span>w</span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>If the reflected scene position's alpha or <code>w</code> component
-is zero, the <code>visibility</code> is zero. Note that if
-<code>w</code> is zero, there was no scene position at that point.</p>
+<p>如果采样点的 alpha 分量为 0（即
+<code>w == 0</code>），则说明没有场景信息。<br />
+此时 <code>visibility == 0</code>。</p>
 <p align="center">
 <img src="../resources/images/7e2cOdZ.gif" alt="Reflection ray pointing towards the camera position." title="Reflection ray pointing towards the camera position.">
 </p>
@@ -640,19 +586,12 @@ is zero, the <code>visibility</code> is zero. Note that if
 <span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">)</span></span>
 <span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>One of the ways in which screen space reflection can fail is when the
-reflection ray points in the general direction of the camera. If the
-reflection ray points towards the camera and hits something, it's most
-likely hitting the back side of something facing away from the
-camera.</p>
-<p>To handle this failure case, you'll need to gradually fade out the
-reflection based on how much the reflection vector points to the
-camera's position. If the reflection vector points directly in the
-opposite direction of the position vector, the visibility is zero. Any
-other direction results in the visibility being greater than zero.</p>
-<p>Remember to normalize both vectors when taking the dot product.
-<code>unitPositionFrom</code> is the normalized position vector. It has
-a length or magnitude of one.</p>
+<p>当反射向量朝向摄像机时，可能会出现 SSR 错误。<br />
+为了解决这一问题，使用 dot 值对反射做渐变衰减。</p>
+<ul>
+<li>dot 为 -1（完全相反）时，<code>visibility = 1</code></li>
+<li>dot 为 1（完全相同方向）时，<code>visibility = 0</code></li>
+</ul>
 <div class="sourceCode" id="cb30"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span> <span class="op">(</span> <span class="dv">1</span></span>
@@ -664,11 +603,8 @@ a length or magnitude of one.</p>
 <span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">)</span></span>
 <span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>As you sample scene positions along the reflection ray, you're hoping
-to find the exact point where the reflection ray first intersects with
-the scene's geometry. Unfortunately, you may not find this particular
-point. Fade out the reflection the further it is from the intersection
-point you did find.</p>
+<p>如果你没能准确找到交点，可以根据差值与 <code>thickness</code>
+的比值进行模糊衰减。</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span> <span class="op">(</span> <span class="dv">1</span></span>
@@ -681,10 +617,8 @@ point you did find.</p>
 <span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>      <span class="op">)</span></span>
 <span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Fade out the reflection based on how far way the reflected point is
-from the initial starting point. This will fade out the reflection
-instead of it ending abruptly as it reaches
-<code>maxDistance</code>.</p>
+<p>根据反射点与起点之间的距离进行进一步衰减，<br />
+避免反射突然中断。</p>
 <p align="center">
 <img src="../resources/images/i0btBna.gif" alt="Reflection ray exiting the frustum." title="Reflection ray exiting the frustum.">
 </p>
@@ -695,29 +629,26 @@ instead of it ending abruptly as it reaches
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span> <span class="op">(</span>uv<span class="op">.</span>y <span class="op">&lt;</span> <span class="dv">0</span> <span class="op">||</span> uv<span class="op">.</span>y <span class="op">&gt;</span> <span class="dv">1</span> <span class="op">?</span> <span class="dv">0</span> <span class="op">:</span> <span class="dv">1</span><span class="op">);</span></span>
 <span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>If the reflected UV coordinates are out of bounds, set the
-<code>visibility</code> to zero. This occurs when the reflection ray
-travels outside the camera's frustum.</p>
+<p>如果 UV 坐标超出了 [0, 1]
+范围，表示光线跑出视锥体，<code>visibility = 0</code>。</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>  visibility <span class="op">=</span> clamp<span class="op">(</span>visibility<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  uv<span class="op">.</span>ba <span class="op">=</span> vec2<span class="op">(</span>visibility<span class="op">);</span></span></code></pre></div>
-<p>Set the blue and alpha component to the visibility as the UV
-coordinates only need the RG or XY components of the final vector.</p>
+<p>将 visibility 存储在 uv 向量的蓝色和 alpha 分量中；红绿分量是 UV
+坐标。</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> uv<span class="op">;</span></span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The final fragment color is the reflected UV coordinates and the
-visibility.</p>
-<h3 id="specular-map">Specular Map</h3>
+<p>最终片元颜色即为反射 UV 坐标（uv.rg）以及其可见性（uv.ba）。</p>
+<h3 id="高光贴图specular-map">高光贴图（Specular Map）</h3>
 <p align="center">
 <img src="../resources/images/iuFYVWB.gif" alt="Specular Map" title="Specular Map">
 </p>
 
-<p>In addition to the reflected UV coordinates, you'll also need a
-specular map. The example code creates one using the fragment's material
-specular properties.</p>
+<p>除了反射 UV 坐标之外，你还需要一个高光贴图。<br />
+示例代码使用片元材质的高光属性来创建它：</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#define MAX_SHININESS </span><span class="fl">127.75</span></span>
@@ -737,44 +668,49 @@ specular properties.</p>
 <span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>      <span class="op">,</span> clamp<span class="op">(</span>p3d_Material<span class="op">.</span>shininess <span class="op">/</span> MAX_SHININESS<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">)</span></span>
 <span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>      <span class="op">);</span></span>
 <span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>The specular fragment shader is quite simple. Using the fragment's
-material, the shader outputs the specular color and uses the alpha
-channel for the shininess. The shininess is mapped to a range of zero to
-one. In Blender, the maximum specular hardness or shininess is 511. When
-exporting from Blender to Panda3D, 511 is exported as 127.75. Feel free
-to adjust the shininess to range of zero to one however you see fit for
-your particular stack.</p>
-<p>The example code generates a specular map from the material specular
-properties but you could create one in GIMP, for example, and attach
-that as a texture to your 3D model. For instance, say your 3D treasure
-chest has shiny brackets on it but nothing else should reflect the
-environment. You can paint the brackets some shade of gray and the rest
-of the treasure chest black. This will mask off the brackets, allowing
-your shader to render the reflections on only the brackets and nothing
-else.</p>
-<h3 id="scene-colors">Scene Colors</h3>
+<p>这个高光片元着色器非常简单。<br />
+它使用片元的材质信息输出高光颜色，并将 alpha
+通道用于光泽度（shininess）。<br />
+光泽度被映射到 0 到 1 的范围内。<br />
+在 Blender 中，最高的高光硬度（shininess）是 511，<br />
+从 Blender 导出到 Panda3D 时，511 被转换为 127.75。<br />
+你可以根据自己的需求调整这个值，使它落在 0 到 1 的范围内。</p>
+<p>示例代码根据材质高光属性生成高光贴图，<br />
+但你也可以在 GIMP 等软件中手动绘制，并作为纹理附加到你的 3D 模型上。</p>
+<p>比如：<br />
+假设你的 3D 宝箱上有一些闪亮的金属扣件，但其它部分不需要反射环境。<br />
+你可以将扣件绘制为灰色，而将其它区域涂成黑色。<br />
+这样，shader 就会只在扣件区域渲染反射，而忽略其它部分。</p>
+<hr />
+<h3 id="场景颜色scene-colors">场景颜色（Scene Colors）</h3>
 <p align="center">
 <img src="../resources/images/diBSxPI.png" alt="Scene Colors" title="Scene Colors">
 </p>
 
-<p>You'll need to render the parts of the scene you wish to reflect and
-store this in a framebuffer texture. This is typically just the scene
-without any reflections.</p>
-<h3 id="reflected-scene-colors">Reflected Scene Colors</h3>
+<p>你需要渲染场景中希望被反射的部分，并将其存储到一个 framebuffer
+纹理中。<br />
+这通常是未加反射效果的场景。</p>
+<hr />
+<h3
+id="被反射的场景颜色reflected-scene-colors">被反射的场景颜色（Reflected
+Scene Colors）</h3>
 <p align="center">
 <img src="../resources/images/UPvgfDU.gif" alt="Reflected Scene Colors" title="Reflected Scene Colors">
 </p>
 
-<p>Here you see the reflected colors saved to a framebuffer texture.</p>
+<p>上图展示了保存到 framebuffer 纹理中的反射颜色。</p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D uvTexture<span class="op">;</span></span>
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>uniform sampler2D colorTexture<span class="op">;</span></span>
 <span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>Once you have the reflected UV coordinates, looking up the reflected
-colors is fairly easy. You'll need the reflected UV coordinates texture
-and the color texture containing the colors you wish to reflect.</p>
+<p>一旦你得到了反射的 UV 坐标，查找反射颜色就很简单了。<br />
+你需要：</p>
+<ul>
+<li>一个反射 UV 坐标纹理（<code>uvTexture</code>）；</li>
+<li>一个包含待反射颜色的颜色纹理（<code>colorTexture</code>）。</li>
+</ul>
 <div class="sourceCode" id="cb37"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  vec2 texSize  <span class="op">=</span> textureSize<span class="op">(</span>uvTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
@@ -784,110 +720,138 @@ and the color texture containing the colors you wish to reflect.</p>
 <span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  vec4 color <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span> uv<span class="op">.</span>xy<span class="op">);</span></span>
 <span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Using the UV coordinates for the current fragment, look up the
-reflected color.</p>
+<p>使用当前片元的 UV 坐标，在颜色纹理中查找反射颜色。</p>
 <div class="sourceCode" id="cb38"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> alpha <span class="op">=</span> clamp<span class="op">(</span>uv<span class="op">.</span>b<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
 <span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Recall that the reflected UV texture stored the visibility in the B
-or blue component. This is the alpha channel for the reflected colors
-framebuffer texture.</p>
+<p>回忆一下：反射 UV
+纹理将可见性（visibility）存储在蓝色（B）通道中。<br />
+这将作为反射颜色 framebuffer 的 alpha 通道。</p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> vec4<span class="op">(</span>mix<span class="op">(</span>vec3<span class="op">(</span><span class="dv">0</span><span class="op">),</span> color<span class="op">.</span>rgb<span class="op">,</span> alpha<span class="op">),</span> alpha<span class="op">);</span></span>
 <span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The fragment color is a mix between no reflection and the reflected
-color based on the visibility. The visibility was computed during the
-reflected UV coordinates step.</p>
-<h3 id="blurred-reflected-scene-colors">Blurred Reflected Scene
-Colors</h3>
+<p>最终的片元颜色是根据可见性 <code>alpha</code>
+在黑色与反射颜色之间进行插值的结果。<br />
+可见性值是在反射 UV 坐标计算步骤中求出的。</p>
+<h3 id="高光贴图specular-map-1">高光贴图（Specular Map）</h3>
+<p align="center">
+<img src="../resources/images/iuFYVWB.gif" alt="Specular Map" title="Specular Map">
+</p>
+
+<p>除了反射 UV
+坐标之外，你还需要一个高光贴图。示例代码使用片元的材质高光属性创建该贴图：</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>\#define MAX\_SHININESS <span class="fl">127.75</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>uniform <span class="kw">struct</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="op">{</span> vec3 specular</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="op">;</span> <span class="dt">float</span> shininess</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="op">;</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> p3d\_Material<span class="op">;</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>out vec4 fragColor<span class="op">;</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>vec4</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a><span class="op">(</span> p3d\_Material<span class="op">.</span>specular</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a><span class="op">,</span> clamp<span class="op">(</span>p3d\_Material<span class="op">.</span>shininess <span class="op">/</span> MAX\_SHININESS<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">)</span></span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a><span class="op">);</span></span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>该高光着色器非常简单。使用材质的高光颜色作为输出的 RGB 值，
+并将光泽度（shininess）通过映射后的 alpha 值输出。 光泽度被映射到 0 到 1
+范围内。Blender 中最大 shininess 是 511， 但导出到 Panda3D 时会转换为
+127.75。你可以根据具体需求调整这个范围。</p>
+<p>上述代码是通过材质的高光属性动态生成高光贴图， 但你也可以使用 GIMP
+等工具手动绘制灰度图作为贴图。</p>
+<p>例如： 你的 3D 宝箱模型中只有金属扣件需要反射，其它部分不需要。
+你可以将金属扣件区域涂成灰色，其它区域涂成黑色。 Shader
+将根据这个贴图，仅在灰色区域渲染反射效果。</p>
+<hr />
+<h3 id="场景颜色scene-colors-1">场景颜色（Scene Colors）</h3>
+<p align="center">
+<img src="../resources/images/diBSxPI.png" alt="Scene Colors" title="Scene Colors">
+</p>
+
+<p>你需要渲染希望被反射的场景部分，并将其存入 framebuffer 纹理中。
+通常该场景不包含反射，仅是基本渲染结果。</p>
+<hr />
+<h3
+id="被反射的场景颜色reflected-scene-colors-1">被反射的场景颜色（Reflected
+Scene Colors）</h3>
+<p align="center">
+<img src="../resources/images/UPvgfDU.gif" alt="Reflected Scene Colors" title="Reflected Scene Colors">
+</p>
+
+<p>下图展示了保存反射颜色的 framebuffer 纹理：</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>uniform sampler2D uvTexture<span class="op">;</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>uniform sampler2D colorTexture<span class="op">;</span></span></code></pre></div>
+<p>获取反射颜色的方式是：</p>
+<ul>
+<li>读取反射 UV 坐标纹理 <code>uvTexture</code>；</li>
+<li>用该坐标在颜色纹理 <code>colorTexture</code> 中查找颜色。</li>
+</ul>
+<div class="sourceCode" id="cb42"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>vec2 texSize  <span class="op">=</span> textureSize<span class="op">(</span>uvTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>vec2 texCoord <span class="op">=</span> gl\_FragCoord<span class="op">.</span>xy <span class="op">/</span> texSize<span class="op">;</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>vec4 uv    <span class="op">=</span> texture<span class="op">(</span>uvTexture<span class="op">,</span>    texCoord<span class="op">);</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>vec4 color <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span> uv<span class="op">.</span>xy<span class="op">);</span></span></code></pre></div>
+<p>当前片元坐标用作查找反射 UV 的索引，再利用反射 UV 查找反射颜色。</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> alpha <span class="op">=</span> clamp<span class="op">(</span>uv<span class="op">.</span>b<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span></code></pre></div>
+<p>反射 UV 纹理的 B（蓝色）通道存储的是 visibility 值，
+该值在反射颜色纹理中作为 alpha 通道使用。</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> vec4<span class="op">(</span>mix<span class="op">(</span>vec3<span class="op">(</span><span class="dv">0</span><span class="op">),</span> color<span class="op">.</span>rgb<span class="op">,</span> alpha<span class="op">),</span> alpha<span class="op">);</span></span></code></pre></div>
+<p>最终颜色是在黑色和反射颜色之间基于 visibility 的插值。 这个
+visibility 是在计算反射 UV 坐标阶段确定的。</p>
+<hr />
+<h3
+id="模糊的反射颜色blurred-reflected-scene-colors">模糊的反射颜色（Blurred
+Reflected Scene Colors）</h3>
 <p align="center">
 <img src="../resources/images/gVvx1Ei.png" alt="Blurred Reflected Scene Colors" title="Blurred Reflected Scene Colors">
 </p>
 
-<p>Now blur the reflected scene colors and store this in a framebuffer
-texture. The blurring is done using a box blur. Refer to the <a
-href="ssao.html#blurring">SSAO blurring</a> step for details.</p>
-<p>The blurred reflected colors are used for surfaces that have a less
-than mirror like finish. These surfaces have tiny little hills and
-valleys that tend to diffuse or blur the reflection. I'll cover this
-more during the roughness calculation.</p>
-<h3 id="reflections">Reflections</h3>
-<div class="sourceCode" id="cb40"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D colorTexture<span class="op">;</span></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>uniform sampler2D colorBlurTexture<span class="op">;</span></span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>uniform sampler2D specularTexture<span class="op">;</span></span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>To generate the final reflections, you'll need the three framebuffer
-textures computed earlier. You'll need the reflected colors, the blurred
-reflected colors, and the specular map.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  vec4 specular  <span class="op">=</span> texture<span class="op">(</span>specularTexture<span class="op">,</span>  texCoord<span class="op">);</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  vec4 color     <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span>     texCoord<span class="op">);</span></span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  vec4 colorBlur <span class="op">=</span> texture<span class="op">(</span>colorBlurTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Look up the specular amount and shininess, the reflected scene color,
-and the blurred reflected scene color.</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> specularAmount <span class="op">=</span> dot<span class="op">(</span>specular<span class="op">.</span>rgb<span class="op">,</span> vec3<span class="op">(</span><span class="dv">1</span><span class="op">))</span> <span class="op">/</span> <span class="dv">3</span><span class="op">;</span></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>specularAmount <span class="op">&lt;=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span> fragColor <span class="op">=</span> vec4<span class="op">(</span><span class="dv">0</span><span class="op">);</span> <span class="cf">return</span><span class="op">;</span> <span class="op">}</span></span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Map the specular color to a greyscale value. If the specular amount
-is none, set the frag color to nothing and return.</p>
-<p>Later on, you'll multiply the final reflection color by the specular
-amount. Multiplying by the specular amount allows you to control how
-much a material reflects its environment simply by brightening or
-darkening the greyscale value in the specular map.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>  dot<span class="op">(</span>specular<span class="op">.</span>rgb<span class="op">,</span> vec3<span class="op">(</span><span class="dv">1</span><span class="op">))</span> <span class="op">==</span> <span class="op">(</span>specular<span class="op">.</span>r <span class="op">+</span> specular<span class="op">.</span>g <span class="op">+</span> specular<span class="op">.</span>b<span class="op">);</span></span></code></pre></div>
-<p>Using the dot product to produce the greyscale value is just a short
-way of summing the three color components.</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> roughness <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> min<span class="op">(</span>specular<span class="op">.</span>a<span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Calculate the roughness based on the shininess value set during the
-specular map step. Recall that the shininess value was saved in the
-alpha channel of the specular map. The shininess determined how spread
-out or blurred the specular reflection was. Similarly, the
-<code>roughness</code> determines how blurred the reflection is. A
-roughness of one will produce the blurred reflection color. A roughness
-of zero will produce the non-blurred reflection color. Doing it this way
-allows you to control how blurred the reflection is just by changing the
-material's shininess value.</p>
-<p>The example code generates a roughness map from the material specular
-properties but you could create one in GIMP, for example, and attach
-that as a texture to your 3D model. For instance, say you have a tiled
-floor that has polished tiles and scratched up tiles. The polished tiles
-could be painted a more translucent white while the scratched up tiles
-could be painted a more opaque white. The more translucent/transparent
-the greyscale value, the more the shader will use the blurred reflected
-color. The scratched tiles will have a blurry reflection while the
-polished tiles will have a mirror like reflection.</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> mix<span class="op">(</span>color<span class="op">,</span> colorBlur<span class="op">,</span> roughness<span class="op">)</span> <span class="op">*</span> specularAmount<span class="op">;</span></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Mix the reflected color and blurred reflected color based on the
-roughness. Multiply that vector by the specular amount and then set that
-value as the fragment color.</p>
-<p>The reflection color is a mix between the reflected scene color and
-the blurred reflected scene color based on the roughness. A high
-roughness will produce a blurry reflection meaning the surface is rough.
-A low roughness will produce a clear reflection meaning the surface is
-smooth.</p>
-<h3 id="source">Source</h3>
+<p>现在对反射颜色进行模糊处理，并将其写入 framebuffer。模糊使用 box blur
+算法， 参考 <a href="ssao.html#blurring">SSAO 模糊处理</a> 一节。</p>
+<p>模糊反射颜色用于非镜面材质表面，例如表面有细微粗糙度时，反射应被模糊处理。
+这部分将在 roughness 粗糙度计算时进一步讨论。</p>
+<hr />
+<h3 id="最终反射合成reflections">最终反射合成（Reflections）</h3>
+<div class="sourceCode" id="cb45"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>uniform sampler2D colorTexture<span class="op">;</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>uniform sampler2D colorBlurTexture<span class="op">;</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D specularTexture<span class="op">;</span></span></code></pre></div>
+<p>最终合成需要三个纹理：反射颜色、模糊反射颜色和高光贴图。</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>vec4 specular  <span class="op">=</span> texture<span class="op">(</span>specularTexture<span class="op">,</span>  texCoord<span class="op">);</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>vec4 color     <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span>     texCoord<span class="op">);</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>vec4 colorBlur <span class="op">=</span> texture<span class="op">(</span>colorBlurTexture<span class="op">,</span> texCoord<span class="op">);</span></span></code></pre></div>
+<p>获取当前像素的高光信息、反射颜色和模糊反射颜色。</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> specularAmount <span class="op">=</span> dot<span class="op">(</span>specular<span class="op">.</span>rgb<span class="op">,</span> vec3<span class="op">(</span><span class="dv">1</span><span class="op">))</span> <span class="op">/</span> <span class="dv">3</span><span class="op">;</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span>specularAmount <span class="op">&lt;=</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> vec4<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span><span class="op">;</span></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>将 RGB 高光颜色转为灰度值作为反射强度。 如果该值为
+0，则不显示反射。</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>dot<span class="op">(</span>specular<span class="op">.</span>rgb<span class="op">,</span> vec3<span class="op">(</span><span class="dv">1</span><span class="op">))</span> <span class="op">==</span> <span class="op">(</span>specular<span class="op">.</span>r <span class="op">+</span> specular<span class="op">.</span>g <span class="op">+</span> specular<span class="op">.</span>b<span class="op">);</span></span></code></pre></div>
+<p>使用点积简写将 RGB 三通道相加转为灰度值。</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> roughness <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> min<span class="op">(</span>specular<span class="op">.</span>a<span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span></code></pre></div>
+<p>利用高光贴图的 alpha 通道（存储的是 shininess）计算粗糙度 roughness。
+shininess 越大，反射越锐利，roughness 越小；shininess
+越小，反射越模糊。</p>
+<p>你也可以通过绘制 roughness 贴图（例如在 GIMP
+中），标识哪些区域表面光滑，哪些区域粗糙。
+例如一块瓷砖地面有些区域抛光，有些区域刮花。
+可将抛光区域设为接近黑色（低 roughness），刮花区域设为接近白色（高
+roughness）。 shader 会据此决定使用清晰反射还是模糊反射。</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>fragColor <span class="op">=</span> mix<span class="op">(</span>color<span class="op">,</span> colorBlur<span class="op">,</span> roughness<span class="op">)</span> \<span class="op">*</span> specularAmount<span class="op">;</span></span></code></pre></div>
+<p>使用 roughness 在 color（清晰反射）和 colorBlur（模糊反射）之间插值。
+再乘以 specularAmount 得到最终颜色。</p>
+<hr />
+<h3 id="源码参考">源码参考</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

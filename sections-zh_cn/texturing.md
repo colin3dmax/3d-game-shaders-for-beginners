@@ -4,27 +4,26 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](lighting.md)
 
-# 3D Game Shaders For Beginners
+# 3D游戏着色器入门
 
-## Texturing
-
-<p align="center">
-<img src="../resources/images/cqbgT8b.gif" alt="Diffuse Texture Only" title="Diffuse Texture Only">
-</p>
-
-Texturing involves mapping some color or some other kind of vector to a fragment using UV coordinates.
-Both U and V range from zero to one.
-Each vertex gets a UV coordinate and this is outputted in the vertex shader.
+## 贴图（Texturing）
 
 <p align="center">
-<img src="../resources/images/JjAdNfk.png" alt="UV Interpolation" title="UV Interpolation">
+<img src="../resources/images/cqbgT8b.gif" alt="仅漫反射贴图" title="仅漫反射贴图">
 </p>
 
-The fragment shader receives the UV coordinate interpolated.
-Interpolated meaning the UV coordinate for the fragment is somewhere between the UV coordinates
-for the vertexes that make up the triangle face.
+贴图就是使用 UV 坐标将某种颜色或其他向量映射到片元上。  
+U 和 V 都是在 0 到 1 之间的值。  
+每个顶点会有对应的 UV 坐标，这个坐标会在顶点着色器中输出。
 
-### Vertex
+<p align="center">
+<img src="../resources/images/JjAdNfk.png" alt="UV插值" title="UV插值">
+</p>
+
+片元着色器接收插值后的 UV 坐标。  
+插值的意思是，片元的 UV 坐标是在组成该片元的三角形顶点 UV 坐标之间进行线性插值计算得到的。
+
+### 顶点着色器
 
 ```c
 #version 150
@@ -45,11 +44,10 @@ void main()
 }
 ```
 
-Here you see the vertex shader outputting the texture coordinate to the fragment shader.
-Notice how it's a two dimensional vector.
-One dimension for U and one for V.
+这里顶点着色器将纹理坐标输出到片元着色器。  
+注意这是二维向量，一维是 U，另一维是 V。
 
-### Fragment
+### 片元着色器
 
 ```c
 #version 150
@@ -68,9 +66,9 @@ void main()
 }
 ```
 
-Here you see the fragment shader looking up the color at its UV coordinate and outputting that as the fragment color.
+片元着色器根据 UV 坐标查找纹理颜色，并输出为片元颜色。
 
-#### Screen Filled Texture
+#### 全屏贴图纹理
 
 ```c
 #version 150
@@ -90,13 +88,16 @@ void main()
 }
 ```
 
-When performing render to texture, the mesh is a flat rectangle with the same aspect ratio as the screen.
-Because of this, you can calculate the UV coordinates knowing only
-A) the width and height of the screen sized texture being UV mapped to the rectangle and
-B) the fragment's x and y coordinate.
-To map x to U, divide x by the width of the input texture.
-Similarly, to map y to V, divide y by the height of the input texture.
-You'll see this technique used in the example code.
+在渲染到纹理时，网格是一个与屏幕宽高比相同的平面矩形。  
+因此，计算 UV 坐标只需要知道：  
+A) 这个屏幕大小的纹理的宽高，  
+B) 当前片元的屏幕坐标 x 和 y。  
+
+将 x 除以纹理宽度即可得到 U，  
+将 y 除以纹理高度即可得到 V。  
+
+你会在示例代码中见到这种用法。
+
 
 ## Copyright
 
