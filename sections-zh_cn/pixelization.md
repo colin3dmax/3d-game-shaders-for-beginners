@@ -4,17 +4,17 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](sharpen.md)
 
-# 3D Game Shaders For Beginners
+# 3D游戏着色器入门
 
-## Pixelization
+## 像素化（Pixelization）
 
 <p align="center">
 <img src="../resources/images/IbnyYZN.gif" alt="Pixelization" title="Pixelization">
 </p>
 
-Pixelizing your 3D game can give it a interesting look and
-possibly save you time by not having to create all of the pixel art by hand.
-Combine it with the posterization for a true retro look.
+对你的3D游戏进行像素化处理，可以赋予其有趣的视觉效果，
+并且可能节省你手工制作所有像素艺术的时间。
+结合色调分离（posterization）可以获得真正复古的效果。
 
 ```c
   // ...
@@ -24,8 +24,8 @@ Combine it with the posterization for a true retro look.
   // ...
 ```
 
-Feel free to adjust the pixel size.
-The bigger the pixel size, the blockier the image will be.
+你可以随意调整像素大小。
+像素越大，图像看起来越方块化。
 
 <p align="center">
 <img src="../resources/images/WF5MmM0.gif" alt="Pixelization Process" title="Pixelization Process">
@@ -46,10 +46,9 @@ The bigger the pixel size, the blockier the image will be.
   // ...
 ```
 
-The technique works by mapping each fragment to the center of its closest, non-overlapping
-pixel-sized window.
-These windows are laid out in a grid over the input texture.
-The center-of-the-window fragments determine the color for the other fragments in their window.
+该技术的原理是将每个片元映射到其最近且不重叠的像素大小窗口的中心。
+这些窗口以网格形式覆盖输入纹理。
+窗口中心的片元颜色决定该窗口内其他片元的颜色。
 
 ```c
     // ...
@@ -59,10 +58,10 @@ The center-of-the-window fragments determine the color for the other fragments i
     // ...
 ```
 
-Once you have determined the correct fragment coordinate to use,
-pull its color from the input texture and assign that to the fragment color.
+确定正确的片元坐标后，
+从输入纹理中采样该坐标的颜色，并赋值给当前片元颜色。
 
-### Source
+### 源代码
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [basic.vert](../demonstration/shaders/vertex/basic.vert)

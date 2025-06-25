@@ -4,36 +4,29 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](depth-of-field.md)
 
-# 3D Game Shaders For Beginners
+# 3D游戏着色器入门
 
-## Outlining
+## 描边（Outlining）
 
 <p align="center">
 <img src="../resources/images/EKaZRkR.gif" alt="Outlined Scene" title="Outlined Scene">
 </p>
 
-Outlining your scene's geometry can give your game a distinctive look,
-reminiscent of comic books and cartoons.
+为场景几何体添加描边可以赋予游戏一种独特的外观，让人联想到漫画和卡通。
 
-### Discontinuities
+### 不连续性
 
-The process of outlining is the process of finding and labeling discontinuities or differences.
-Every time you find what you consider a significant difference,
-you mark it with your line color.
-As you go about labeling or coloring in the differences, outlines or edges will start to form.
+描边的过程是寻找并标记不连续性或差异的过程。
+每当你发现一个显著的差异，就用线条颜色标记出来。
+随着你逐步标记这些差异，描边轮廓就会形成。
 
-Where you choose to search for the discontinuities is up to you.
-It could be the diffuse colors in your scene,
-the normals of your models,
-the depth buffer,
-or some other scene related data.
+你可以选择在哪些地方查找不连续性。
+可能是场景中的漫反射颜色、模型的法线、深度缓冲，或其他与场景相关的数据。
 
-The demo uses the interpolated vertex positions to render the outlines.
-However,
-a less straightforward but more typical way is to use both the
-scene's normals and depth buffer values to construct the outlines.
+这个示例使用插值后的顶点位置来绘制描边。
+但更常见的一种方式是结合使用场景的法线和深度缓冲值来生成描边效果。
 
-### Vertex Positions
+### 顶点位置
 
 ```c
 // ...
@@ -43,10 +36,10 @@ uniform sampler2D positionTexture;
 // ...
 ```
 
-Like SSAO, you'll need the vertex positions in view space.
-Referrer back to [SSAO](ssao.md#vertex-positions) for details.
+就像 SSAO 一样，你需要视图空间中的顶点位置。
+具体细节可参考 [SSAO](ssao.md#vertex-positions)。
 
-### Scene Colors
+### 场景颜色
 
 ```c
 // ...
@@ -56,197 +49,165 @@ uniform sampler2D colorTexture;
 // ...
 ```
 
-The demo darkens the colors of the scene where there's an outline.
-This tends to look nicer than a constant color since it provides
-some color variation to the edges.
+这个示例在有描边的区域会加深颜色。
+这种方式比使用纯色看起来更自然，因为边缘有一些颜色变化。
 
-### Parameters
-
-```c
-  // ...
-
-  float minSeparation = 1.0;
-  float maxSeparation = 3.0;
-  float minDistance   = 0.5;
-  float maxDistance   = 2.0;
-  int   size          = 1;
-  vec3 colorModifier  = vec3(0.324, 0.063, 0.099);
-
-  // ...
-```
-
-The min and max separation parameters control the thickness of the outline
-depending on the fragment's distance from the camera or depth.
-The min and max distance control the significance of any changes found.
-The `size` parameter controls the constant thickness of the line no matter the fragment's position.
-The outline color is based on `colorModifier` and the current fragment's color.
-
-### Fragment Position
+### 参数
 
 ```c
-  // ...
+// ...
 
-  vec2 texSize   = textureSize(colorTexture, 0).xy;
-  vec2 fragCoord = gl_FragCoord.xy;
-  vec2 texCoord  = fragCoord / texSize;
+float minSeparation = 1.0;
+float maxSeparation = 3.0;
+float minDistance   = 0.5;
+float maxDistance   = 2.0;
+int   size          = 1;
+vec3 colorModifier  = vec3(0.324, 0.063, 0.099);
 
-  vec4 position = texture(positionTexture, texCoord);
-
-  // ...
+// ...
 ```
 
-Sample the position texture for the current fragment's position in the scene.
-Recall that the position texture is just a screen shaped quad making the UV coordinate
-the current fragment's screen coordinate divided by the dimensions of the screen.
+min/max 分离参数根据片元距相机的深度控制描边粗细。
+min/max 距离参数控制被视为显著变化的阈值。
+`size` 控制线条固定的粗细。
+描边颜色由 `colorModifier` 和片元原有颜色共同决定。
 
-### Fragment Depth
+### 片元位置
 
 ```c
-  // ...
+// ...
 
-  float depth =
-    clamp
-      (   1.0
-        - ( (far - position.y)
-          / (far - near)
-        )
-      , 0.0
-      , 1.0
-      );
+vec2 texSize   = textureSize(colorTexture, 0).xy;
+vec2 fragCoord = gl_FragCoord.xy;
+vec2 texCoord  = fragCoord / texSize;
 
-  float separation = mix(maxSeparation, minSeparation, depth);
+vec4 position = texture(positionTexture, texCoord);
 
-  // ...
+// ...
 ```
 
-The fragment's depth ranges from zero to one.
-When the fragment's view-space y coordinate matches the far clipping plane,
-the depth is one.
-When the fragment's view-space y coordinate matches the near clipping plane,
-the depth is zero.
-In other words,
-the depth ranges from zero at the near clipping plane all the way up to one at the far clipping plane.
+从 positionTexture 中采样当前片元在场景中的位置。
+这个纹理是屏幕形状的四边形，因此 UV 坐标就是屏幕坐标除以屏幕尺寸。
+
+### 片元深度
 
 ```c
-  // ...
+// ...
 
-  float separation = mix(maxSeparation, minSeparation, depth);
+float depth =
+  clamp(
+    1.0 - ((far - position.y) / (far - near)),
+    0.0,
+    1.0
+  );
 
-  // ...
+float separation = mix(maxSeparation, minSeparation, depth);
+
+// ...
 ```
 
-Converting the position to a depth value isn't necessary
-but it allows you to vary the thickness of the outline based on how far
-away the fragment is from the camera.
-Far away fragments get a thinner line while nearer fragments get a thicker outline.
-This tends to look nicer than a constant thickness since it gives depth to the outline.
+深度值范围从 0 到 1。
+片元的视图空间 y 坐标等于 far 平面时，深度为 1；
+等于 near 平面时为 0。
 
-### Finding The Discontinuities
+```c
+// ...
+
+float separation = mix(maxSeparation, minSeparation, depth);
+
+// ...
+```
+
+转换为深度值不是必须的，
+但这样你可以让距离更远的片元使用更细的线条，近处使用更粗的。
+这种方式看起来更具空间感。
+
+### 寻找不连续性
 
 <p align="center">
 <img src="../resources/images/xAMRGhn.gif" alt="Edge Finding" title="Edge Finding">
 </p>
 
-
 ```c
-  // ...
+// ...
 
-  float mx = 0.0;
+float mx = 0.0;
 
-  for (int i = -size; i <= size; ++i) {
-    for (int j = -size; j <= size; ++j) {
-      // ...
-    }
+for (int i = -size; i <= size; ++i) {
+  for (int j = -size; j <= size; ++j) {
+    // ...
   }
+}
 
-  // ...
+// ...
 ```
 
-Now that you have the current fragment's position,
-loop through an i by j grid or window surrounding the current fragment.
-
+现在你有了当前片元的位置，可以遍历一个 i x j 的窗口区域。
 
 ```c
-      // ...
+// ...
 
-      texCoord =
-          ( fragCoord
-          + (vec2(i, j) * separation)
-          )
-        / texSize;
+texCoord = (fragCoord + (vec2(i, j) * separation)) / texSize;
 
-      vec4 positionTemp =
-        texture
-          ( positionTexture
-          , texCoord
-          );
+vec4 positionTemp = texture(positionTexture, texCoord);
 
-      mx = max(mx, abs(position.y - positionTemp.y));
+mx = max(mx, abs(position.y - positionTemp.y));
 
-      // ...
+// ...
 ```
 
-With each iteration,
-find the biggest distance between this fragment's
-and the surrounding fragments' positions.
+每次迭代中，比较当前片元和邻近片元之间 y 坐标的最大差异。
 
 <p align="center">
 <img src="../resources/images/idDZr62.png" alt="smoothstep" title="smoothstep">
 </p>
 
 ```c
-  // ...
+// ...
 
-  float diff = smoothstep(minDistance, maxDistance, mx);
+float diff = smoothstep(minDistance, maxDistance, mx);
 
-  // ...
+// ...
 ```
 
-Calculate the significance of any difference discovered using the `minDistance`, `maxDistance`, and `smoothstep`.
-`smoothstep` returns values from zero to one.
-The `minDistance` is the left-most edge.
-Any difference less than the minimum distance will be zero.
-The `maxDistance` is the right-most edge.
-Any difference greater than the maximum distance will be one.
-For distances between the edges,
-the difference will be between zero and one.
-These values are interpolated along a s-shaped curve.
+使用 `smoothstep` 判断差异是否足够显著。
+小于 `minDistance` 为 0，大于 `maxDistance` 为 1，之间为插值结果。
 
-### Line Color
+### 线条颜色
 
 ```c
-  // ...
+// ...
 
-  vec3 lineColor = texture(colorTexture, texCoord).rgb * colorModifier;
+vec3 lineColor = texture(colorTexture, texCoord).rgb * colorModifier;
 
-  // ...
+// ...
 ```
 
-The line color is the current fragment color either darkened or lightened.
+线条颜色是当前片元颜色的加深或变亮版本。
 
-### Fragment Color
+### 片元颜色输出
 
 <p align="center">
 <img src="../resources/images/yWNdPZe.gif" alt="Outlines" title="Outlines">
 </p>
 
 ```c
-  // ...
+// ...
 
-  fragColor.rgb = vec4(lineColor, diff);
+fragColor.rgb = vec4(lineColor, diff);
 
-  // ...
+// ...
 ```
 
-The fragment's RGB color is the `lineColor` and its alpha channel is `diff`.
+片元的 RGB 为描边颜色，Alpha 为差异值。
 
-### Sketchy
+### 草图风格（Sketchy）
 
 <p align="center">
 <img src="../resources/images/FRBkSm1.gif" alt="Sketchy Outline" title="Sketchy Outline">
 </p>
 
-For a sketchy outline, you can distort the UV coordinates used to sample the position vectors.
+要实现涂鸦风格的描边，可以扭曲采样位置的 UV 坐标。
 
 <p align="center">
 <img src="../resources/images/qgZNtnN.png" alt="Outline Noise" title="Outline Noise">
@@ -260,84 +221,67 @@ uniform sampler2D noiseTexture;
 // ...
 ```
 
-Start by creating a RGB noise texture.
-A good size is either 128 by 128 or 512 by 512.
-Be sure to blur it and make it tileable.
-This will produce a nice wavy, inky outline.
+准备一张 RGB 噪声纹理，尺寸如 128x128 或 512x512，
+要模糊并可重复平铺，这样可以产生波浪状墨迹描边效果。
 
 ```c
-  // ...
+// ...
 
-  float noiseScale = 10.0;
+float noiseScale = 10.0;
 
-  // ...
+// ...
 ```
 
-The `noiseScale` parameter controls how distorted the outline is.
-The bigger the `noiseScale`, the sketchier the line.
+`noiseScale` 控制扰动强度，数值越大越草图化。
 
 ```c
-  // ...
+// ...
 
-  vec2 fragCoord = gl_FragCoord.xy;
+vec2 fragCoord = gl_FragCoord.xy;
 
-  vec2 noise  = texture(noiseTexture, fragCoord / textureSize(noiseTexture, 0).xy).rb;
-       noise  = noise * 2.0 - 1.0;
-       noise *= noiseScale;
+vec2 noise = texture(noiseTexture, fragCoord / textureSize(noiseTexture, 0).xy).rb;
+noise = noise * 2.0 - 1.0;
+noise *= noiseScale;
 
-  // ...
+// ...
 ```
 
-Sample the noise texture using the current screen/fragment position and the size of the noise texture.
-Since you're distorting the UV coordinates used to sample the position vectors,
-you'll only need two of the three color channels.
-Map the two color channels from `[0, 1]` to `[-1, 1]`.
-Finally, scale the noise by the scale chosen earlier.
+使用屏幕坐标采样噪声纹理，两个颜色通道足矣。
+将其值从 `[0, 1]` 映射为 `[-1, 1]`，再乘以 `noiseScale`。
 
 ```c
-  // ...
+// ...
 
-  vec2 texSize  = textureSize(colorTexture, 0).xy;
-  vec2 texCoord = (fragCoord - noise) / texSize;
+vec2 texSize  = textureSize(colorTexture, 0).xy;
+vec2 texCoord = (fragCoord - noise) / texSize;
 
-  vec4 position = texture(positionTexture, texCoord);
+vec4 position = texture(positionTexture, texCoord);
 
-  // ...
+// ...
 ```
 
-When sampling the current position,
-subtract the noise vector from the current fragment's coordinates.
+采样时从当前坐标中减去扰动值。
 
 <p align="center">
 <img src="../resources/images/wk43ybP.png" alt="Squiggly Outline" title="Squiggly Outline">
 </p>
 
-You could instead add it to the current fragment's coordinates
-which will create more of a squiggly line that loosely follows the geometry.
+你也可以将噪声加到当前坐标，
+这样会产生一种更加扭曲的线条，贴近几何边缘但略有变化。
 
 ```c
-  // ...
+// ...
 
-      texCoord =
-          (vec2(i, j) * separation + fragCoord + noise)
-        / texSize;
+texCoord = (vec2(i, j) * separation + fragCoord + noise) / texSize;
 
-      // ...
+vec4 positionTemp = texture(positionTexture, texCoord);
 
-      vec4 positionTemp =
-        texture
-          ( positionTexture
-          , texCoord
-          );
-
-      // ...
+// ...
 ```
 
-When sampling the surrounding positions inside the loop,
-add the noise vector to the current fragment's coordinates.
-The rest of the calculations are the same.
+在循环中采样周围片元时，将噪声添加到坐标中，其余逻辑不变。
 
-### Source
+### 源码文件
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [base.vert](../demonstration/shaders/vertex/base.vert)

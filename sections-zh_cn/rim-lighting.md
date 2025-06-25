@@ -4,20 +4,20 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](cel-shading.md)
 
-# 3D Game Shaders For Beginners
+# 3D游戏着色器入门
 
-## Rim Lighting
+## 边缘光（Rim Lighting）
 
 <p align="center">
 <img src="../resources/images/3erauzN.gif" alt="Rim Lighting" title="Rim Lighting">
 </p>
 
-Taking inspiration from the [fresnel factor](fresnel-factor.md),
-rim lighting targets the rim or silhouette of an object.
-When combined with [cel shading](cel-shading.md) and [outlining](outlining.md),
-it can really complete that cartoon look.
-You can also use it to highlight objects in the game,
-making it easier for players to navigate and accomplish tasks.
+灵感来源于[fresnel因子](fresnel-factor.md)，
+边缘光着重突出物体的边缘或轮廓。
+结合[卡通渲染](cel-shading.md)和[描边](outlining.md)，
+它能完美强化卡通效果。
+你也可以用它来高亮游戏中的物体，
+帮助玩家更容易导航和完成任务。
 
 ```c
   // ...
@@ -27,10 +27,9 @@ making it easier for players to navigate and accomplish tasks.
   // ...
 ```
 
-As it was for the fresnel factor,
-you'll need the eye vector.
-If your vertex positions are in view space,
-the eye vector is the negation of the vertex position.
+与fresnel因子一样，
+你需要计算视线向量（eye vector）。
+如果顶点位置是视图空间的，那么视线向量就是顶点位置的反向。
 
 <p align="center">
 <img src="../resources/images/mMsQFbE.gif" alt="Rim Light" title="Rim Light">
@@ -46,12 +45,10 @@ the eye vector is the negation of the vertex position.
   // ...
 ```
 
-The Intensity of the rim light ranges from zero to one.
-When the eye and normal vector point in the same direction,
-the rim light intensity is zero.
-As the two vectors start to point in different directions,
-the rim light intensity increases
-until it eventually reaches one when the eye and normal become orthogonal or perpendicular to one another.
+边缘光强度范围是0到1。
+当视线向量和法线方向相同时，边缘光强度为0。
+两者方向逐渐不同，边缘光强度增加，
+当视线与法线正交时，强度达到1。
 
 <p align="center">
 <img src="../resources/images/AAFI8p1.gif" alt="Rim Light Power" title="Rim Light Power">
@@ -65,7 +62,7 @@ until it eventually reaches one when the eye and normal become orthogonal or per
   // ...
 ```
 
-You can control the falloff of the rim light using the power function.
+你可以用幂函数控制边缘光的衰减曲线。
 
 ```c
   // ...
@@ -75,9 +72,9 @@ You can control the falloff of the rim light using the power function.
   // ...
 ```
 
-`step` or `smoothstep` can also be used to control the falloff.
-This tends to look better when using [cel shading](cel-shading.md).
-You'll learn more about these functions in later sections.
+也可以用`step`或`smoothstep`控制衰减，
+搭配[卡通渲染](cel-shading.md)时效果更佳。
+你将在后续章节学习更多相关函数。
 
 ```c
   // ...
@@ -88,10 +85,9 @@ You'll learn more about these functions in later sections.
   // ...
 ```
 
-What color you use for the rim light is up to you.
-The demo code multiplies the diffuse light by the `rimLightIntensity`.
-This will highlight the silhouette without overexposing it
-and without lighting any shadowed fragments.
+边缘光的颜色由你决定。
+示例代码将漫反射颜色乘以边缘光强度，
+这样既突出轮廓，又不会过曝或照亮阴影区域。
 
 ```c
   // ...
@@ -108,10 +104,9 @@ and without lighting any shadowed fragments.
   // ...
 ```
 
-After you've calculated the rim light,
-add it to the ambient, diffuse, specular, and emission lights.
+计算完边缘光后，将其与环境光、漫反射、高光和自发光叠加。
 
-### Source
+### 源码
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [basic.vert](../demonstration/shaders/vertex/basic.vert)

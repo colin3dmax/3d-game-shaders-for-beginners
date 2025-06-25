@@ -105,17 +105,15 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="blinn-phong.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="lighting">Lighting</h2>
+<h1 id="3d游戏着色器入门">3D游戏着色器入门</h1>
+<h2 id="光照">光照</h2>
 <p align="center">
 <img src="../resources/images/zQrA8tr.gif" alt="Lighting" title="Lighting">
 </p>
 
-<p>Completing the lighting involves calculating and combining the
-ambient, diffuse, specular, and emission light aspects. The example code
-uses either Phong or Blinn-Phong lighting.</p>
-<h3 id="vertex">Vertex</h3>
+<p>完成光照计算需要计算并组合环境光、漫反射光、高光以及自发光部分。<br />
+示例代码使用的是Phong或Blinn-Phong光照模型。</p>
+<h3 id="顶点着色器">顶点着色器</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>uniform <span class="kw">struct</span> p3d_LightSourceParameters</span>
@@ -145,10 +143,9 @@ uses either Phong or Blinn-Phong lighting.</p>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> p3d_LightSource<span class="op">[</span>NUMBER_OF_LIGHTS<span class="op">];</span></span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>For every light, minus the ambient light, Panda3D gives you this
-convenient struct which is available to both the vertex and fragment
-shaders. The biggest convenience being the shadow map and shadow view
-matrix for transforming vertexes to shadow or light space.</p>
+<p>对于每个灯光（除环境光外），Panda3D会提供这个方便的结构体，<br />
+该结构体在顶点着色器和片元着色器中均可访问。<br />
+其中最方便的是阴影贴图和阴影视图矩阵，用于将顶点转换到阴影空间或光源空间。</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  vertexPosition <span class="op">=</span> p3d_ModelViewMatrix <span class="op">*</span> p3d_Vertex<span class="op">;</span></span>
@@ -160,15 +157,12 @@ matrix for transforming vertexes to shadow or light space.</p>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Starting in the vertex shader, you'll need to transform and output
-the vertex from view space to shadow or light space for each light in
-your scene. You'll need this later in the fragment shader in order to
-render the shadows. Shadow or light space is where every coordinate is
-relative to the light position (the light is the origin).</p>
-<h3 id="fragment">Fragment</h3>
-<p>The fragment shader is where most of the lighting calculations take
-place.</p>
-<h4 id="material">Material</h4>
+<p>在顶点着色器中，需要把顶点位置从视图空间转换到每个光源的阴影空间或光源空间，<br />
+这一步后续在片元着色器中用于阴影渲染。<br />
+阴影空间或光源空间是以光源位置为原点的坐标系。</p>
+<h3 id="片元着色器">片元着色器</h3>
+<p>大部分光照计算都发生在片元着色器中。</p>
+<h4 id="材质">材质</h4>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>uniform <span class="kw">struct</span></span>
@@ -181,17 +175,15 @@ place.</p>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> p3d_Material<span class="op">;</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>Panda3D gives us the material (in the form of a struct) for the mesh
-or model you are currently rendering.</p>
-<h4 id="multiple-lights">Multiple Lights</h4>
+<p>Panda3D为当前渲染的网格或模型提供材质信息（结构体形式）。</p>
+<h4 id="多灯光处理">多灯光处理</h4>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  vec4 diffuse  <span class="op">=</span> vec4<span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> diffuseTex<span class="op">.</span>a<span class="op">);</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  vec4 specular <span class="op">=</span> vec4<span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> <span class="fl">0.0</span><span class="op">,</span> diffuseTex<span class="op">.</span>a<span class="op">);</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Before you loop through the scene's lights, create an accumulator for
-both the diffuse and specular colors.</p>
+<p>在遍历场景中的所有灯光前，先创建累加变量用于累计漫反射色和高光色。</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> p3d_LightSource<span class="op">.</span>length<span class="op">();</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
@@ -199,19 +191,17 @@ both the diffuse and specular colors.</p>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Now you can loop through the lights, calculating the diffuse and
-specular colors for each one.</p>
-<h4 id="light-related-vectors">Light Related Vectors</h4>
+<p>现在可以遍历所有灯光，计算每个灯光贡献的漫反射色和高光色。</p>
+<h4 id="相关光照向量">相关光照向量</h4>
 <p align="center">
 <img src="../resources/images/0pzNh5d.gif" alt="Phong Lighting Model" title="Phong Lighting Model">
 </p>
 
-<p>Here you see the four major vectors you'll need to calculate the
-diffuse and specular colors contributed by each light. The light
-direction vector is the light blue arrow pointing to the light. The
-normal vector is the green arrow standing straight up. The reflection
-vector is the dark blue arrow mirroring the light direction vector. The
-eye or view vector is the orange arrow pointing towards the camera.</p>
+<p>下图展示了计算漫反射和高光所需的四个主要向量：<br />
+光线方向向量（浅蓝色箭头，指向光源），<br />
+法线向量（绿色箭头，垂直表面），<br />
+反射向量（深蓝色箭头，光线方向相对于法线的反射），<br />
+视线向量（橙色箭头，指向摄像机）。</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    vec3 lightDirection <span class="op">=</span></span>
@@ -220,21 +210,17 @@ eye or view vector is the orange arrow pointing towards the camera.</p>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">*</span> p3d_LightSource<span class="op">[</span>i<span class="op">].</span>position<span class="op">.</span>w<span class="op">;</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>The light direction is from the vertex's position to the light's
-position.</p>
-<p>Panda3D sets <code>p3d_LightSource[i].position.w</code> to zero if
-this is a directional light. Directional lights do not have a position
-as they only have a direction. So if this is a directional light, the
-light direction will be the negative or opposite direction of the light
-as Panda3D sets <code>p3d_LightSource[i].position.xyz</code> to be
-<code>-direction</code> for directional lights.</p>
+<p>光线方向向量是从顶点位置指向光源位置。</p>
+<p>Panda3D中，如果光源是方向光，<code>p3d_LightSource[i].position.w</code>
+会被设为0。<br />
+方向光没有具体位置，只有方向。<br />
+此时，光线方向是方向光方向的相反方向（Panda3D中<code>p3d_LightSource[i].position.xyz</code>存储的是方向光的负方向）。</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  normal <span class="op">=</span> normalize<span class="op">(</span>vertexNormal<span class="op">);</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>You'll need the vertex normal to be a unit vector. Unit vectors have
-a length of magnitude of one.</p>
+<p>需要将顶点法线标准化为单位向量（长度为1）。</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    vec3 unitLightDirection <span class="op">=</span> normalize<span class="op">(</span>lightDirection<span class="op">);</span></span>
@@ -242,28 +228,18 @@ a length of magnitude of one.</p>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    vec3 reflectedDirection <span class="op">=</span> normalize<span class="op">(-</span>reflect<span class="op">(</span>unitLightDirection<span class="op">,</span> normal<span class="op">));</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>Next you'll need three more vectors.</p>
-<p>You'll need to take the dot product involving the light direction so
-its best to normalize it. This gives it a distance or magnitude of one
-(unit vector).</p>
-<p>The eye direction is the opposite of the vertex/fragment position
-since the vertex/fragment position is relative to the camera's position.
-Remember that the vertex/fragment position is in view space. So instead
-of going from the camera (eye) to the vertex/fragment, you go from the
-vertex/fragment to the eye (camera).</p>
-<p>The <a
-href="http://asawicki.info/news_1301_reflect_and_refract_functions.html">reflection
-vector</a> is a reflection of the light direction at the surface normal.
-As the light "ray" hits the surface, it bounces off at the same angle it
-came in at. The angle between the light direction vector and the normal
-is known as the "angle of incidence". The angle between the reflection
-vector and the normal is known as the "angle of reflection".</p>
-<p>You'll have to negate the reflected light vector as it needs to point
-in the same direction as the eye vector. Remember the eye direction is
-from the vertex/fragment to the camera position. You'll use the
-reflection vector to calculate the intensity of the specular
-highlight.</p>
-<h4 id="diffuse">Diffuse</h4>
+<p>接着需要计算三个单位向量：</p>
+<ul>
+<li>单位光线方向（标准化光线方向向量，长度为1），</li>
+<li>视线方向（从顶点指向摄像机，顶点位置为视图空间坐标，故取负），</li>
+<li>反射方向（光线方向相对于法线的反射向量，需取反使其指向视线方向）。</li>
+</ul>
+<p><a
+href="http://asawicki.info/news_1301_reflect_and_refract_functions.html">反射向量详解</a><br />
+光线射向表面时，会按照入射角反射出去，反射角等于入射角。</p>
+<p>反射向量需要取反，使其方向和视线向量一致。<br />
+反射向量用于计算高光强度。</p>
+<h4 id="漫反射">漫反射</h4>
 <div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> diffuseIntensity  <span class="op">=</span> dot<span class="op">(</span>normal<span class="op">,</span> unitLightDirection<span class="op">);</span></span>
@@ -271,23 +247,20 @@ highlight.</p>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>diffuseIntensity <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span> <span class="cf">continue</span><span class="op">;</span> <span class="op">}</span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>The diffuse intensity is the dot product between the surface normal
-and the unit vector light direction. The dot product can range from
-negative one to one. If both vectors point in the same direction, the
-intensity is one. Any other case will be less than one.</p>
+<p>漫反射强度是法线与光线方向单位向量的点积。<br />
+点积范围是-1到1。<br />
+如果两个向量方向相同，点积为1；否则小于1。</p>
 <p align="center">
 <img src="../resources/images/Nb78z96.gif" alt="The light direction versus the normal direction." title="The light direction versus the normal direction.">
 </p>
 
-<p>As the light vector approaches the same direction as the normal, the
-diffuse intensity approaches one.</p>
+<p>光线方向越接近法线方向，漫反射强度越接近1。</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>diffuseIntensity <span class="op">&lt;</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span> <span class="cf">continue</span><span class="op">;</span> <span class="op">}</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>If the diffuse intensity is zero or less, move on to the next
-light.</p>
+<p>漫反射强度小于等于0时，跳过当前灯光，继续下一灯光。</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    vec4 diffuseTemp <span class="op">=</span></span>
@@ -305,16 +278,14 @@ light.</p>
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    diffuseTemp <span class="op">=</span> clamp<span class="op">(</span>diffuseTemp<span class="op">,</span> vec4<span class="op">(</span><span class="dv">0</span><span class="op">),</span> diffuseTex<span class="op">);</span></span>
 <span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>You can now calculate the diffuse color contributed by this light. If
-the diffuse intensity is one, the diffuse color will be a mix between
-the diffuse texture color and the lights color. Any other intensity will
-cause the diffuse color to be darker.</p>
-<p>Notice how I clamp the diffuse color to be only as bright as the
-diffuse texture color is. This will protect the scene from being over
-exposed. When creating your diffuse textures, make sure to create them
-as if they were fully lit.</p>
-<h4 id="specular">Specular</h4>
-<p>After diffuse, comes specular.</p>
+<p>计算该灯光贡献的漫反射颜色。<br />
+漫反射强度为1时，漫反射颜色是漫反射贴图颜色和灯光颜色的乘积。<br />
+强度较小时，颜色更暗。</p>
+<p>注意这里将漫反射颜色限制(clamp)为不超过漫反射贴图颜色，<br />
+避免场景过曝。<br />
+创建漫反射贴图时，假设它们是在完全照明下的颜色。</p>
+<h4 id="高光">高光</h4>
+<p>漫反射之后计算高光。</p>
 <p align="center">
 <img src="../resources/images/FnOhXxv.gif" alt="Specular Intensity" title="Specular Intensity">
 </p>
@@ -336,19 +307,16 @@ as if they were fully lit.</p>
 <span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">);</span></span>
 <span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>The specular intensity is the dot product between the eye vector and
-the reflection vector. As with the diffuse intensity, if the two vectors
-point in the same direction, the specular intensity is one. Any other
-intensity will diminish the amount of specular color contributed by this
-light.</p>
+<p>高光强度是视线方向与反射方向的点积（最大值不低于0）。<br />
+两个向量方向越一致，高光强度越大。</p>
 <p align="center">
 <img src="../resources/images/4r6wqLP.gif" alt="Shininess" title="Shininess">
 </p>
 
-<p>The material shininess determines how spread out the specular
-highlight is. This is typically set in a modeling program like Blender.
-In Blender it's known as the specular hardness.</p>
-<h4 id="spotlights">Spotlights</h4>
+<p>材质的高光强度指数（shininess）决定高光的集中程度，<br />
+数值越大，高光越集中。<br />
+一般在建模软件如Blender中设置，Blender里称为高光硬度。</p>
+<h4 id="聚光灯">聚光灯</h4>
 <div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> unitLightDirectionDelta <span class="op">=</span></span>
@@ -361,48 +329,36 @@ In Blender it's known as the specular hardness.</p>
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>This snippet keeps fragments outside of a spotlight's cone or frustum
-from being affected by the light. Fortunately, Panda3D <a
-href="https://github.com/panda3d/panda3d/blob/daa57733cb9b4ccdb23e28153585e8e20b5ccdb5/panda/src/display/graphicsStateGuardian.cxx#L1705">sets
-up</a> <code>spotDirection</code> and <code>spotCosCutoff</code> to also
-work for directional lights and points lights. Spotlights have both a
-position and direction. However, directional lights only have a
-direction and point lights only have a position. Still, this code works
-for all three lights avoiding the need for noisy if statements.</p>
+<p>这段代码用于剔除聚光灯光锥外的片元。<br />
+Panda3D同时设置了<code>spotDirection</code>和<code>spotCosCutoff</code>以支持方向光和点光。<br />
+聚光灯有位置和方向，方向光只有方向，点光只有位置。<br />
+这段代码统一支持三种灯光，避免大量条件判断。</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>        <span class="co">// ...</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="op">-</span>unitLightDirection</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        <span class="co">// ...</span></span></code></pre></div>
-<p>You must negate <code>unitLightDirection</code>.
-<code>unitLightDirection</code> goes from the fragment to the spotlight
-and you need it to go from the spotlight to the fragment since the
-<code>spotDirection</code> goes directly down the center of the
-spotlight's frustum some distance away from the spotlight's
-position.</p>
+<p>这里对<code>unitLightDirection</code>取负。<br />
+<code>unitLightDirection</code>是从片元指向光源的方向，需要反向变为从光源指向片元，<br />
+因为<code>spotDirection</code>是聚光灯中心方向向外的单位向量。</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>spotCosCutoff <span class="op">=</span> cosine<span class="op">(</span><span class="fl">0.5</span> <span class="op">*</span> spotlightLensFovAngle<span class="op">);</span></span></code></pre></div>
-<p>For a spotlight, if the dot product between the fragment-to-light
-vector and the spotlight's direction vector is less than the cosine of
-half the spotlight's field of view angle, the shader disregards this
-light's influence.</p>
-<p>For directional lights and point lights, Panda3D sets
-<code>spotCosCutoff</code> to negative one. Recall that the dot product
-ranges from negative one to one. So it doesn't matter what the
-<code>unitLightDirectionDelta</code> is because it will always be
-greater than or equal to negative one.</p>
+<p>对于聚光灯，如果片元到光源方向向量与聚光灯方向向量的点积小于聚光灯视锥角一半余弦值，着色器将忽略该光源的影响。</p>
+<p>对于方向光和点光，Panda3D 会将 <code>spotCosCutoff</code> 设置为
+-1。<br />
+点积范围是 -1 到 1，<br />
+所以无论 <code>unitLightDirectionDelta</code> 是多少，它总是大于或等于
+-1。</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    diffuseTemp <span class="op">*=</span> pow<span class="op">(</span>unitLightDirectionDelta<span class="op">,</span> p3d_LightSource<span class="op">[</span>i<span class="op">].</span>spotExponent<span class="op">);</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>Like the <code>unitLightDirectionDelta</code> snippet, this snippet
-also works for all three light types. For spotlights, this will make the
-fragments brighter as you move closer to the center of the spotlight's
-frustum. For directional lights and point lights,
-<code>spotExponent</code> is zero. Recall that anything to the power of
-zero is one so the diffuse color is one times itself meaning it is
-unchanged.</p>
-<h4 id="shadows">Shadows</h4>
+<p>和 <code>unitLightDirectionDelta</code>
+判断类似，这段代码对所有三种光源都适用。<br />
+对于聚光灯，这会让靠近聚光灯中心的片元更亮。<br />
+对于方向光和点光，<code>spotExponent</code> 为 0，<br />
+任何数的 0 次方都为 1，漫反射颜色不变。</p>
+<h4 id="阴影">阴影</h4>
 <div class="sourceCode" id="cb17"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> shadow <span class="op">=</span></span>
@@ -415,38 +371,32 @@ unchanged.</p>
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    specularTemp<span class="op">.</span>rgb <span class="op">*=</span> shadow<span class="op">;</span></span>
 <span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>Panda3D makes applying shadows relatively easy by providing the
-shadow map and shadow transformation matrix for every scene light. To
-create the shadow transformation matrix yourself, you'll need to
-assemble a matrix that transforms view space coordinates to light space
-(coordinates are relative to the light's position). To create the shadow
-map yourself, you'll need to render the scene from the perspective of
-the light to a framebuffer texture. The framebuffer texture must hold
-the distances from the light to the fragments. This is known as a "depth
-map". Lastly, you'll need to manually give to your shader your DIY depth
-map as a <code>uniform sampler2DShadow</code> and your DIY shadow
-transformation matrix as a <code>uniform mat4</code>. At this point,
-you've recreated what Panda3D does for you automatically.</p>
-<p>The shadow snippet shown uses <code>textureProj</code> which is
-different from the <code>texure</code> function shown earlier.
-<code>textureProj</code> first divides
-<code>vertexInShadowSpaces[i].xyz</code> by
-<code>vertexInShadowSpaces[i].w</code>. After this, it uses
-<code>vertexInShadowSpaces[i].xy</code> to locate the depth stored in
-the shadow map. Next it uses <code>vertexInShadowSpaces[i].z</code> to
-compare this vertex's depth against the shadow map depth at
-<code>vertexInShadowSpaces[i].xy</code>. If the comparison passes,
-<code>textureProj</code> will return one. Otherwise, it will return
-zero. Zero meaning this vertex/fragment is in the shadow and one meaning
-this vertex/fragment is not in the shadow.</p>
-<p><code>textureProj</code> can also return a value between zero and one
-depending on how the shadow map was set up. In this instance,
-<code>textureProj</code> performs multiple depth tests using neighboring
-depth values and returns a weighted average. This weighted average can
-give shadows a softer look.</p>
-<h4 id="attenuation">Attenuation</h4>
+<p>Panda3D
+为每个场景光源提供阴影贴图和阴影变换矩阵，使得应用阴影相对简单。<br />
+如果你想自己实现阴影变换矩阵，<br />
+需要构建一个矩阵，将视图空间坐标转换到光源空间（坐标以光源为原点）。<br />
+若要自己制作阴影贴图，需要从光源视角渲染场景到帧缓冲纹理，<br />
+该纹理存储从光源到片元的距离，称为“深度图”。<br />
+最后你需将自制的深度图作为
+<code>uniform sampler2DShadow</code>，阴影变换矩阵作为
+<code>uniform mat4</code> 传入着色器。<br />
+到这一步，你就重现了 Panda3D 自动帮你完成的功能。</p>
+<p>此处用到的 <code>textureProj</code> 与之前的 <code>texture</code>
+函数不同，<br />
+<code>textureProj</code> 会先将 <code>vertexInShadowSpaces[i].xyz</code>
+除以 <code>vertexInShadowSpaces[i].w</code>，<br />
+然后用 xy 坐标定位深度图中的深度值，<br />
+接着用 z 坐标将该片元的深度与深度图深度比较。<br />
+比较通过则返回 1，表示该片元未被阴影遮挡；否则返回
+0，表示片元处于阴影中。</p>
+<p><code>textureProj</code> 也可能返回 0 到 1
+之间的值，取决于阴影贴图的设置。<br />
+这种情况下，<code>textureProj</code>
+会对邻近深度值进行多重深度测试，返回加权平均值，<br />
+从而获得更柔和的阴影效果。</p>
+<h4 id="衰减">衰减</h4>
 <p align="center">
-<img src="../resources/images/jyatr7l.png" alt="Attenuation" title="Attenuation">
+<img src="../resources/images/jyatr7l.png" alt="衰减" title="衰减">
 </p>
 
 <div class="sourceCode" id="cb18"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
@@ -466,31 +416,24 @@ give shadows a softer look.</p>
 <span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    specularTemp<span class="op">.</span>rgb <span class="op">*=</span> attenuation<span class="op">;</span></span>
 <span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>The light's distance is just the magnitude or length of the light
-direction vector. Notice it's not using the normalized light direction
-as that distance would be one.</p>
-<p>You'll need the light distance to calculate the attenuation.
-Attenuation meaning the light's influence diminishes as you get further
-away from it.</p>
-<p>You can set <code>constantAttenuation</code>,
-<code>linearAttenuation</code>, and <code>quadraticAttenuation</code> to
-whatever values you would like. A good starting point is
-<code>constantAttenuation = 1</code>,
-<code>linearAttenuation = 0</code>, and
-<code>quadraticAttenuation = 1</code>. With these settings, the
-attenuation is one at the light's position and approaches zero as you
-move further away.</p>
-<h4 id="final-light-color">Final Light Color</h4>
+<p>光源距离即光线方向向量的长度（不是归一化后的方向，否则长度恒为1）。</p>
+<p>计算衰减时需要距离值，<br />
+衰减表示光照影响会随着距离增加而减弱。</p>
+<p>你可以任意设置
+<code>constantAttenuation</code>、<code>linearAttenuation</code> 和
+<code>quadraticAttenuation</code>。<br />
+一个合理的起点是：<code>constantAttenuation = 1</code>，<code>linearAttenuation = 0</code>，<code>quadraticAttenuation = 1</code>。<br />
+这样设置时，光源位置处衰减为 1，远离光源时趋近于 0。</p>
+<h4 id="最终光照颜色">最终光照颜色</h4>
 <div class="sourceCode" id="cb19"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    diffuse  <span class="op">+=</span> diffuseTemp<span class="op">;</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    specular <span class="op">+=</span> specularTemp<span class="op">;</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>To calculate the final light color, add the diffuse and specular
-together. Be sure to add this to the accumulator as you loop through the
-scene's lights.</p>
-<h4 id="ambient">Ambient</h4>
+<p>最终光照颜色是漫反射色和高光色的叠加。<br />
+遍历场景光源时，需将每个光源的贡献累加。</p>
+<h4 id="环境光">环境光</h4>
 <div class="sourceCode" id="cb20"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D p3d_Texture1<span class="op">;</span></span>
@@ -515,23 +458,20 @@ scene's lights.</p>
 <span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>  vec4 ambient <span class="op">=</span> p3d_Material<span class="op">.</span>ambient <span class="op">*</span> p3d_LightModel<span class="op">.</span>ambient <span class="op">*</span> diffuseTex<span class="op">;</span></span>
 <span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>The ambient component to the lighting model is based on the
-material's ambient color, the ambient light's color, and the diffuse
-texture color.</p>
-<p>There should only ever be one ambient light. Because of this, the
-ambient color calculation only needs to occur once. Contrast this with
-the diffuse and specular color which must be accumulated for each
-spot/directional/point light. When you reach <a href="ssao.html">SSAO</a>,
-you'll revisit the ambient color calculation.</p>
-<h4 id="putting-it-all-together">Putting It All Together</h4>
+<p>环境光部分基于材质的环境光颜色、环境光源颜色以及漫反射贴图颜色计算。</p>
+<p>环境光在场景中通常只有一个，<br />
+因此环境光颜色计算只需进行一次，<br />
+与此不同的是漫反射和高光颜色需为每个点光、方向光和聚光灯累积。<br />
+当你学习<a
+href="ssao.html">屏幕空间环境光遮蔽（SSAO）</a>时，会再次调整环境光计算。</p>
+<h4 id="综合计算">综合计算</h4>
 <div class="sourceCode" id="cb21"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  vec4 outputColor <span class="op">=</span> ambient <span class="op">+</span> diffuse <span class="op">+</span> specular <span class="op">+</span> p3d_Material<span class="op">.</span>emission<span class="op">;</span></span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The final color is the sum of the ambient color, diffuse color,
-specular color, and the emission color.</p>
-<h3 id="source">Source</h3>
+<p>最终输出颜色是环境光、漫反射、高光和自发光的颜色叠加。</p>
+<h3 id="资源链接">资源链接</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

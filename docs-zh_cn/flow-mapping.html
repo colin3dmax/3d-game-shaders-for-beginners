@@ -104,33 +104,34 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 <a href="#copyright"><span class="emoji"
 data-emoji="arrow_down_small">🔽</span></a> <a href="outlining.html"><span
 class="emoji" data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="flow-mapping">Flow Mapping</h2>
+<h1 id="3d-游戏着色器入门">3D 游戏着色器入门</h1>
+<h2 id="流动贴图flow-mapping">流动贴图（Flow Mapping）</h2>
 <p align="center">
 <img src="../resources/images/3WDO9xW.gif" alt="Flow Mapping" title="Flow Mapping">
 </p>
 
-<p>Flow mapping is useful when you need to animate some fluid material.
-Much like diffuse maps map UV coordinates to diffuse colors and normal
-maps map UV coordinates to normals, flow maps map UV coordinates to 2D
-translations or flows.</p>
+<p>流动贴图在你需要动画化液体材质时非常有用。<br />
+就像漫反射贴图将 UV 坐标映射到漫反射颜色，法线贴图将 UV
+坐标映射到法线方向，<br />
+流动贴图将 UV 坐标映射到二维的偏移量（即流动方向）。</p>
 <p align="center">
 <img src="../resources/images/b9Vw94N.png" alt="Flow Map" title="Flow Map">
 </p>
 
-<p>Here you see a flow map that maps UV coordinates to translations in
-the positive y-axis direction. Flow maps use the red and green channels
-to store translations in the x and y direction. The red channel is for
-the x-axis and the green channel is the y-axis. Both range from zero to
-one which translates to flows that range from <code>(-1, -1)</code> to
-<code>(1, 1)</code>. This flow map is all one color consisting of 0.5
-red and 0.6 green.</p>
+<p>上图是一个将 UV 坐标映射到正 Y 方向偏移的流动贴图。<br />
+流动贴图使用红色和绿色通道分别存储 X 和 Y 方向的偏移值：</p>
+<ul>
+<li>红色通道表示 X 方向流动</li>
+<li>绿色通道表示 Y 方向流动</li>
+</ul>
+<p>这两个通道的值范围都是 <code>[0, 1]</code>，在经过换算后会映射到
+<code>(-1, 1)</code> 的偏移范围。<br />
+上图中该贴图是单一颜色，R 为 0.5，G 为 0.6。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">[</span>r<span class="op">,</span> g<span class="op">,</span> b<span class="op">]</span> <span class="op">=</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">[</span>r <span class="op">*</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span><span class="op">,</span> g <span class="op">*</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span><span class="op">,</span> b <span class="op">*</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span><span class="op">]</span> <span class="op">=</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span> x<span class="op">,</span> y<span class="op">,</span> z<span class="op">]</span></span></code></pre></div>
-<p>Recall how the colors in a normal map are converted to actual
-normals. There is a similar process for flow maps.</p>
+<p>回顾法线贴图中的颜色到法线的转换方式，<br />
+流动贴图采用类似的转换逻辑。</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D flowTexture<span class="op">;</span></span>
@@ -139,8 +140,8 @@ normals. There is a similar process for flow maps.</p>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>       flow <span class="op">=</span> <span class="op">(</span>flow <span class="op">-</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="dv">2</span><span class="op">;</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>To convert a flow map color to a flow, you minus 0.5 from the channel
-(red and green) and multiply by two.</p>
+<p>要将流动贴图的颜色值转换为实际的流动向量，<br />
+只需将颜色通道值减去 0.5 并乘以 2。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">(</span>r<span class="op">,</span> g<span class="op">)</span> <span class="op">=</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a> <span class="op">(</span> <span class="op">(</span>r <span class="op">-</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="dv">2</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a> <span class="op">,</span> <span class="op">(</span>g <span class="op">-</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">*</span> <span class="dv">2</span></span>
@@ -150,11 +151,10 @@ normals. There is a similar process for flow maps.</p>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span> <span class="op">=</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">(</span>x<span class="op">,</span> y<span class="op">)</span> <span class="op">=</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div>
-<p>The flow map above maps each UV coordinate to the flow
-<code>(0, 0.2)</code>. This indicates zero movement in the x direction
-and a movement of 0.2 in the y direction.</p>
-<p>The flows can be used to translate all sorts of things but they're
-typically used to offset the UV coordinates of a another texture.</p>
+<p>上面的流动贴图会将每个 UV 坐标映射为 <code>(0, 0.2)</code>
+的偏移，<br />
+表示 X 方向无移动，Y 方向每单位时间偏移 0.2。</p>
+<p>流动值通常用于偏移其他纹理的 UV 坐标，来模拟流动效果。</p>
 <p align="center">
 <img src="../resources/images/N6TWBw8.gif" alt="Foam Mask" title="Foam Mask">
 </p>
@@ -174,24 +174,23 @@ typically used to offset the UV coordinates of a another texture.</p>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">);</span></span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>For example, the demo program uses a flow map to animate the water.
-Here you see the flow map being used to animate the <a
-href="foam.html#mask">foam mask</a>. This continuously moves the diffuse
-UV coordinates directly up, giving the foam mask the appearance of
-moving down stream.</p>
+<p>例如，示例程序使用流动贴图为水面添加动画。<br />
+在上图中，流动贴图被用于驱动 <a href="foam.html#mask">泡沫遮罩</a>
+的移动。<br />
+它会持续向上偏移 UV 坐标，从而让泡沫看起来像是顺流而下。</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>          <span class="co">// ...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>          <span class="op">(</span> diffuseCoord<span class="op">.</span>x <span class="op">+</span> flow<span class="op">.</span>x <span class="op">*</span> osg_FrameTime</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>          <span class="op">,</span> diffuseCoord<span class="op">.</span>y <span class="op">+</span> flow<span class="op">.</span>y <span class="op">*</span> osg_FrameTime</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>          <span class="co">// ...</span></span></code></pre></div>
-<p>You'll need how many seconds have passed since the first frame in
-order to animate the UV coordinates in the direction indicated by the
-flow. <code>osg_FrameTime</code> is <a
-href="https://github.com/panda3d/panda3d/blob/daa57733cb9b4ccdb23e28153585e8e20b5ccdb5/panda/src/display/graphicsStateGuardian.cxx#L930">provided</a>
-by Panda3D. It is a timestamp of how many seconds have passed since the
-first frame.</p>
-<h3 id="source">Source</h3>
+<p>为了根据流动方向动画化 UV
+坐标，你需要知道自第一帧以来经过了多少秒。<br />
+<code>osg_FrameTime</code> 是由 Panda3D 提供的变量，<br />
+<a
+href="https://github.com/panda3d/panda3d/blob/daa57733cb9b4ccdb23e28153585e8e20b5ccdb5/panda/src/display/graphicsStateGuardian.cxx#L930">参考链接</a>，<br />
+它表示从第一帧开始过去的时间戳。</p>
+<h3 id="源码参考">源码参考</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

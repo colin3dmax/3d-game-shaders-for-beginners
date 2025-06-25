@@ -4,60 +4,60 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](texturing.md)
 
-# 3D Game Shaders For Beginners
+# 3D游戏着色器入门
 
-## Render To Texture
+## 渲染到纹理（Render To Texture）
 
-Instead of rendering/drawing/painting directly to the screen, the example code uses a technique called "render to texture".
-In order to render to a texture, you'll need to set up a framebuffer and bind a texture to it.
-Multiple textures can be bound to a single framebuffer.
+示例代码并不是直接渲染/绘制/绘画到屏幕上，而是使用一种称为“渲染到纹理”的技术。
+为了实现渲染到纹理，你需要设置一个帧缓冲（framebuffer）并将纹理绑定到它。
+一个帧缓冲可以绑定多个纹理。
 
-The textures bound to the framebuffer hold the vector(s) returned by the fragment shader.
-Typically these vectors are color vectors `(r, g, b, a)` but they could also be position or normal vectors `(x, y, z, w)`.
-For each bound texture, the fragment shader can output a different vector.
-For example you could output a vertex's position and normal in a single pass.
+绑定到帧缓冲的纹理保存了片元着色器返回的向量。
+通常这些向量是颜色向量 `(r, g, b, a)`，但也可能是位置或法线向量 `(x, y, z, w)`。
+对于每个绑定的纹理，片元着色器可以输出不同的向量。
+例如，你可以在一次渲染中同时输出顶点的位置和法线。
 
-Most of the example code dealing with Panda3D involves setting up
-[framebuffer textures](https://www.panda3d.org/manual/?title=Render-to-Texture_and_Image_Postprocessing).
-To keep things straightforward, nearly all of the fragment shaders in the example code have only one output.
-However, you'll want to output as much as you can each render pass to keep your frames per second (FPS) high.
+大部分涉及 Panda3D 的示例代码都涉及设置
+[帧缓冲纹理](https://www.panda3d.org/manual/?title=Render-to-Texture_and_Image_Postprocessing)。
+为了简化，示例代码中的几乎所有片元着色器都只有一个输出。
+但为了保持较高的帧率（FPS），你希望每次渲染尽可能输出更多内容。
 
-There are two framebuffer texture setups found in the example code.
-
-<p align="center">
-<img src="../resources/images/t3iLKhx.gif" alt="The first framebuffer texture setup." title="The first framebuffer texture setup.">
-</p>
-
-The first setup renders the mill scene into a framebuffer texture using a variety of vertex and fragment shaders.
-This setup will go through each of the mill scene's vertexes and corresponding fragments.
-
-In this setup, the example code performs the following.
-
-- Stores geometry data (like vertex position or normal) for later use.
-- Stores material data (like the diffuse color) for later use.
-- UV maps the various textures (diffuse, normal, shadow, etc.).
-- Calculates the ambient, diffuse, specular, and emission lighting.
+示例代码中有两种帧缓冲纹理的设置。
 
 <p align="center">
-<img src="../resources/images/o8H6cTy.png" alt="The second framebuffer texture setup." title="The second framebuffer texture setup.">
+<img src="../resources/images/t3iLKhx.gif" alt="第一个帧缓冲纹理设置。" title="第一个帧缓冲纹理设置。">
 </p>
 
-The second setup is an orthographic camera pointed at a screen-shaped rectangle.
-This setup will go through just the four vertexes and their corresponding fragments.
+第一个设置将水车场景渲染到帧缓冲纹理中，使用了多种顶点和片元着色器。
+这个设置会处理水车场景中的每个顶点和对应的片元。
 
-In this second setup, the example code performs the following.
+在此设置中，示例代码执行了以下操作：
 
-- Manipulates the output of another framebuffer texture.
-- Combines various framebuffer textures into one.
-
-I like to think of this second setup as using layers in GIMP, Krita, or Inkscape.
+- 存储几何数据（如顶点位置或法线）以备后用。
+- 存储材质数据（如漫反射颜色）以备后用。
+- 对各种纹理（漫反射、法线、阴影等）进行UV映射。
+- 计算环境光、漫反射、高光和自发光照明。
 
 <p align="center">
-<img src="../resources/images/L6Hwuxa.gif" alt="Tabbing Through Framebuffer Textures" title="Tabbing Through Framebuffer Textures">
+<img src="../resources/images/o8H6cTy.png" alt="第二个帧缓冲纹理设置。" title="第二个帧缓冲纹理设置。">
 </p>
 
-In the example code, you can see the output of a particular framebuffer texture
-by using the <kbd>Tab</kbd> key or the <kbd>Shift</kbd>+<kbd>Tab</kbd> keys.
+第二个设置是一个正交相机，面向一个屏幕形状的矩形。
+这个设置只处理四个顶点及其对应的片元。
+
+在第二个设置中，示例代码执行了以下操作：
+
+- 操作另一个帧缓冲纹理的输出。
+- 将多个帧缓冲纹理合成为一个。
+
+我喜欢把第二个设置想象成使用 GIMP、Krita 或 Inkscape 的图层功能。
+
+<p align="center">
+<img src="../resources/images/L6Hwuxa.gif" alt="在帧缓冲纹理之间切换" title="在帧缓冲纹理之间切换">
+</p>
+
+在示例代码中，你可以通过按 <kbd>Tab</kbd> 键或 <kbd>Shift</kbd>+<kbd>Tab</kbd> 键查看特定帧缓冲纹理的输出。
+
 
 ## Copyright
 

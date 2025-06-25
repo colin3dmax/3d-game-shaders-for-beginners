@@ -104,23 +104,21 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 <a href="#copyright"><span class="emoji"
 data-emoji="arrow_down_small">🔽</span></a> <a href="sharpen.html"><span
 class="emoji" data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="pixelization">Pixelization</h2>
+<h1 id="3d游戏着色器入门">3D游戏着色器入门</h1>
+<h2 id="像素化pixelization">像素化（Pixelization）</h2>
 <p align="center">
 <img src="../resources/images/IbnyYZN.gif" alt="Pixelization" title="Pixelization">
 </p>
 
-<p>Pixelizing your 3D game can give it a interesting look and possibly
-save you time by not having to create all of the pixel art by hand.
-Combine it with the posterization for a true retro look.</p>
+<p>对你的3D游戏进行像素化处理，可以赋予其有趣的视觉效果，
+并且可能节省你手工制作所有像素艺术的时间。
+结合色调分离（posterization）可以获得真正复古的效果。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> pixelSize <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Feel free to adjust the pixel size. The bigger the pixel size, the
-blockier the image will be.</p>
+<p>你可以随意调整像素大小。 像素越大，图像看起来越方块化。</p>
 <p align="center">
 <img src="../resources/images/WF5MmM0.gif" alt="Pixelization Process" title="Pixelization Process">
 </p>
@@ -137,19 +135,17 @@ blockier the image will be.</p>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  y <span class="op">=</span> gl_FragCoord<span class="op">.</span>y <span class="op">+</span> y<span class="op">;</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The technique works by mapping each fragment to the center of its
-closest, non-overlapping pixel-sized window. These windows are laid out
-in a grid over the input texture. The center-of-the-window fragments
-determine the color for the other fragments in their window.</p>
+<p>该技术的原理是将每个片元映射到其最近且不重叠的像素大小窗口的中心。
+这些窗口以网格形式覆盖输入纹理。
+窗口中心的片元颜色决定该窗口内其他片元的颜色。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    fragColor <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span> vec2<span class="op">(</span>x<span class="op">,</span> y<span class="op">)</span> <span class="op">/</span> texSize<span class="op">);</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span></code></pre></div>
-<p>Once you have determined the correct fragment coordinate to use, pull
-its color from the input texture and assign that to the fragment
-color.</p>
-<h3 id="source">Source</h3>
+<p>确定正确的片元坐标后，
+从输入纹理中采样该坐标的颜色，并赋值给当前片元颜色。</p>
+<h3 id="源代码">源代码</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

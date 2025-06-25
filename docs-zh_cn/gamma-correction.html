@@ -104,131 +104,126 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 <a href="#copyright"><span class="emoji"
 data-emoji="arrow_down_small">🔽</span></a> <a href="setup.html"><span
 class="emoji" data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="gamma-correction">Gamma Correction</h2>
+<h1 id="3d-游戏着色器入门">3D 游戏着色器入门</h1>
+<h2 id="伽马校正gamma-correction">伽马校正（Gamma Correction）</h2>
 <p align="center">
 <img src="../resources/images/IG7A6cj.gif" alt="Gamma Correction" title="Gamma Correction">
 </p>
 
-<p>Correcting for gamma will make your color calculations look correct.
-This isn't to say they'll look amazing but with gamma correction, you'll
-find that the colors meld together better, the shadows are more nuanced,
-and the highlights are more subtle. Without gamma correction, the
-shadowed areas tend to get crushed while the highlighted areas tend to
-get blown-out and over saturated making for a harsh contrast
-overall.</p>
-<p>If you're aiming for realism, gamma correction is especially
-important. As you perform more and more calculations, the tiny errors
-add up making it harder to achieve photorealism. The equations will be
-correct but the inputs and outputs will be wrong leaving you
-frustrated.</p>
-<p>It's easy to get twisted around when thinking about gamma correction
-but essentially it boils down to knowing what color space a color is in
-and how to convert that color to the color space you need. With those
-two pieces of the puzzle, gamma correction becomes a tedious yet simple
-chore you'll have to perform from time to time.</p>
-<h3 id="color-spaces">Color Spaces</h3>
+<p>伽马校正能让你的颜色计算看起来更合理。<br />
+这并不意味着画面一定惊艳，但校正后，颜色融合得更自然，<br />
+阴影更细腻，高光也更柔和。<br />
+如果没有伽马校正，阴影区域常常会被“压死”，<br />
+而高光区域则容易过曝、饱和度过高，导致对比度刺眼。</p>
+<p>如果你追求真实感，伽马校正尤为重要。<br />
+因为随着计算步骤的增多，微小的误差会累积，<br />
+让真实感难以实现。即使公式没错，输入输出的偏差也会让你挫败。</p>
+<p>伽马校正听起来很绕，但其实归根结底就是：<br />
+<strong>弄清颜色所属的颜色空间，以及如何把它转换到你需要的颜色空间。</strong><br />
+理解了这两点，伽马校正就变成了一项繁琐但简单的日常工作。</p>
+<h3 id="颜色空间color-spaces">颜色空间（Color Spaces）</h3>
 <p align="center">
 <img src="../resources/images/a1U5oBq.png" alt="sRGB vs RGB" title="sRGB vs RGB">
 </p>
 
-<p>The two color spaces you'll need to be aware of are sRGB (standard
-Red Green Blue) and RGB or linear color space.</p>
+<p>你需要关注的两个颜色空间是：<br />
+<strong>sRGB（标准红绿蓝）</strong> 和
+<strong>RGB（线性色彩空间）</strong>。</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">identify</span> <span class="at">-format</span> <span class="st">&quot;%[colorspace]\n&quot;</span> house-diffuse-srgb.png</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sRGB</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">identify</span> <span class="at">-format</span> <span class="st">&quot;%[colorspace]\n&quot;</span> house-diffuse-rgb.png</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">RGB</span></span></code></pre></div>
-<p>Knowing what color space a color texture is in will determine how you
-handle it in your shaders. To determine the color space of a texture,
-use ImageMagick's <code>identify</code>. You'll find that most textures
-are in sRGB.</p>
+<p>想知道一张贴图属于哪个颜色空间，可以用 ImageMagick 的
+<code>identify</code> 命令。<br />
+大部分贴图通常都是 sRGB 编码的。</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">convert</span> house-diffuse-srgb <span class="at">-colorspace</span> rgb house-diffuse-rgb.png</span></code></pre></div>
-<p>To convert a texture to a particular color space, use ImageMagick's
-<code>convert</code> program. Notice how a texture is darkened when
-transforming from sRGB to RGB.</p>
-<h3 id="decoding">Decoding</h3>
-<p>The red, green, and blue values in a sRGB color texture are encoded
-and cannot be modified directly. Modifying them directly would be like
-running spellcheck on an encrypted message. Before you can run
-spellcheck, you first have to decrypt the message. Similarly, to modify
-the values of an sRGB texture, you first have to decode or transform
-them to RGB or linear color space.</p>
+<p>你也可以使用 <code>convert</code>
+命令把贴图转换到目标颜色空间。<br />
+从 sRGB 转换到 RGB 后，贴图通常会变暗。</p>
+<h3 id="解码decoding">解码（Decoding）</h3>
+<p>sRGB
+颜色贴图中的红绿蓝值是<strong>经过编码的</strong>，不能直接修改。<br />
+直接操作这些值，就像在加密邮件上运行拼写检查一样。<br />
+你得先“解密”它，才能正确修改。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  color     <span class="op">=</span> texture<span class="op">(</span>color_texture<span class="op">,</span> uv<span class="op">);</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  color<span class="op">.</span>rgb <span class="op">=</span> pow<span class="op">(</span>color<span class="op">.</span>rgb<span class="op">,</span> <span class="fl">2.2</span><span class="op">);</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>To decode a sRGB encoded color, raise the <code>rgb</code> values to
-the power of <code>2.2</code>. Once you have decoded the color, you are
-now free to add, subtract, multiply, and divide it.</p>
-<p>By raising the color values to the power of <code>2.2</code>, you're
-converting them from sRGB to RGB or linear color space. This conversion
-has the effect of darkening the colors.</p>
+<p>要解码一张 sRGB 颜色，<br />
+只需把其 <code>rgb</code> 分量提升到 <code>2.2</code> 次方。<br />
+完成解码后，你就可以对它进行加减乘除运算了。</p>
+<p>通过这种转换，<br />
+颜色会从 sRGB 空间变换到线性 RGB 空间，<br />
+颜色也会变得更暗一些。</p>
 <p align="center">
 <img src="../resources/images/E5nkRfG.png" alt="Color Darkening" title="Color Darkening">
 </p>
 
-<p>For example, <code>vec3(0.9, 0.2, 0.3)</code> becomes
-<code>vec3(0.793, 0.028, 0.07)</code>.</p>
+<p>例如：<br />
+<code>vec3(0.9, 0.2, 0.3)</code> 解码后变成
+<code>vec3(0.793, 0.028, 0.07)</code>。</p>
 <p align="center">
 <img src="../resources/images/TOEb0EC.gif" alt="Gamma Curves" title="Gamma Curves">
 </p>
 
-<p>The <code>2.2</code> value is known as gamma. Loosely speaking, gamma
-can either be <code>1.0 / 2.2</code>, <code>2.2</code>, or
-<code>1.0</code>. As you've seen, <code>2.2</code> is for decoding sRGB
-encoded color textures. As you will see, <code>1.0 / 2.2</code> is for
-encoding linear or RGB color textures. And <code>1.0</code> is RGB or
-linear color space since <code>y = 1 * x + 0</code> and any base raised
-to the power of <code>1.0</code> is itself.</p>
-<h4 id="non-color-data">Non-color Data</h4>
+<p><code>2.2</code> 就是所谓的伽马值（gamma）。<br />
+通俗来讲，gamma 可能取 <code>1.0 / 2.2</code>、<code>2.2</code> 或
+<code>1.0</code>。<br />
+其中：</p>
+<ul>
+<li><code>2.2</code> 用于<strong>解码</strong> sRGB。</li>
+<li><code>1.0 / 2.2</code> 用于<strong>编码</strong> RGB。</li>
+<li><code>1.0</code> 表示已经是线性空间，没必要变换。</li>
+</ul>
+<h4 id="非颜色数据non-color-data">非颜色数据（Non-color Data）</h4>
 <p align="center">
 <img src="../resources/images/reA2qjs.png" alt="Non-color Data" title="Non-color Data">
 </p>
 
-<p>One important exception to decoding is when the "colors" of a texture
-represent non-color data. Some examples of non-color data would be the
-normals in a normal map, the alpha channel, the heights in a height map,
-and the directions in a flow map. Only decode color related data or data
-that represents color. When dealing with non-color data, treat the sRGB
-color values as RGB or linear and skip the decoding process.</p>
-<h3 id="encoding">Encoding</h3>
+<p>有一种情况你<strong>不应该解码</strong>，<br />
+那就是贴图中的“颜色”其实代表的是非颜色数据，比如：</p>
+<ul>
+<li>法线贴图（normal map）</li>
+<li>Alpha 通道</li>
+<li>高度图（height map）</li>
+<li>流动图（flow map）</li>
+</ul>
+<p>这类数据虽然长得像颜色，但实则是向量或数值信息。<br />
+遇到这种情况，直接当作线性空间使用，<strong>跳过解码</strong>。</p>
+<h3 id="编码encoding">编码（Encoding）</h3>
 <p align="center">
 <img src="../resources/images/tRxkKNe.gif" alt="Perceptually versus Actually Linear" title="Perceptually versus Actually Linear">
 </p>
 
-<p>The necessity for encoding and decoding stems from the fact that
-humans do not perceive lightness linearly and most displays (like a
-monitor) lack the precision or number of bits to accurately show both
-lighter and darker tonal values or shades. With only so many bits to go
-around, colors are encoded in such a way that more bits are devoted to
-the darker shades than the lighter shades since humans are more
-sensitive to darker tones than lighter tones. Encoding it this way uses
-the limited number of bits more effectively for human perception. Still,
-the only thing to remember is that your display is expecting sRGB
-encoded values. Therefore, if you decoded a sRGB value, you have to
-encode it before it makes its way to your display.</p>
+<p>之所以需要编码/解码，是因为：</p>
+<ol type="1">
+<li><strong>人眼对亮度的感知并不是线性的</strong>；</li>
+<li><strong>大多数显示器色深有限，显示能力不够线性</strong>。</li>
+</ol>
+<p>由于人类对暗部更敏感，<br />
+所以 sRGB 编码会在暗色区域分配更多比特数，<br />
+让有限的色彩信息更符合视觉感知。</p>
+<p>所以，<strong>显示器期望接收到的是 sRGB 编码后的值。</strong><br />
+你一旦解码使用过，就必须在输出前重新编码。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  color     <span class="op">=</span> texture<span class="op">(</span>color_texture<span class="op">,</span> uv<span class="op">);</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  color<span class="op">.</span>rgb <span class="op">=</span> pow<span class="op">(</span>color<span class="op">.</span>rgb<span class="op">,</span> <span class="fl">1.0</span> <span class="op">/</span> <span class="fl">2.2</span><span class="op">);</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>To encode a linear value or convert RGB to sRGB, raise the
-<code>rgb</code> values to the power of <code>1.0 / 2.2</code>. Notice
-how <code>1.1 / 2.2</code> is the reciprocal of <code>2.2</code> or
-<code>2.2 / 1.0</code>. Here you see the symmetry in decoding and
-encoding.</p>
+<p>编码方式与解码正好相反。<br />
+把颜色分量提升到 <code>1.0 / 2.2</code> 次方即可完成编码。<br />
+<code>1.0 / 2.2</code> 就是 <code>2.2</code> 的倒数。</p>
 <p align="center">
 <img src="../resources/images/4km0pdv.gif" alt="Not Gamma Corrected versus Gamma Corrected" title="Not Gamma Corrected versus Gamma Corrected">
 </p>
 
-<h3 id="source">Source</h3>
+<h3 id="源码参考">源码参考</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

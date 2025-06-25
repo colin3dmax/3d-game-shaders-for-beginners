@@ -105,88 +105,73 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="pixelization.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="posterization">Posterization</h2>
+<h1 id="3d游戏着色器入门">3D游戏着色器入门</h1>
+<h2 id="色调分离posterization">色调分离（Posterization）</h2>
 <p align="center">
 <img src="../resources/images/hpP5G9z.gif" alt="Posterization" title="Posterization">
 </p>
 
-<p>Posterization or color quantization is the process of reducing the
-number of unique colors in an image. You can use this shader to give
-your game a comic book or retro look. Combine it with <a
-href="outlining.html">outlining</a> for a full-on cartoon art style.</p>
-<p>There are various different ways to implement posterization. This
-method works directly with the greyscale values and indirectly with the
-RGB values of the image. For each fragment, it maps the RGB color to a
-greyscale value. This greyscale value is then mapped to both its lower
-and upper level value. The closest level to the original greyscale value
-is then mapped back to an RGB value This new RGB value becomes the
-fragment color. I find this method produces nicer results than the more
-typical methods you'll find.</p>
+<p>色调分离或颜色量化是减少图像中唯一颜色数量的过程。
+你可以使用此着色器为你的游戏赋予漫画书或复古风格。 结合<a
+href="outlining.html">outlining</a>使用，可以实现完整的卡通艺术风格。</p>
+<p>实现色调分离的方法有多种。
+此方法直接处理灰度值，间接作用于图像的RGB值。
+对于每个片元，它将RGB颜色映射为灰度值。
+然后将灰度值映射到它的下一级和上一级色阶。
+最后选择最接近原始灰度值的色阶，再映射回RGB值。
+这个新的RGB值成为片元颜色。 我觉得这种方法比一般常见的方法效果更好。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> levels <span class="op">=</span> <span class="dv">10</span><span class="op">;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The <code>levels</code> parameter controls how many discrete bands or
-steps there are. This will break up the continuous values from zero to
-one into chunks. With four levels, <code>0.0</code> to <code>1.0</code>
-becomes <code>0.0</code>, <code>0.25</code>, <code>0.5</code>,
-<code>0.75</code>, and <code>1.0</code>.</p>
+<p><code>levels</code>参数控制离散色阶的数量。
+它会将连续的0到1的值分割成多个区间。
+例如4个色阶时，0.0到1.0会被分割成0.0、0.25、0.5、0.75和1.0。</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> texture<span class="op">(</span>posterizeTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Sample the current fragment's color.</p>
+<p>采样当前片元的颜色。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> greyscale <span class="op">=</span> max<span class="op">(</span>fragColor<span class="op">.</span>r<span class="op">,</span> max<span class="op">(</span>fragColor<span class="op">.</span>g<span class="op">,</span> fragColor<span class="op">.</span>b<span class="op">));</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Map the RGB values to a greyscale value. In this instance, the
-greyscale value is the maximum value of the R, G, and B values.</p>
+<p>将RGB值映射为灰度值。 这里用的是R、G、B中的最大值作为灰度。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> lower     <span class="op">=</span> floor<span class="op">(</span>greyscale <span class="op">*</span> levels<span class="op">)</span> <span class="op">/</span> levels<span class="op">;</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> lowerDiff <span class="op">=</span> abs<span class="op">(</span>greyscale <span class="op">-</span> lower<span class="op">);</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Map the greyscale value to its lower level and then calculate the
-difference between its lower level and itself. For example, if the
-greyscale value is <code>0.87</code> and there are four levels, its
-lower level is <code>0.75</code> and the difference is
-<code>0.12</code>.</p>
+<p>将灰度映射到下一级色阶，并计算它与灰度本身的差值。
+例如灰度为0.87，色阶为4时，下一级色阶是0.75，差值是0.12。</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> upper     <span class="op">=</span> ceil<span class="op">(</span>greyscale <span class="op">*</span> levels<span class="op">)</span> <span class="op">/</span> levels<span class="op">;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> upperDiff <span class="op">=</span> abs<span class="op">(</span>upper <span class="op">-</span> greyscale<span class="op">);</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Now calculate the upper level and the difference. Keeping with the
-example up above, the upper level is <code>1.0</code> and the difference
-is <code>0.13</code>.</p>
+<p>计算上一级色阶及差值。 以上例为例，上一级色阶是1.0，差值是0.13。</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> level      <span class="op">=</span> lowerDiff <span class="op">&lt;=</span> upperDiff <span class="op">?</span> lower <span class="op">:</span> upper<span class="op">;</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> adjustment <span class="op">=</span> level <span class="op">/</span> greyscale<span class="op">;</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The closest level is used to calculate the adjustment. The adjustment
-is the ratio between the quantized and unquantized greyscale value. This
-adjustment is used to map the quantized greyscale value back to an RGB
-value.</p>
+<p>选择距离灰度最近的色阶计算调整比例。
+调整比例为量化灰度值与未量化灰度值的比值。
+该比例用于将量化的灰度映射回RGB值。</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  fragColor<span class="op">.</span>rgb <span class="op">*</span> adjustment<span class="op">;</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>After multiplying <code>rgb</code> by the adjustment,
-<code>max(r, max(g, b))</code> will now equal the quantized greyscale
-value. This maps the quantized greyscale value back to a red, green, and
-blue vector.</p>
-<h3 id="source">Source</h3>
+<p>将RGB乘以调整比例后，max(r, g, b)即为量化后的灰度值，
+实现了灰度向RGB的映射。</p>
+<h3 id="源代码">源代码</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

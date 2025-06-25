@@ -105,31 +105,32 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="chromatic-aberration.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="motion-blur">Motion Blur</h2>
+<h1 id="3d-游戏着色器入门">3D 游戏着色器入门</h1>
+<h2 id="运动模糊motion-blur">运动模糊（Motion Blur）</h2>
 <p align="center">
 <img src="../resources/images/eTnhpLr.gif" alt="Motion Blur" title="Motion Blur">
 </p>
 
-<p>To really sell the illusion of speed, you can do no better than
-motion blur. From high speed car chases to moving at warp speed, motion
-blur greatly improves the look and feel of fast moving objects.</p>
-<p>There are a few ways to implement motion blur as a screen space
-technique. The less involved implementation will only blur the scene in
-relation to the camera's movements while the more involved version will
-blur any moving objects even with the camera remaining still. The less
-involved technique is described below but the principle is the same.</p>
-<h3 id="textures">Textures</h3>
+<p>为了更好地营造速度感，运动模糊是极佳的选择。<br />
+无论是高速追车，还是以光速穿梭，<br />
+运动模糊都能极大提升快速移动物体的观感与真实感。</p>
+<p>作为屏幕空间技术，有几种实现运动模糊的方法。<br />
+一种较简单的方法是仅根据相机的移动模糊整个场景；<br />
+更复杂的方法是，即使相机保持不动，也能模糊场景中移动的物体。<br />
+下面介绍的是较简单的方法，但其原理是通用的。</p>
+<h3 id="纹理输入">纹理输入</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>uniform sampler2D positionTexture<span class="op">;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>uniform sampler2D colorTexture<span class="op">;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>The input textures needed are the vertex positions in view space and
-the scene's colors. Refer back to <a
-href="ssao.html#vertex-positions">SSAO</a> for acquiring the vertex
-positions.</p>
-<h3 id="matrices">Matrices</h3>
+<p>所需输入的纹理包括：</p>
+<ul>
+<li>顶点在视图空间中的位置（positionTexture）</li>
+<li>场景颜色（colorTexture）<br />
+关于如何获取视图空间的顶点位置，可参考 <a
+href="ssao.html#vertex-positions">SSAO</a>。</li>
+</ul>
+<h3 id="矩阵输入">矩阵输入</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>uniform mat4 previousViewWorldMat<span class="op">;</span></span>
@@ -137,12 +138,14 @@ positions.</p>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>uniform mat4 lensProjection<span class="op">;</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>The motion blur technique determines the blur direction by comparing
-the previous frame's vertex positions with the current frame's vertex
-positions. To do this, you'll need the previous frame's view-to-world
-matrix, the current frame's world-to-view matrix, and the camera lens'
-projection matrix.</p>
-<h3 id="parameters">Parameters</h3>
+<p>运动模糊通过比较当前帧与上一帧的顶点位置来确定模糊方向。<br />
+你需要以下矩阵：</p>
+<ul>
+<li>上一帧的视图转世界矩阵（previousViewWorldMat）</li>
+<li>当前帧的世界转视图矩阵（worldViewMat）</li>
+<li>摄像机透视投影矩阵（lensProjection）</li>
+</ul>
+<h3 id="参数设置">参数设置</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>uniform vec2 parameters<span class="op">;</span></span>
@@ -154,14 +157,14 @@ projection matrix.</p>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> separation <span class="op">=</span>     parameters<span class="op">.</span>y<span class="op">;</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>The adjustable parameters are <code>size</code> and
-<code>separation</code>. <code>size</code> controls how many samples are
-taken along the blur direction. Increasing <code>size</code> increases
-the amount of blur at the cost of performance. <code>separation</code>
-controls how spread out the samples are along the blur direction.
-Increasing <code>separation</code> increases the amount of blur at the
-cost of accuracy.</p>
-<h3 id="blur-direction">Blur Direction</h3>
+<p>可调参数包括 <code>size</code> 和 <code>separation</code>：</p>
+<ul>
+<li><code>size</code>
+控制在模糊方向上采样的次数，数值越大模糊越强，但性能开销越高</li>
+<li><code>separation</code>
+控制每次采样之间的间距，越大模糊越重，但准确度可能下降</li>
+</ul>
+<h3 id="模糊方向计算">模糊方向计算</h3>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  vec2 texSize  <span class="op">=</span> textureSize<span class="op">(</span>colorTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
@@ -171,14 +174,16 @@ cost of accuracy.</p>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  vec4 position0 <span class="op">=</span> worldViewMat <span class="op">*</span> previousViewWorldMat <span class="op">*</span> position1<span class="op">;</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>To determine which way to blur this fragment, you'll need to know
-where things were last frame and where things are this frame. To figure
-out where things are now, sample the current vertex position. To figure
-out where things were last frame, transform the current position from
-view space to world space, using the previous frame's view-to-world
-matrix, and then transform it back to view space from world space using
-this frame's world-to-view matrix. This transformed position is this
-fragment's previous interpolated vertex position.</p>
+<p>要确定该片元的模糊方向，<br />
+需知道它在上一帧的位置以及当前帧的位置。</p>
+<ul>
+<li>当前帧的位置通过采样 <code>positionTexture</code> 获取</li>
+<li>上一帧的位置通过变换 <code>position1</code>：
+<ul>
+<li>首先用上一帧的 view-to-world 矩阵将其变换为世界空间</li>
+<li>然后用当前帧的 world-to-view 矩阵将其变换回视图空间</li>
+</ul></li>
+</ul>
 <p align="center">
 <img src="../resources/images/oQqdxM9.gif" alt="Position Projection" title="Position Projection">
 </p>
@@ -194,9 +199,8 @@ fragment's previous interpolated vertex position.</p>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  position1<span class="op">.</span>xy   <span class="op">=</span> position1<span class="op">.</span>xy <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">;</span></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Now that you have the current and previous positions, transform them
-to screen space. With the positions in screen space, you can trace out
-the 2D direction you'll need to blur the onscreen image.</p>
+<p>获得当前与上一帧的位置后，将它们变换到屏幕空间。<br />
+在屏幕空间中，便可以计算出需要沿哪个 2D 方向模糊图像。</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">//   position1.xy = position0.xy + direction;</span></span>
@@ -205,39 +209,38 @@ the 2D direction you'll need to blur the onscreen image.</p>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>length<span class="op">(</span>direction<span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">0.0</span><span class="op">)</span> <span class="op">{</span> <span class="cf">return</span><span class="op">;</span> <span class="op">}</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The blur direction goes from the previous position to the current
-position.</p>
-<h3 id="blurring">Blurring</h3>
+<p>模糊方向是从上一帧的位置指向当前帧的位置的向量。<br />
+若方向为零（没有移动），就无需模糊。</p>
+<h3 id="执行模糊">执行模糊</h3>
 <div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Sample the current fragment's color. This will be the first of the
-colors blurred together.</p>
+<p>首先采样当前片元颜色，<br />
+这是第一个参与混合的颜色。</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  direction<span class="op">.</span>xy <span class="op">*=</span> separation<span class="op">;</span></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Multiply the direction vector by the separation.</p>
+<p>将模糊方向乘以 separation 参数，控制采样间隔。</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  vec2  forward  <span class="op">=</span> texCoord<span class="op">;</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  vec2  backward <span class="op">=</span> texCoord<span class="op">;</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>For a more seamless blur, sample in the direction of the blur and in
-the opposite direction of the blur. For now, set the two vectors to the
-fragment's UV coordinate.</p>
+<p>为了更平滑的模糊效果，<br />
+在模糊方向和其反方向上同时采样。<br />
+初始时，两者都设置为当前片元的纹理坐标。</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> count <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p><code>count</code> is used to average all of the samples taken. It
-starts at one since you've already sampled the current fragment's
-color.</p>
+<p><code>count</code> 用于计算平均值，<br />
+初始值为1，因为已经采样了当前片元的颜色。</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> size<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
@@ -259,16 +262,14 @@ color.</p>
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
 <span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Sample the screen's colors both in the forward and backward direction
-of the blur. Be sure to add these samples together as you travel
-along.</p>
+<p>沿模糊方向和反方向逐步采样屏幕颜色，<br />
+并将它们加和。</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">/=</span> count<span class="op">;</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>The final fragment color is the average color of the samples
-taken.</p>
-<h3 id="source">Source</h3>
+<p>最终将采样结果平均，作为输出的颜色。</p>
+<h3 id="源码文件">源码文件</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

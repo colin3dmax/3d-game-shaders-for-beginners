@@ -105,190 +105,150 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="depth-of-field.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="outlining">Outlining</h2>
+<h1 id="3d游戏着色器入门">3D游戏着色器入门</h1>
+<h2 id="描边outlining">描边（Outlining）</h2>
 <p align="center">
 <img src="../resources/images/EKaZRkR.gif" alt="Outlined Scene" title="Outlined Scene">
 </p>
 
-<p>Outlining your scene's geometry can give your game a distinctive
-look, reminiscent of comic books and cartoons.</p>
-<h3 id="discontinuities">Discontinuities</h3>
-<p>The process of outlining is the process of finding and labeling
-discontinuities or differences. Every time you find what you consider a
-significant difference, you mark it with your line color. As you go
-about labeling or coloring in the differences, outlines or edges will
-start to form.</p>
-<p>Where you choose to search for the discontinuities is up to you. It
-could be the diffuse colors in your scene, the normals of your models,
-the depth buffer, or some other scene related data.</p>
-<p>The demo uses the interpolated vertex positions to render the
-outlines. However, a less straightforward but more typical way is to use
-both the scene's normals and depth buffer values to construct the
-outlines.</p>
-<h3 id="vertex-positions">Vertex Positions</h3>
+<p>为场景几何体添加描边可以赋予游戏一种独特的外观，让人联想到漫画和卡通。</p>
+<h3 id="不连续性">不连续性</h3>
+<p>描边的过程是寻找并标记不连续性或差异的过程。
+每当你发现一个显著的差异，就用线条颜色标记出来。
+随着你逐步标记这些差异，描边轮廓就会形成。</p>
+<p>你可以选择在哪些地方查找不连续性。
+可能是场景中的漫反射颜色、模型的法线、深度缓冲，或其他与场景相关的数据。</p>
+<p>这个示例使用插值后的顶点位置来绘制描边。
+但更常见的一种方式是结合使用场景的法线和深度缓冲值来生成描边效果。</p>
+<h3 id="顶点位置">顶点位置</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D positionTexture<span class="op">;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>Like SSAO, you'll need the vertex positions in view space. Referrer
-back to <a href="ssao.html#vertex-positions">SSAO</a> for details.</p>
-<h3 id="scene-colors">Scene Colors</h3>
+<p>就像 SSAO 一样，你需要视图空间中的顶点位置。 具体细节可参考 <a
+href="ssao.html#vertex-positions">SSAO</a>。</p>
+<h3 id="场景颜色">场景颜色</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D colorTexture<span class="op">;</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>The demo darkens the colors of the scene where there's an outline.
-This tends to look nicer than a constant color since it provides some
-color variation to the edges.</p>
-<h3 id="parameters">Parameters</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<p>这个示例在有描边的区域会加深颜色。
+这种方式比使用纯色看起来更自然，因为边缘有一些颜色变化。</p>
+<h3 id="参数">参数</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> minSeparation <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> maxSeparation <span class="op">=</span> <span class="fl">3.0</span><span class="op">;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> minDistance   <span class="op">=</span> <span class="fl">0.5</span><span class="op">;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> maxDistance   <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>   size          <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  vec3 colorModifier  <span class="op">=</span> vec3<span class="op">(</span><span class="fl">0.324</span><span class="op">,</span> <span class="fl">0.063</span><span class="op">,</span> <span class="fl">0.099</span><span class="op">);</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> minSeparation <span class="op">=</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> maxSeparation <span class="op">=</span> <span class="fl">3.0</span><span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> minDistance   <span class="op">=</span> <span class="fl">0.5</span><span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> maxDistance   <span class="op">=</span> <span class="fl">2.0</span><span class="op">;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span>   size          <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>vec3 colorModifier  <span class="op">=</span> vec3<span class="op">(</span><span class="fl">0.324</span><span class="op">,</span> <span class="fl">0.063</span><span class="op">,</span> <span class="fl">0.099</span><span class="op">);</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The min and max separation parameters control the thickness of the
-outline depending on the fragment's distance from the camera or depth.
-The min and max distance control the significance of any changes found.
-The <code>size</code> parameter controls the constant thickness of the
-line no matter the fragment's position. The outline color is based on
-<code>colorModifier</code> and the current fragment's color.</p>
-<h3 id="fragment-position">Fragment Position</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>min/max 分离参数根据片元距相机的深度控制描边粗细。 min/max
+距离参数控制被视为显著变化的阈值。 <code>size</code>
+控制线条固定的粗细。 描边颜色由 <code>colorModifier</code>
+和片元原有颜色共同决定。</p>
+<h3 id="片元位置">片元位置</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  vec2 texSize   <span class="op">=</span> textureSize<span class="op">(</span>colorTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  vec2 fragCoord <span class="op">=</span> gl_FragCoord<span class="op">.</span>xy<span class="op">;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  vec2 texCoord  <span class="op">=</span> fragCoord <span class="op">/</span> texSize<span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>vec2 texSize   <span class="op">=</span> textureSize<span class="op">(</span>colorTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>vec2 fragCoord <span class="op">=</span> gl_FragCoord<span class="op">.</span>xy<span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>vec2 texCoord  <span class="op">=</span> fragCoord <span class="op">/</span> texSize<span class="op">;</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  vec4 position <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>vec4 position <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Sample the position texture for the current fragment's position in
-the scene. Recall that the position texture is just a screen shaped quad
-making the UV coordinate the current fragment's screen coordinate
-divided by the dimensions of the screen.</p>
-<h3 id="fragment-depth">Fragment Depth</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>从 positionTexture 中采样当前片元在场景中的位置。
+这个纹理是屏幕形状的四边形，因此 UV 坐标就是屏幕坐标除以屏幕尺寸。</p>
+<h3 id="片元深度">片元深度</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> depth <span class="op">=</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    clamp</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      <span class="op">(</span>   <span class="fl">1.0</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span> <span class="op">(</span> <span class="op">(</span>far <span class="op">-</span> position<span class="op">.</span>y<span class="op">)</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>          <span class="op">/</span> <span class="op">(</span>far <span class="op">-</span> near<span class="op">)</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">)</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">,</span> <span class="fl">0.0</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      <span class="op">,</span> <span class="fl">1.0</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">);</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> separation <span class="op">=</span> mix<span class="op">(</span>maxSeparation<span class="op">,</span> minSeparation<span class="op">,</span> depth<span class="op">);</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The fragment's depth ranges from zero to one. When the fragment's
-view-space y coordinate matches the far clipping plane, the depth is
-one. When the fragment's view-space y coordinate matches the near
-clipping plane, the depth is zero. In other words, the depth ranges from
-zero at the near clipping plane all the way up to one at the far
-clipping plane.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> depth <span class="op">=</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  clamp<span class="op">(</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.0</span> <span class="op">-</span> <span class="op">((</span>far <span class="op">-</span> position<span class="op">.</span>y<span class="op">)</span> <span class="op">/</span> <span class="op">(</span>far <span class="op">-</span> near<span class="op">)),</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.0</span><span class="op">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1.0</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">);</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> separation <span class="op">=</span> mix<span class="op">(</span>maxSeparation<span class="op">,</span> minSeparation<span class="op">,</span> depth<span class="op">);</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>深度值范围从 0 到 1。 片元的视图空间 y 坐标等于 far 平面时，深度为
+1； 等于 near 平面时为 0。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> separation <span class="op">=</span> mix<span class="op">(</span>maxSeparation<span class="op">,</span> minSeparation<span class="op">,</span> depth<span class="op">);</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> separation <span class="op">=</span> mix<span class="op">(</span>maxSeparation<span class="op">,</span> minSeparation<span class="op">,</span> depth<span class="op">);</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Converting the position to a depth value isn't necessary but it
-allows you to vary the thickness of the outline based on how far away
-the fragment is from the camera. Far away fragments get a thinner line
-while nearer fragments get a thicker outline. This tends to look nicer
-than a constant thickness since it gives depth to the outline.</p>
-<h3 id="finding-the-discontinuities">Finding The Discontinuities</h3>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>转换为深度值不是必须的，
+但这样你可以让距离更远的片元使用更细的线条，近处使用更粗的。
+这种方式看起来更具空间感。</p>
+<h3 id="寻找不连续性">寻找不连续性</h3>
 <p align="center">
 <img src="../resources/images/xAMRGhn.gif" alt="Edge Finding" title="Edge Finding">
 </p>
 
-<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> mx <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> mx <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="op">-</span>size<span class="op">;</span> i <span class="op">&lt;=</span> size<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> <span class="op">-</span>size<span class="op">;</span> j <span class="op">&lt;=</span> size<span class="op">;</span> <span class="op">++</span>j<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="op">-</span>size<span class="op">;</span> i <span class="op">&lt;=</span> size<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> <span class="op">-</span>size<span class="op">;</span> j <span class="op">&lt;=</span> size<span class="op">;</span> <span class="op">++</span>j<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Now that you have the current fragment's position, loop through an i
-by j grid or window surrounding the current fragment.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>现在你有了当前片元的位置，可以遍历一个 i x j 的窗口区域。</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>      texCoord <span class="op">=</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>          <span class="op">(</span> fragCoord</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>          <span class="op">+</span> <span class="op">(</span>vec2<span class="op">(</span>i<span class="op">,</span> j<span class="op">)</span> <span class="op">*</span> separation<span class="op">)</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>          <span class="op">)</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">/</span> texSize<span class="op">;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>texCoord <span class="op">=</span> <span class="op">(</span>fragCoord <span class="op">+</span> <span class="op">(</span>vec2<span class="op">(</span>i<span class="op">,</span> j<span class="op">)</span> <span class="op">*</span> separation<span class="op">))</span> <span class="op">/</span> texSize<span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>vec4 positionTemp <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>mx <span class="op">=</span> max<span class="op">(</span>mx<span class="op">,</span> abs<span class="op">(</span>position<span class="op">.</span>y <span class="op">-</span> positionTemp<span class="op">.</span>y<span class="op">));</span></span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      vec4 positionTemp <span class="op">=</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        texture</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>          <span class="op">(</span> positionTexture</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>          <span class="op">,</span> texCoord</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>          <span class="op">);</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>      mx <span class="op">=</span> max<span class="op">(</span>mx<span class="op">,</span> abs<span class="op">(</span>position<span class="op">.</span>y <span class="op">-</span> positionTemp<span class="op">.</span>y<span class="op">));</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span></code></pre></div>
-<p>With each iteration, find the biggest distance between this
-fragment's and the surrounding fragments' positions.</p>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>每次迭代中，比较当前片元和邻近片元之间 y 坐标的最大差异。</p>
 <p align="center">
 <img src="../resources/images/idDZr62.png" alt="smoothstep" title="smoothstep">
 </p>
 
-<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> diff <span class="op">=</span> smoothstep<span class="op">(</span>minDistance<span class="op">,</span> maxDistance<span class="op">,</span> mx<span class="op">);</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> diff <span class="op">=</span> smoothstep<span class="op">(</span>minDistance<span class="op">,</span> maxDistance<span class="op">,</span> mx<span class="op">);</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Calculate the significance of any difference discovered using the
-<code>minDistance</code>, <code>maxDistance</code>, and
-<code>smoothstep</code>. <code>smoothstep</code> returns values from
-zero to one. The <code>minDistance</code> is the left-most edge. Any
-difference less than the minimum distance will be zero. The
-<code>maxDistance</code> is the right-most edge. Any difference greater
-than the maximum distance will be one. For distances between the edges,
-the difference will be between zero and one. These values are
-interpolated along a s-shaped curve.</p>
-<h3 id="line-color">Line Color</h3>
-<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>使用 <code>smoothstep</code> 判断差异是否足够显著。 小于
+<code>minDistance</code> 为 0，大于 <code>maxDistance</code> 为
+1，之间为插值结果。</p>
+<h3 id="线条颜色">线条颜色</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  vec3 lineColor <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span> texCoord<span class="op">).</span>rgb <span class="op">*</span> colorModifier<span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>vec3 lineColor <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span> texCoord<span class="op">).</span>rgb <span class="op">*</span> colorModifier<span class="op">;</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The line color is the current fragment color either darkened or
-lightened.</p>
-<h3 id="fragment-color">Fragment Color</h3>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>线条颜色是当前片元颜色的加深或变亮版本。</p>
+<h3 id="片元颜色输出">片元颜色输出</h3>
 <p align="center">
 <img src="../resources/images/yWNdPZe.gif" alt="Outlines" title="Outlines">
 </p>
 
-<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<div class="sourceCode" id="cb11"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  fragColor<span class="op">.</span>rgb <span class="op">=</span> vec4<span class="op">(</span>lineColor<span class="op">,</span> diff<span class="op">);</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>fragColor<span class="op">.</span>rgb <span class="op">=</span> vec4<span class="op">(</span>lineColor<span class="op">,</span> diff<span class="op">);</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The fragment's RGB color is the <code>lineColor</code> and its alpha
-channel is <code>diff</code>.</p>
-<h3 id="sketchy">Sketchy</h3>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>片元的 RGB 为描边颜色，Alpha 为差异值。</p>
+<h3 id="草图风格sketchy">草图风格（Sketchy）</h3>
 <p align="center">
 <img src="../resources/images/FRBkSm1.gif" alt="Sketchy Outline" title="Sketchy Outline">
 </p>
 
-<p>For a sketchy outline, you can distort the UV coordinates used to
-sample the position vectors.</p>
+<p>要实现涂鸦风格的描边，可以扭曲采样位置的 UV 坐标。</p>
 <p align="center">
 <img src="../resources/images/qgZNtnN.png" alt="Outline Noise" title="Outline Noise">
 </p>
@@ -298,68 +258,50 @@ sample the position vectors.</p>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D noiseTexture<span class="op">;</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>Start by creating a RGB noise texture. A good size is either 128 by
-128 or 512 by 512. Be sure to blur it and make it tileable. This will
-produce a nice wavy, inky outline.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<p>准备一张 RGB 噪声纹理，尺寸如 128x128 或 512x512，
+要模糊并可重复平铺，这样可以产生波浪状墨迹描边效果。</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> noiseScale <span class="op">=</span> <span class="fl">10.0</span><span class="op">;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="dt">float</span> noiseScale <span class="op">=</span> <span class="fl">10.0</span><span class="op">;</span></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The <code>noiseScale</code> parameter controls how distorted the
-outline is. The bigger the <code>noiseScale</code>, the sketchier the
-line.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p><code>noiseScale</code> 控制扰动强度，数值越大越草图化。</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  vec2 fragCoord <span class="op">=</span> gl_FragCoord<span class="op">.</span>xy<span class="op">;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>vec2 fragCoord <span class="op">=</span> gl_FragCoord<span class="op">.</span>xy<span class="op">;</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  vec2 noise  <span class="op">=</span> texture<span class="op">(</span>noiseTexture<span class="op">,</span> fragCoord <span class="op">/</span> textureSize<span class="op">(</span>noiseTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">).</span>rb<span class="op">;</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>       noise  <span class="op">=</span> noise <span class="op">*</span> <span class="fl">2.0</span> <span class="op">-</span> <span class="fl">1.0</span><span class="op">;</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>       noise <span class="op">*=</span> noiseScale<span class="op">;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>vec2 noise <span class="op">=</span> texture<span class="op">(</span>noiseTexture<span class="op">,</span> fragCoord <span class="op">/</span> textureSize<span class="op">(</span>noiseTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">).</span>rb<span class="op">;</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>noise <span class="op">=</span> noise <span class="op">*</span> <span class="fl">2.0</span> <span class="op">-</span> <span class="fl">1.0</span><span class="op">;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>noise <span class="op">*=</span> noiseScale<span class="op">;</span></span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Sample the noise texture using the current screen/fragment position
-and the size of the noise texture. Since you're distorting the UV
-coordinates used to sample the position vectors, you'll only need two of
-the three color channels. Map the two color channels from
-<code>[0, 1]</code> to <code>[-1, 1]</code>. Finally, scale the noise by
-the scale chosen earlier.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>使用屏幕坐标采样噪声纹理，两个颜色通道足矣。 将其值从
+<code>[0, 1]</code> 映射为 <code>[-1, 1]</code>，再乘以
+<code>noiseScale</code>。</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  vec2 texSize  <span class="op">=</span> textureSize<span class="op">(</span>colorTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  vec2 texCoord <span class="op">=</span> <span class="op">(</span>fragCoord <span class="op">-</span> noise<span class="op">)</span> <span class="op">/</span> texSize<span class="op">;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>vec2 texSize  <span class="op">=</span> textureSize<span class="op">(</span>colorTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>vec2 texCoord <span class="op">=</span> <span class="op">(</span>fragCoord <span class="op">-</span> noise<span class="op">)</span> <span class="op">/</span> texSize<span class="op">;</span></span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  vec4 position <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>vec4 position <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
 <span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>When sampling the current position, subtract the noise vector from
-the current fragment's coordinates.</p>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>采样时从当前坐标中减去扰动值。</p>
 <p align="center">
 <img src="../resources/images/wk43ybP.png" alt="Squiggly Outline" title="Squiggly Outline">
 </p>
 
-<p>You could instead add it to the current fragment's coordinates which
-will create more of a squiggly line that loosely follows the
-geometry.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<p>你也可以将噪声加到当前坐标，
+这样会产生一种更加扭曲的线条，贴近几何边缘但略有变化。</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>      texCoord <span class="op">=</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>          <span class="op">(</span>vec2<span class="op">(</span>i<span class="op">,</span> j<span class="op">)</span> <span class="op">*</span> separation <span class="op">+</span> fragCoord <span class="op">+</span> noise<span class="op">)</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">/</span> texSize<span class="op">;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>texCoord <span class="op">=</span> <span class="op">(</span>vec2<span class="op">(</span>i<span class="op">,</span> j<span class="op">)</span> <span class="op">*</span> separation <span class="op">+</span> fragCoord <span class="op">+</span> noise<span class="op">)</span> <span class="op">/</span> texSize<span class="op">;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>vec4 positionTemp <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>      vec4 positionTemp <span class="op">=</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        texture</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>          <span class="op">(</span> positionTexture</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>          <span class="op">,</span> texCoord</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>          <span class="op">);</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>      <span class="co">// ...</span></span></code></pre></div>
-<p>When sampling the surrounding positions inside the loop, add the
-noise vector to the current fragment's coordinates. The rest of the
-calculations are the same.</p>
-<h3 id="source">Source</h3>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
+<p>在循环中采样周围片元时，将噪声添加到坐标中，其余逻辑不变。</p>
+<h3 id="源码文件">源码文件</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

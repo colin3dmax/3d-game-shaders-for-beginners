@@ -105,44 +105,42 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="gamma-correction.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="lookup-table-lut">Lookup Table (LUT)</h2>
+<h1 id="3d-游戏着色器入门">3D 游戏着色器入门</h1>
+<h2 id="查找表lut">查找表（LUT）</h2>
 <p align="center">
 <img src="../resources/images/WrPzVlW.gif" alt="LUT" title="LUT">
 </p>
 
-<p>The lookup table or LUT shader allows you to transform the colors of
-your game using an image editor like the <a
-href="https://www.gimp.org/">GIMP</a>. From color grading to turning day
-into night, the LUT shader is a handy tool for tweaking the look of your
-game.</p>
+<p>查找表（LUT）着色器允许你使用图像编辑器（例如 <a
+href="https://www.gimp.org/">GIMP</a>）来转换游戏中的颜色。<br />
+无论是进行色彩分级，还是将白天变成夜晚，LUT
+着色器都是调整游戏视觉效果的方便工具。</p>
 <p align="center">
 <img src="../resources/images/NPdJNGj.png" alt="Neutral LUT" title="Neutral LUT">
 </p>
 
-<p>Before you can get started, you'll need to find a neutral LUT image.
-Neutral meaning that it leaves the fragment colors unchanged. The LUT
-needs to be 256 pixels wide by 16 pixels tall and contain 16 blocks with
-each block being 16 by 16 pixels.</p>
-<p>The LUT is mapped out into 16 blocks. Each block has a different
-level of blue. As you move across the blocks, from left to right, the
-amount of blue increases. You can see the amount of blue in each block's
-upper-left corner. Within each block, the amount of red increases as you
-move from left to right and the amount of green increases as you move
-from top to bottom. The upper-left corner of the first block is black
-since every RGB channel is zero. The lower-right corner of the last
-block is white since every RGB channel is one.</p>
+<p>开始之前，你需要找到一张“中性”LUT图片。<br />
+“中性”意味着它不会改变片元颜色。<br />
+LUT 图片尺寸需要是宽256像素，高16像素，且包含16个区块，<br />
+每个区块大小为16×16像素。</p>
+<p>LUT 被划分成16个区块，<br />
+每个区块的蓝色通道不同。<br />
+从左到右，蓝色通道的强度逐渐增加，<br />
+你可以在每个区块左上角看到对应的蓝色值。<br />
+在每个区块内，<br />
+从左到右红色通道递增，<br />
+从上到下绿色通道递增。<br />
+第一个区块左上角是黑色，因为所有RGB通道都为0。<br />
+最后一个区块右下角是白色，因为所有RGB通道都为1。</p>
 <p align="center">
 <img src="../resources/images/KyxPm1r.png" alt="LUT And Screenshot" title="LUT And Screenshot">
 </p>
 
-<p>With the neutral LUT in hand, take a screenshot of your game and open
-it in your image editor. Add the neutral LUT as a new layer and merge it
-with the screenshot. As you manipulate the colors of the screenshot, the
-LUT will be altered in the same way. When you're done editing, select
-only the LUT and save it as a new image. You now have your new lookup
-table and can begin writing your shader.</p>
+<p>拿到中性LUT后，截取一张游戏截图并用图像编辑器打开。<br />
+将中性LUT作为新图层叠加到截图上并合并图层。<br />
+你对截图颜色的任何调整都会同步改变LUT。<br />
+编辑完成后，仅选择LUT图层并保存为新图片。<br />
+这样你就获得了新的查找表，可以开始编写着色器了。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  vec2 texSize <span class="op">=</span> textureSize<span class="op">(</span>colorTexture<span class="op">,</span> <span class="dv">0</span><span class="op">).</span>xy<span class="op">;</span></span>
@@ -150,8 +148,8 @@ table and can begin writing your shader.</p>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  vec4 color <span class="op">=</span> texture<span class="op">(</span>colorTexture<span class="op">,</span> gl_FragCoord<span class="op">.</span>xy <span class="op">/</span> texSize<span class="op">);</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The LUT shader is a screen space technique. Therefore, sample the
-scene's color at the current fragment or screen position.</p>
+<p>LUT 着色器是一种屏幕空间技术，<br />
+因此需要在当前片元或屏幕位置采样场景颜色。</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> u  <span class="op">=</span>  floor<span class="op">(</span>color<span class="op">.</span>b <span class="op">*</span> <span class="fl">15.0</span><span class="op">)</span> <span class="op">/</span> <span class="fl">15.0</span> <span class="op">*</span> <span class="fl">240.0</span><span class="op">;</span></span>
@@ -163,23 +161,20 @@ scene's color at the current fragment or screen position.</p>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        v  <span class="op">=</span> <span class="fl">1.0</span> <span class="op">-</span> v<span class="op">;</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>In order to transform the current fragment's color, using the LUT,
-you'll need to map the color to two UV coordinates on the lookup table
-texture. The first mapping (shown up above) is to the nearest left or
-lower bound block location and the second mapping (shown below) is to
-the nearest right or upper bound block mapping. At the end, you'll
-combine these two mappings to create the final color transformation.</p>
+<p>为了使用LUT转换当前片元颜色，<br />
+你需要将颜色映射到查找表纹理上的两个UV坐标。<br />
+第一个映射（如上所示）是到最近的左边或下边界区块位置，<br />
+第二个映射（如下所示）是到最近的右边或上边界区块位置。<br />
+最终将结合这两个映射来生成最终颜色变换。</p>
 <p align="center">
-<img src="../resources/images/j2JmyQ2.png" alt="RGB Channel Mapping" title="RGB Channel Mapping">
+<img src="../resources/images/j2JmyQ2.png" alt="RGB 通道映射" title="RGB 通道映射">
 </p>
 
-<p>Each of the red, green, and blue channels maps to one of 16
-possibilities in the LUT. The blue channel maps to one of the 16
-upper-left block corners. After the blue channel maps to a block, the
-red channel maps to one of the 16 horizontal pixel positions within the
-block and the green channel maps to one of the 16 vertical pixel
-positions within the block. These three mappings will determine the UV
-coordinate you'll need to sample a color from the LUT.</p>
+<p>红绿蓝三个通道各自映射到 LUT 中的16个可能值。<br />
+蓝色通道映射到16个区块左上角之一。<br />
+确定区块后，红色通道映射区块内的16个水平像素位置之一，<br />
+绿色通道映射区块内的16个垂直像素位置之一。<br />
+这三者决定了你需要从 LUT 采样的 UV 坐标。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        u <span class="op">/=</span> <span class="fl">255.0</span><span class="op">;</span></span>
@@ -188,20 +183,17 @@ coordinate you'll need to sample a color from the LUT.</p>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        v  <span class="op">=</span> <span class="fl">1.0</span> <span class="op">-</span> v<span class="op">;</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>To calculate the final U coordinate, divide it by 255 since the LUT
-is 256 pixels wide and U ranges from zero to one. To calculate the final
-V coordinate, divide it by 15 since the LUT is 16 pixels tall and V
-ranges from zero to one. You'll also need to subtract the normalized V
-coordinate from one since V ranges from zero at the bottom to one at the
-top while the green channel ranges from zero at the top to 15 at the
-bottom.</p>
+<p>计算最终U坐标时，除以255，因为LUT宽度为256像素，U坐标范围0到1。<br />
+计算最终V坐标时，除以15，因为LUT高度为16像素，V坐标范围0到1。<br />
+V坐标还需要用1减去它，<br />
+因为V在纹理中从底部0到顶部1，而绿色通道从顶部0到底部15。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  vec3 left <span class="op">=</span> texture<span class="op">(</span>lookupTableTexture<span class="op">,</span> vec2<span class="op">(</span>u<span class="op">,</span> v<span class="op">)).</span>rgb<span class="op">;</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Using the UV coordinates, sample a color from the lookup table. This
-is the nearest left block color.</p>
+<p>用UV坐标从查找表采样颜色，<br />
+这是最近左边区块的颜色。</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  u  <span class="op">=</span>  ceil<span class="op">(</span>color<span class="op">.</span>b <span class="op">*</span> <span class="fl">15.0</span><span class="op">)</span> <span class="op">/</span> <span class="fl">15.0</span> <span class="op">*</span> <span class="fl">240.0</span><span class="op">;</span></span>
@@ -213,11 +205,11 @@ is the nearest left block color.</p>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  vec3 right <span class="op">=</span> texture<span class="op">(</span>lookupTableTexture<span class="op">,</span> vec2<span class="op">(</span>u<span class="op">,</span> v<span class="op">)).</span>rgb<span class="op">;</span></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Now you'll need to calculate the UV coordinates for the nearest right
-block color. Notice how <code>ceil</code> or ceiling is being used now
-instead of <code>floor</code>.</p>
+<p>接下来计算最近右边区块的UV坐标。<br />
+注意这里用到了 <code>ceil</code>（向上取整），而不是之前的
+<code>floor</code>（向下取整）。</p>
 <p align="center">
-<img src="../resources/images/uciq7Um.png" alt="Mixing" title="Mixing">
+<img src="../resources/images/uciq7Um.png" alt="混合" title="混合">
 </p>
 
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
@@ -227,26 +219,25 @@ instead of <code>floor</code>.</p>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  color<span class="op">.</span>b <span class="op">=</span> mix<span class="op">(</span>left<span class="op">.</span>b<span class="op">,</span> right<span class="op">.</span>b<span class="op">,</span> fract<span class="op">(</span>color<span class="op">.</span>b <span class="op">*</span> <span class="fl">15.0</span><span class="op">));</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Not every channel will map perfectly to one of its 16 possibilities.
-For example, <code>0.5</code> doesn't map perfectly. At the lower bound
-(<code>floor</code>), it maps to <code>0.4666666666666667</code> and at
-the upper bound (<code>ceil</code>), it maps to
-<code>0.5333333333333333</code>. Compare that with <code>0.4</code>
-which maps to <code>0.4</code> at the lower bound and <code>0.4</code>
-at the upper bound. For those channels which do not map perfectly,
-you'll need to mix the left and right sides based on where the channel
-falls between its lower and upper bound. For <code>0.5</code>, it falls
-directly between them making the final color a mixture of half left and
-half right. However, for <code>0.132</code> the mixture will be 98%
-right and 2% left since the fractional part of <code>0.123</code> times
-<code>15.0</code> is <code>0.98</code>.</p>
+<p>不是每个通道的值都恰好映射到16个位置中的一个。<br />
+例如，0.5的映射：</p>
+<ul>
+<li>向下取整映射到0.4666666666666667，</li>
+<li>向上取整映射到0.5333333333333333。<br />
+而0.4的映射是向下和向上取整均为0.4。<br />
+对于不能精确映射的通道值，<br />
+你需要根据该值在上下界之间的位置对左右两个颜色进行混合。<br />
+以0.5为例，刚好在中间，因此结果是左右颜色各占一半。<br />
+而0.132则混合比例大约是右边98%，左边2%，<br />
+因为 <code>fract(0.123 * 15.0)</code> 等于0.98。</li>
+</ul>
 <div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> color<span class="op">;</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Set the fragment color to the final mix and you're done.</p>
-<h3 id="source">Source</h3>
+<p>将片元颜色设置为混合后的最终颜色，完成颜色转换。</p>
+<h3 id="资源链接">资源链接</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

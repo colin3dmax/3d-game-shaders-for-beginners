@@ -4,25 +4,25 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](pixelization.md)
 
-# 3D Game Shaders For Beginners
+# 3D游戏着色器入门
 
-## Posterization
+## 色调分离（Posterization）
 
 <p align="center">
 <img src="../resources/images/hpP5G9z.gif" alt="Posterization" title="Posterization">
 </p>
 
-Posterization or color quantization is the process of reducing the number of unique colors in an image.
-You can use this shader to give your game a comic book or retro look.
-Combine it with [outlining](outlining.md) for a full-on cartoon art style.
+色调分离或颜色量化是减少图像中唯一颜色数量的过程。
+你可以使用此着色器为你的游戏赋予漫画书或复古风格。
+结合[outlining](outlining.md)使用，可以实现完整的卡通艺术风格。
 
-There are various different ways to implement posterization.
-This method works directly with the greyscale values and indirectly with the RGB values of the image.
-For each fragment, it maps the RGB color to a greyscale value.
-This greyscale value is then mapped to both its lower and upper level value.
-The closest level to the original greyscale value is then mapped back to an RGB value
-This new RGB value becomes the fragment color.
-I find this method produces nicer results than the more typical methods you'll find.
+实现色调分离的方法有多种。
+此方法直接处理灰度值，间接作用于图像的RGB值。
+对于每个片元，它将RGB颜色映射为灰度值。
+然后将灰度值映射到它的下一级和上一级色阶。
+最后选择最接近原始灰度值的色阶，再映射回RGB值。
+这个新的RGB值成为片元颜色。
+我觉得这种方法比一般常见的方法效果更好。
 
 ```c
   // ...
@@ -32,10 +32,9 @@ I find this method produces nicer results than the more typical methods you'll f
   // ...
 ```
 
-The `levels` parameter controls how many discrete bands or steps there are.
-This will break up the continuous values from zero to one into chunks.
-With four levels, `0.0` to `1.0` becomes `0.0`, `0.25`, `0.5`, `0.75`, and `1.0`.
-
+`levels`参数控制离散色阶的数量。
+它会将连续的0到1的值分割成多个区间。
+例如4个色阶时，0.0到1.0会被分割成0.0、0.25、0.5、0.75和1.0。
 
 ```c
   // ...
@@ -45,7 +44,7 @@ With four levels, `0.0` to `1.0` becomes `0.0`, `0.25`, `0.5`, `0.75`, and `1.0`
   // ...
 ```
 
-Sample the current fragment's color.
+采样当前片元的颜色。
 
 ```c
   // ...
@@ -55,8 +54,8 @@ Sample the current fragment's color.
   // ...
 ```
 
-Map the RGB values to a greyscale value.
-In this instance, the greyscale value is the maximum value of the R, G, and B values.
+将RGB值映射为灰度值。
+这里用的是R、G、B中的最大值作为灰度。
 
 ```c
   // ...
@@ -67,11 +66,8 @@ In this instance, the greyscale value is the maximum value of the R, G, and B va
   // ...
 ```
 
-Map the greyscale value to its lower level and
-then calculate the difference between its lower level and itself.
-For example,
-if the greyscale value is `0.87` and there are four levels, its lower level is `0.75` and the difference is `0.12`.
-
+将灰度映射到下一级色阶，并计算它与灰度本身的差值。
+例如灰度为0.87，色阶为4时，下一级色阶是0.75，差值是0.12。
 
 ```c
   // ...
@@ -82,8 +78,8 @@ if the greyscale value is `0.87` and there are four levels, its lower level is `
   // ...
 ```
 
-Now calculate the upper level and the difference.
-Keeping with the example up above, the upper level is `1.0` and the difference is `0.13`.
+计算上一级色阶及差值。
+以上例为例，上一级色阶是1.0，差值是0.13。
 
 ```c
   // ...
@@ -94,10 +90,9 @@ Keeping with the example up above, the upper level is `1.0` and the difference i
   // ...
 ```
 
-The closest level is used to calculate the adjustment.
-The adjustment is the ratio between the quantized and unquantized greyscale value.
-This adjustment is used to map the quantized greyscale value back to an RGB value.
-
+选择距离灰度最近的色阶计算调整比例。
+调整比例为量化灰度值与未量化灰度值的比值。
+该比例用于将量化的灰度映射回RGB值。
 
 ```c
   // ...
@@ -107,14 +102,15 @@ This adjustment is used to map the quantized greyscale value back to an RGB valu
   // ...
 ```
 
-After multiplying `rgb` by the adjustment, `max(r, max(g, b))` will now equal the quantized greyscale value.
-This maps the quantized greyscale value back to a red, green, and blue vector.
+将RGB乘以调整比例后，max(r, g, b)即为量化后的灰度值，
+实现了灰度向RGB的映射。
 
-### Source
+### 源代码
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [basic.vert](../demonstration/shaders/vertex/basic.vert)
 - [posterize.frag](../demonstration/shaders/fragment/posterize.frag)
+
 
 ## Copyright
 

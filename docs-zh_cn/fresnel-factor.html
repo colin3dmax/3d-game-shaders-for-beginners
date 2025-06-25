@@ -105,29 +105,25 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="rim-lighting.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="fresnel-factor">Fresnel Factor</h2>
+<h1 id="3d-游戏着色器入门">3D 游戏着色器入门</h1>
+<h2 id="菲涅尔因子fresnel-factor">菲涅尔因子（Fresnel Factor）</h2>
 <p align="center">
 <img src="../resources/images/3lQL51m.gif" alt="Fresnel" title="Fresnel">
 </p>
 
-<p>The fresnel factor alters the reflectiveness of a surface based on
-the camera or viewing angle. As a surface points away from the camera,
-its reflectiveness goes up. Similarly, as a surface points towards the
-camera, its reflectiveness goes down.</p>
+<p>菲涅尔因子会根据相机或观察角度改变表面的反射性。<br />
+当表面背向相机时，其反射性增强；<br />
+而当表面朝向相机时，其反射性减弱。</p>
 <p align="center">
 <img src="../resources/images/WolRRhX.png" alt="" title="">
 </p>
 
-<p>In other words, as a surface becomes perpendicular with the camera,
-it becomes more mirror like. Utilizing this property, you can vary the
-opacity of reflections (such as <a
-href="lighting.html#specular">specular</a> and <a
-href="screen-space-reflection.html">screen space reflections</a>) and/or
-vary a surface's alpha values for a more plausible or realistic
-look.</p>
-<h3 id="specular-reflection">Specular Reflection</h3>
+<p>换句话说，当表面与相机方向垂直时，它会变得更像镜面。<br />
+利用这个特性，你可以动态控制反射的不透明度<br />
+（例如 <a href="lighting.html#specular">镜面反射</a> 和 <a
+href="screen-space-reflection.html">屏幕空间反射</a>），<br />
+或者调整表面的 Alpha 值，让效果更逼真自然。</p>
+<h3 id="镜面反射">镜面反射</h3>
 <p align="center">
 <img src="../resources/images/FnOhXxv.gif" alt="Specular Intensity" title="Specular Intensity">
 </p>
@@ -135,79 +131,74 @@ look.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  vec4 specular <span class="op">=</span>   materialSpecularColor</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                  <span class="op">*</span> lightSpecularColor</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                  <span class="op">*</span> pow<span class="op">(</span>max<span class="op">(</span>dot<span class="op">(</span>eye<span class="op">,</span> reflection<span class="op">),</span> <span class="fl">0.0</span><span class="op">),</span> shininess<span class="op">);</span></span></code></pre></div>
-<p>In the <a href="lighting.html#specular">lighting</a> section, the
-specular component was a combination of the material's specular color,
-the light's specular color, and by how much the camera pointed into the
-light's reflection direction. Incorporating the fresnel factor, you'll
-now vary the material specular color based on the angle between the
-camera and the surface it's pointed at.</p>
+<p>在 <a href="lighting.html#specular">光照</a> 一章中，<br />
+镜面反射部分是由材质的高光颜色、光源的高光颜色、<br />
+以及相机是否朝向光的反射方向这三者组合而成。<br />
+引入菲涅尔因子后，<br />
+我们将根据相机与表面之间的夹角动态调整材质的高光颜色。</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  vec3 eye <span class="op">=</span> normalize<span class="op">(-</span>vertexPosition<span class="op">.</span>xyz<span class="op">);</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The first vector you'll need is the eye/view/camera vector. Recall
-that the eye vector points from the vertex position to the camera's
-position. If the vertex position is in view or camera space, the eye
-vector is the vertex position pointed in the opposite direction.</p>
+<p>首先你需要观察向量（eye/view/camera vector）。<br />
+它从当前顶点指向相机方向。<br />
+如果顶点坐标是视图空间中的，<br />
+那么观察向量就是该顶点的反方向。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  vec3 light   <span class="op">=</span> normal<span class="op">(</span>lightPosition<span class="op">.</span>xyz <span class="op">-</span> vertexPosition<span class="op">.</span>xyz<span class="op">);</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  vec3 halfway <span class="op">=</span> normalize<span class="op">(</span>light <span class="op">+</span> eye<span class="op">);</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The fresnel factor is calculated using two vectors. The simplest two
-vectors to use are the eye and normal vector. However, if you're using
-the halfway vector (from the <a href="blinn-phong.html">Blinn-Phong</a>
-section), you can instead calculate the fresnel factor using the halfway
-and eye vector.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> fresnelFactor <span class="op">=</span> dot<span class="op">(</span>halfway<span class="op">,</span> eye<span class="op">);</span> <span class="co">// Or dot(normal, eye).</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        fresnelFactor <span class="op">=</span> max<span class="op">(</span>fresnelFactor<span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        fresnelFactor <span class="op">=</span> <span class="fl">1.0</span> <span class="op">-</span> fresnelFactor<span class="op">;</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        fresnelFactor <span class="op">=</span> pow<span class="op">(</span>fresnelFactor<span class="op">,</span> fresnelPower<span class="op">);</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>With the needed vectors in hand, you can now compute the fresnel
-factor. The fresnel factor ranges from zero to one. When the dot product
-is one, the fresnel factor is zero. When the dot product is less than or
-equal to zero, the fresnel factor is one. This equation comes from <a
-href="https://en.wikipedia.org/wiki/Schlick%27s_approximation">Schlick's
-approximation</a>.</p>
+<p>菲涅尔因子可以用两个向量计算，最简单的是用观察向量和法线向量。<br />
+如果你在使用 <a href="blinn-phong.html">Blinn-Phong 模型</a>，<br />
+也可以用 halfway 向量与观察向量计算。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> fresnelFactor <span class="op">=</span> dot<span class="op">(</span>halfway<span class="op">,</span> eye<span class="op">);</span> <span class="co">// 或 dot(normal, eye)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        fresnelFactor <span class="op">=</span> max<span class="op">(</span>fresnelFactor<span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        fresnelFactor <span class="op">=</span> <span class="fl">1.0</span> <span class="op">-</span> fresnelFactor<span class="op">;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        fresnelFactor <span class="op">=</span> pow<span class="op">(</span>fresnelFactor<span class="op">,</span> fresnelPower<span class="op">);</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
+<p>有了这些向量之后，就可以计算菲涅尔因子了。<br />
+它的范围是 0 到 1。<br />
+当 dot 值为 1 时，菲涅尔因子为 0；<br />
+当 dot 值为 0 或更小时，菲涅尔因子为 1。<br />
+这个公式来源于 <a
+href="https://en.wikipedia.org/wiki/Schlick%27s_approximation">Schlick
+近似</a>。</p>
 <p align="center">
 <img src="../resources/images/AAFI8p1.gif" alt="Fresnel Power" title="Fresnel Power">
 </p>
 
-<p>In Schlick's approximation, the <code>fresnelPower</code> is five but
-you can alter this to your liking. The demo code varies it using the
-blue channel of the specular map with a maximum value of five.</p>
+<p>在 Schlick 的近似中，<code>fresnelPower</code> 默认是 5，<br />
+你可以根据需要修改。<br />
+演示代码中，它通过高光贴图的蓝色通道控制，最大值为 5。</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  materialSpecularColor<span class="op">.</span>rgb <span class="op">=</span> mix<span class="op">(</span>materialSpecularColor<span class="op">.</span>rgb<span class="op">,</span> vec3<span class="op">(</span><span class="fl">1.0</span><span class="op">),</span> fresnelFactor<span class="op">);</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Once the fresnel factor is determined, use it to modulate the
-material's specular color. As the fresnel factor approaches one, the
-material becomes more like a mirror or fully reflective.</p>
+<p>当计算出菲涅尔因子之后，<br />
+用它混合材质的镜面反射颜色。<br />
+随着因子接近 1，材质变得越来越像镜子。</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  vec4 specular      <span class="op">=</span> vec4<span class="op">(</span>vec3<span class="op">(</span><span class="fl">0.0</span><span class="op">),</span> <span class="fl">1.0</span><span class="op">);</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>       specular<span class="op">.</span>rgb  <span class="op">=</span>   materialSpecularColor<span class="op">.</span>rgb</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                       <span class="op">*</span> lightSpecularColor<span class="op">.</span>rgb</span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                       <span class="op">*</span> pow</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                          <span class="op">(</span> max<span class="op">(</span>dot<span class="op">(</span>normal<span class="op">,</span> halfway<span class="op">),</span> <span class="fl">0.0</span><span class="op">)</span> <span class="co">// Or max(dot(reflection, eye), 0.0).</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                          <span class="op">(</span> max<span class="op">(</span>dot<span class="op">(</span>normal<span class="op">,</span> halfway<span class="op">),</span> <span class="fl">0.0</span><span class="op">)</span> <span class="co">// 或 max(dot(reflection, eye), 0.0)</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                          <span class="op">,</span> shininess</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                          <span class="op">);</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>As before, the specular component is a combination of the material's
-specular color, the light's specular color, and by how much the camera
-points into the direction of the light's reflection. However, using the
-fresnel factor, the material's specular color various depending on the
-orientation of the camera and the surface it's looking at.</p>
-<h3 id="source">Source</h3>
+<p>最终，镜面反射部分仍然是材质高光、光源高光与视角方向的组合。<br />
+不过通过引入菲涅尔因子，材质的高光颜色会根据视角变化而变化，<br />
+带来更加真实的视觉效果。</p>
+<h3 id="源码参考">源码参考</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

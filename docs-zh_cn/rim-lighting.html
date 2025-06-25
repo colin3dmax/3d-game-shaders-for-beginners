@@ -105,27 +105,24 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 data-emoji="arrow_down_small">🔽</span></a> <a
 href="cel-shading.html"><span class="emoji"
 data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="rim-lighting">Rim Lighting</h2>
+<h1 id="3d游戏着色器入门">3D游戏着色器入门</h1>
+<h2 id="边缘光rim-lighting">边缘光（Rim Lighting）</h2>
 <p align="center">
 <img src="../resources/images/3erauzN.gif" alt="Rim Lighting" title="Rim Lighting">
 </p>
 
-<p>Taking inspiration from the <a href="fresnel-factor.html">fresnel
-factor</a>, rim lighting targets the rim or silhouette of an object.
-When combined with <a href="cel-shading.html">cel shading</a> and <a
-href="outlining.html">outlining</a>, it can really complete that cartoon
-look. You can also use it to highlight objects in the game, making it
-easier for players to navigate and accomplish tasks.</p>
+<p>灵感来源于<a href="fresnel-factor.html">fresnel因子</a>，
+边缘光着重突出物体的边缘或轮廓。 结合<a
+href="cel-shading.html">卡通渲染</a>和<a href="outlining.html">描边</a>，
+它能完美强化卡通效果。 你也可以用它来高亮游戏中的物体，
+帮助玩家更容易导航和完成任务。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  vec3 eye <span class="op">=</span> normalize<span class="op">(-</span>vertexPosition<span class="op">.</span>xyz<span class="op">);</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>As it was for the fresnel factor, you'll need the eye vector. If your
-vertex positions are in view space, the eye vector is the negation of
-the vertex position.</p>
+<p>与fresnel因子一样， 你需要计算视线向量（eye vector）。
+如果顶点位置是视图空间的，那么视线向量就是顶点位置的反向。</p>
 <p align="center">
 <img src="../resources/images/mMsQFbE.gif" alt="Rim Light" title="Rim Light">
 </p>
@@ -137,11 +134,8 @@ the vertex position.</p>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        rimLightIntensity <span class="op">=</span> max<span class="op">(</span><span class="fl">0.0</span><span class="op">,</span> rimLightIntensity<span class="op">);</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The Intensity of the rim light ranges from zero to one. When the eye
-and normal vector point in the same direction, the rim light intensity
-is zero. As the two vectors start to point in different directions, the
-rim light intensity increases until it eventually reaches one when the
-eye and normal become orthogonal or perpendicular to one another.</p>
+<p>边缘光强度范围是0到1。 当视线向量和法线方向相同时，边缘光强度为0。
+两者方向逐渐不同，边缘光强度增加， 当视线与法线正交时，强度达到1。</p>
 <p align="center">
 <img src="../resources/images/AAFI8p1.gif" alt="Rim Light Power" title="Rim Light Power">
 </p>
@@ -151,27 +145,23 @@ eye and normal become orthogonal or perpendicular to one another.</p>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  rimLightIntensity <span class="op">=</span> pow<span class="op">(</span>rimLightIntensity<span class="op">,</span> rimLightPower<span class="op">);</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>You can control the falloff of the rim light using the power
-function.</p>
+<p>你可以用幂函数控制边缘光的衰减曲线。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  rimLightIntensity <span class="op">=</span> smoothstep<span class="op">(</span><span class="fl">0.3</span><span class="op">,</span> <span class="fl">0.4</span><span class="op">,</span> rimLightIntensity<span class="op">)</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p><code>step</code> or <code>smoothstep</code> can also be used to
-control the falloff. This tends to look better when using <a
-href="cel-shading.html">cel shading</a>. You'll learn more about these
-functions in later sections.</p>
+<p>也可以用<code>step</code>或<code>smoothstep</code>控制衰减， 搭配<a
+href="cel-shading.html">卡通渲染</a>时效果更佳。
+你将在后续章节学习更多相关函数。</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  vec4 rimLight   <span class="op">=</span> rimLightIntensity <span class="op">*</span> diffuse<span class="op">;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>       rimLight<span class="op">.</span>a <span class="op">=</span> diffuse<span class="op">.</span>a<span class="op">;</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>What color you use for the rim light is up to you. The demo code
-multiplies the diffuse light by the <code>rimLightIntensity</code>. This
-will highlight the silhouette without overexposing it and without
-lighting any shadowed fragments.</p>
+<p>边缘光的颜色由你决定。 示例代码将漫反射颜色乘以边缘光强度，
+这样既突出轮廓，又不会过曝或照亮阴影区域。</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  vec4 outputColor     <span class="op">=</span> vec4<span class="op">(</span><span class="fl">0.0</span><span class="op">);</span></span>
@@ -184,9 +174,8 @@ lighting any shadowed fragments.</p>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span> emission<span class="op">.</span>rgb<span class="op">;</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>After you've calculated the rim light, add it to the ambient,
-diffuse, specular, and emission lights.</p>
-<h3 id="source">Source</h3>
+<p>计算完边缘光后，将其与环境光、漫反射、高光和自发光叠加。</p>
+<h3 id="源码">源码</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a

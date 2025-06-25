@@ -104,16 +104,14 @@ href="#"><span class="emoji" data-emoji="arrow_up_small">🔼</span></a>
 <a href="#copyright"><span class="emoji"
 data-emoji="arrow_down_small">🔽</span></a> <a href="blur.html"><span
 class="emoji" data-emoji="arrow_forward">▶️</span></a></p>
-<h1 id="3d-game-shaders-for-beginners">3D Game Shaders For
-Beginners</h1>
-<h2 id="fog">Fog</h2>
+<h1 id="3d-游戏着色器入门">3D 游戏着色器入门</h1>
+<h2 id="雾fog">雾（Fog）</h2>
 <p align="center">
 <img src="../resources/images/uNRxZl4.gif" alt="Fog" title="Fog">
 </p>
 
-<p>Fog (or mist as it's called in Blender) adds atmospheric haze to a
-scene, providing mystique and softening pop-ins (geometry suddenly
-entering into the camera's frustum).</p>
+<p>雾（在 Blender 中被称为雾气）为场景增加了大气朦胧感，<br />
+可以营造神秘氛围，同时柔化物体突然出现在相机视野中的突兀感（pop-in）。</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>uniform vec4 color<span class="op">;</span></span>
@@ -121,8 +119,7 @@ entering into the camera's frustum).</p>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>uniform vec2 nearFar<span class="op">;</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span></code></pre></div>
-<p>To calculate the fog, you'll need its color, near distance, and far
-distance.</p>
+<p>要计算雾效，你需要设置雾的颜色、近距离（near）和远距离（far）。</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D positionTexture<span class="op">;</span></span>
@@ -135,13 +132,11 @@ distance.</p>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  vec4 position <span class="op">=</span> texture<span class="op">(</span>positionTexture<span class="op">,</span> texCoord<span class="op">);</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>In addition to the fog's attributes, you'll also need the fragment's
-vertex <code>position</code>.</p>
+<p>除了雾的属性，还需要当前片元的顶点位置 <code>position</code>。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> fogMin <span class="op">=</span> <span class="fl">0.00</span><span class="op">;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> fogMax <span class="op">=</span> <span class="fl">0.97</span><span class="op">;</span></span></code></pre></div>
-<p><code>fogMax</code> controls how much of the scene is still visible
-when the fog is most intense. <code>fogMin</code> controls how much of
-the fog is still visible when the fog is least intense.</p>
+<p><code>fogMax</code> 控制当雾最浓时场景还能看到多少。<br />
+<code>fogMin</code> 控制当雾最淡时雾本身还能看到多少。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">float</span> near <span class="op">=</span> nearFar<span class="op">.</span>x<span class="op">;</span></span>
@@ -156,24 +151,21 @@ the fog is still visible when the fog is least intense.</p>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>      <span class="op">);</span></span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>The example code uses a linear model for calculating the fog's
-intensity. There's also an exponential model you could use.</p>
-<p>The fog's intensity is <code>fogMin</code> before or at the start of
-the fog's <code>near</code> distance. As the vertex
-<code>position</code> gets closer to the end of the fog's
-<code>far</code> distance, the <code>intensity</code> moves closer to
-<code>fogMax</code>. For any vertexes after the end of the fog, the
-<code>intensity</code> is clamped to <code>fogMax</code>.</p>
+<p>示例代码使用了线性模型来计算雾的强度。<br />
+你也可以使用指数模型实现更自然的衰减效果。</p>
+<p>当顶点距离小于或等于雾的近距 <code>near</code> 时，雾强度为
+<code>fogMin</code>。<br />
+随着顶点接近远距 <code>far</code>，雾强度线性增加，趋近于
+<code>fogMax</code>。<br />
+超过 <code>far</code> 的部分强度会被限制为 <code>fogMax</code>。</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> vec4<span class="op">(</span>color<span class="op">.</span>rgb<span class="op">,</span> intensity<span class="op">);</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Set the fragment's color to the fog <code>color</code> and the
-fragment's alpha channel to the <code>intensity</code>. As
-<code>intensity</code> gets closer to one, you'll have less of the
-scene's color and more of the fog color. When <code>intensity</code>
-reaches one, you'll have all fog color and nothing else.</p>
+<p>设置片元的颜色为雾的颜色，Alpha 通道为雾的强度。<br />
+<code>intensity</code> 越接近 1，越多雾色、越少场景原色。<br />
+当 <code>intensity</code> 为 1 时，只显示雾，完全遮挡原场景。</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// ...</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>uniform sampler2D baseTexture<span class="op">;</span></span>
@@ -194,13 +186,11 @@ reaches one, you'll have all fog color and nothing else.</p>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  fragColor <span class="op">=</span> mix<span class="op">(</span>fragColor<span class="op">,</span> fogColor<span class="op">,</span> min<span class="op">(</span>fogColor<span class="op">.</span>a<span class="op">,</span> <span class="dv">1</span><span class="op">));</span></span>
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span></code></pre></div>
-<p>Normally you calculate the fog in the same shader that does the
-lighting calculations. However, you can also break it out into its own
-framebuffer texture. Here you see the fog color being applied to the
-rest of the scene much like you would apply a layer in GIMP. This allows
-you to calculate the fog once instead calculating it in every shader
-that eventually needs it.</p>
-<h3 id="source">Source</h3>
+<p>通常你会在计算光照的 shader 中一并处理雾效。<br />
+但你也可以把雾效拆分出来，单独输出到一个 framebuffer 纹理中。<br />
+就像在 GIMP 里添加图层一样，这里用雾纹理叠加原场景，节省了在每个 shader
+中重复计算的成本。</p>
+<h3 id="源码参考">源码参考</h3>
 <ul>
 <li><a href="https://github.com/lettier/3d-game-shaders-for-beginners/blob/master/demonstration/src/main.cxx" target="_blank" rel="noopener noreferrer">main.cxx</a></li>
 <li><a
