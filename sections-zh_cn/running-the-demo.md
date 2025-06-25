@@ -4,116 +4,114 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](reference-frames.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门教程
 
-## Running The Demo
+## 运行演示程序
 
 <p align="center">
-<img src="../resources/images/y5XcReP.gif" alt="Running The Demo" title="Running The Demo">
+<img src="../resources/images/y5XcReP.gif" alt="运行演示程序" title="运行演示程序">
 </p>
 
-After you've built the example code, you can now run the executable or demo.
+在你编译完示例代码之后，就可以运行可执行文件或演示程序了。
 
 ```bash
 ./3d-game-shaders-for-beginners
 ```
 
-Here's how you run it on Linux or Mac.
+这是在 Linux 或 Mac 上运行的方法。
 
 ```bash
 3d-game-shaders-for-beginners.exe
 ```
 
-Here's how you run it on Windows.
+这是在 Windows 上运行的方法。
 
-### Demo Controls
 
-The demo comes with both keyboard and mouse controls to move the camera around,
-toggle on and off the different effects,
-adjust the fog,
-and view the various different framebuffer textures.
+### 演示控制方式
 
-#### Mouse
+该演示程序支持键盘和鼠标控制来移动摄像机、切换不同的特效、调节雾效以及查看各种帧缓冲贴图。
 
-You can rotate the scene around by holding down the <kbd>Left Mouse</kbd> button and dragging.
-Hold down the <kbd>Right Mouse</kbd> button and drag to move up, down, left, and/or right.
-To zoom in, roll the <kbd>Mouse Wheel</kbd> forward.
-To zoom out, roll the <kbd>Mouse Wheel</kbd> backward.
+#### 鼠标控制
 
-You can also change the focus point using the mouse.
-To change the focus point,
-click anywhere on the scene using the <kbd>Middle Mouse</kbd> button.
+你可以按住 <kbd>鼠标左键</kbd> 拖动来旋转场景。
+按住 <kbd>鼠标右键</kbd> 拖动可以向上、下、左、右平移视角。
+向前滚动 <kbd>鼠标滚轮</kbd> 可以放大场景，向后滚动可缩小场景。
 
-#### Keyboard
+你还可以使用鼠标改变焦点。
+点击场景任意位置并使用 <kbd>鼠标中键</kbd> 即可更换焦点。
 
-- <kbd>w</kbd> to rotate the scene down.
-- <kbd>a</kbd> to rotate the scene clockwise.
-- <kbd>s</kbd> to rotate the scene up.
-- <kbd>d</kbd> to rotate the scene counterclockwise.
-- <kbd>z</kbd> to zoom in to the scene.
-- <kbd>x</kbd> to zoom out of the scene.
-- <kbd>⬅</kbd> to move left.
-- <kbd>➡</kbd> to move right.
-- <kbd>⬆</kbd> to move up.
-- <kbd>⬇</kbd> to move down.
+
+#### 键盘控制
+
+- <kbd>w</kbd> 向下旋转视角
+- <kbd>a</kbd> 顺时针旋转视角
+- <kbd>s</kbd> 向上旋转视角
+- <kbd>d</kbd> 逆时针旋转视角
+- <kbd>z</kbd> 放大视角
+- <kbd>x</kbd> 缩小视角
+- <kbd>⬅</kbd> 向左移动
+- <kbd>➡</kbd> 向右移动
+- <kbd>⬆</kbd> 向上移动
+- <kbd>⬇</kbd> 向下移动
 
 <p></p>
 
-- <kbd>1</kbd> to show midday.
-- <kbd>2</kbd> to show midnight.
+- <kbd>1</kbd> 显示正午
+- <kbd>2</kbd> 显示午夜
 
 <p></p>
 
-- <kbd>Delete</kbd> to toggle the sound.
-- <kbd>3</kbd> to toggle fresnel.
-- <kbd>4</kbd> to toggle rim lighting.
-- <kbd>5</kbd> to toggle particles.
-- <kbd>6</kbd> to toggle motion blur.
-- <kbd>7</kbd> to toggle Kuwahara filtering.
-- <kbd>8</kbd> to toggle cel shading.
-- <kbd>9</kbd> to toggle lookup table processing.
-- <kbd>0</kbd> to toggle between Phong and Blinn-Phong.
-- <kbd>y</kbd> to toggle SSAO.
-- <kbd>u</kbd> to toggle outlining.
-- <kbd>i</kbd> to toggle bloom.
-- <kbd>o</kbd> to toggle normal mapping.
-- <kbd>p</kbd> to toggle fog.
-- <kbd>h</kbd> to toggle depth of field.
-- <kbd>j</kbd> to toggle posterization.
-- <kbd>k</kbd> to toggle pixelization.
-- <kbd>l</kbd> to toggle sharpen.
-- <kbd>n</kbd> to toggle film grain.
-- <kbd>m</kbd> to toggle screen space reflection.
-- <kbd>,</kbd> to toggle screen space refraction.
-- <kbd>.</kbd> to toggle flow mapping.
-- <kbd>/</kbd> to toggle the sun animation.
-- <kbd>\\</kbd> to toggle chromatic aberration.
+
+- <kbd>Delete</kbd> 切换声音开关
+- <kbd>3</kbd> 切换菲涅尔效果
+- <kbd>4</kbd> 切换边缘光
+- <kbd>5</kbd> 切换粒子
+- <kbd>6</kbd> 切换运动模糊
+- <kbd>7</kbd> 切换 Kuwahara 滤镜
+- <kbd>8</kbd> 切换卡通渲染
+- <kbd>9</kbd> 切换查找表（LUT）处理
+- <kbd>0</kbd> 在 Phong 与 Blinn-Phong 模型之间切换
+- <kbd>y</kbd> 切换屏幕空间环境光遮蔽（SSAO）
+- <kbd>u</kbd> 切换描边效果
+- <kbd>i</kbd> 切换泛光（Bloom）
+- <kbd>o</kbd> 切换法线贴图
+- <kbd>p</kbd> 切换雾效
+- <kbd>h</kbd> 切换景深效果
+- <kbd>j</kbd> 切换色调分离（Posterization）
+- <kbd>k</kbd> 切换像素化（Pixelization）
+- <kbd>l</kbd> 切换锐化滤镜
+- <kbd>n</kbd> 切换胶片颗粒（Film Grain）
+- <kbd>m</kbd> 切换屏幕空间反射
+- <kbd>,</kbd> 切换屏幕空间折射
+- <kbd>.</kbd> 切换流动贴图（Flow Mapping）
+- <kbd>/</kbd> 切换太阳动画
+- <kbd>\</kbd> 切换色差（Chromatic Aberration）
 
 <p></p>
 
-- <kbd>r</kbd> to reset the scene.
+- <kbd>r</kbd> 重置场景
 
 <p></p>
 
-- <kbd>\[</kbd> to decrease the fog near distance.
-- <kbd>Shift</kbd>+<kbd>\[</kbd> to increase the fog near distance.
-- <kbd>]</kbd> to increase the fog far distance.
-- <kbd>Shift</kbd>+<kbd>]</kbd> to decrease the fog far distance.
+- <kbd>[</kbd> 减少雾的最近距离
+- <kbd>Shift</kbd>+<kbd>[</kbd> 增加雾的最近距离
+- <kbd>]</kbd> 增加雾的最远距离
+- <kbd>Shift</kbd>+<kbd>]</kbd> 减少雾的最远距离
 
 <p></p>
 
-- <kbd>Shift</kbd>+<kbd>-</kbd> to decrease the amount of foam.
-- <kbd>-</kbd> to increase the amount of foam.
+- <kbd>Shift</kbd>+<kbd>-</kbd> 减少泡沫量
+- <kbd>-</kbd> 增加泡沫量
 
 <p></p>
 
-- <kbd>Shift</kbd>+<kbd>=</kbd> to decrease the relative index of refraction.
-- <kbd>=</kbd> to increase the relative index of refraction.
+- <kbd>Shift</kbd>+<kbd>=</kbd> 减少相对折射率
+- <kbd>=</kbd> 增加相对折射率
 
 <p></p>
 
-- <kbd>Tab</kbd> to move forward through the framebuffer textures.
-- <kbd>Shift</kbd>+<kbd>Tab</kbd> to move backward through the framebuffer textures.
+- <kbd>Tab</kbd> 向前切换帧缓冲贴图
+- <kbd>Shift</kbd>+<kbd>Tab</kbd> 向后切换帧缓冲贴图
 
 ## Copyright
 
