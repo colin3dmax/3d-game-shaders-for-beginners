@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://i.imgur.com/x8rtGr4.gif" alt="3D Game Shaders For Beginners" title="3D Game Shaders For Beginners">
+<img src="resources/images/x8rtGr4.gif" alt="3D Game Shaders For Beginners" title="3D Game Shaders For Beginners">
 </p>
 
 # 3D Game Shaders For Beginners
