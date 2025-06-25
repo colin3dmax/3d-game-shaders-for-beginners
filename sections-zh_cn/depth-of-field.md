@@ -3,42 +3,41 @@
 [:arrow_up_small:](#)
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](posterization.md)
+# 3D 游戏着色器入门
 
-# 3D Game Shaders For Beginners
-
-## Depth Of Field
+## 景深（Depth Of Field）
 
 <p align="center">
 <img src="../resources/images/DEa77Bh.gif" alt="Depth Of Field" title="Depth Of Field">
 </p>
 
-Like [SSAO](ssao.md), depth of field is an effect you can't live without once you've used it.
-Artistically, you can use it to draw your viewer's eye to a certain subject.
-But in general, depth of field adds a lot of realism for a little bit of effort.
+就像 [SSAO](ssao.md) 一样，一旦你使用了景深效果，就再也离不开它了。  
+从艺术角度来看，景深可以用来引导观众的视线聚焦在某个主体上。  
+而从整体效果而言，景深只需一点代价就能大幅提升画面的真实感。
 
-### In Focus
+### 对焦区域
 
-The first step is to render your scene completely in focus.
-Be sure to render this into a framebuffer texture.
-This will be one of the inputs to the depth of field shader.
+第一步是完整渲染出一个完全对焦的场景。  
+请确保将其渲染到一个帧缓冲纹理中。  
+这个对焦图像将作为景深着色器的输入之一。
 
-### Out Of Focus
+### 模糊区域
 
-The second step is to blur the scene as if it was completely out of focus.
-Like bloom and SSAO, you can use a [box blur](blur.md#box-blur).
-Be sure to render this out-of-focus-scene into a framebuffer texture.
-This will be one of the inputs to the depth of field shader.
+第二步是将整个场景模糊处理，模拟完全失焦的效果。  
+类似于 Bloom 和 SSAO，你可以使用 [盒式模糊（Box Blur）](blur.md#box-blur)。  
+请确保将该模糊后的场景渲染到另一个帧缓冲纹理中。  
+这个失焦图像也将作为景深着色器的输入之一。
 
-#### Bokeh
+#### 散景（Bokeh）
 
 <p align="center">
 <img src="../resources/images/aQ9Ga8J.gif" alt="Bokeh" title="Bokeh">
 </p>
 
-For a great bokeh effect, dilate the out of focus texture and use that as the out of focus input.
-See [dilation](dilation.md) for more details.
+为了获得更好的散景效果，可以先对失焦纹理进行膨胀处理，然后将其作为失焦输入使用。  
+详见 [膨胀操作](dilation.md)。
 
-### Mixing
+### 混合处理
 
 ```c
   // ...
@@ -48,10 +47,9 @@ See [dilation](dilation.md) for more details.
 
   // ...
 ```
-
-Feel free to tweak these two parameters.
-All positions at or below `minDistance` will be completely in focus.
-All positions at or beyond `maxDistance` will be completely out of focus.
+你可以自由调整这两个参数。
+所有小于等于 `minDistance` 的位置将完全对焦；
+所有大于等于 `maxDistance` 的位置将完全失焦。
 
 ```c
   // ...
@@ -62,7 +60,7 @@ All positions at or beyond `maxDistance` will be completely out of focus.
   // ...
 ```
 
-You'll need the in focus and out of focus colors.
+你需要对焦图像和失焦图像中的颜色值。
 
 ```c
   // ...
@@ -72,8 +70,8 @@ You'll need the in focus and out of focus colors.
   // ...
 ```
 
-You'll also need the vertex position in view space.
-You can reuse the position framebuffer texture you used for [SSAO](ssao.md#vertex-positions).
+你还需要该片元在视图空间中的位置。  
+可以复用你在 [SSAO](ssao.md#vertex-positions) 中使用的位置帧缓冲纹理。
 
 ```c
   // ...
@@ -83,12 +81,10 @@ You can reuse the position framebuffer texture you used for [SSAO](ssao.md#verte
   // ...
 ```
 
-The focus point is a position somewhere in your scene.
-All of the points in your scene are measured from the focus point.
-
-Choosing the focus point is up to you.
-The demo uses the scene position directly under the mouse when clicking the middle mouse button.
-However, it could be a constant distance from the camera or a static position.
+焦点是场景中的某个位置，所有场景中的点都将以此点为参考来计算距离。  
+焦点的位置由你自行决定。  
+演示中使用的是中键点击时鼠标下方的场景位置。  
+当然，你也可以设置一个固定的距离或静态位置。
 
 <p align="center">
 <img src="../resources/images/idDZr62.png" alt="smoothstep" title="smoothstep">
@@ -107,14 +103,10 @@ However, it could be a constant distance from the camera or a static position.
   // ...
 ```
 
-`smoothstep` returns values from zero to one.
-The `minDistance` is the left-most edge.
-Any position less than the minimum distance, from the focus point, will be in focus or have a blur of zero.
-The `maxDistance` is the right-most edge.
-Any position greater than the maximum distance, from the focus point, will be out of focus or have a blur or one.
-For distances between the edges,
-blur will be between zero and one.
-These values are interpolated along a s-shaped curve.
+`smoothstep` 返回一个介于 0 到 1 之间的值。  
+`minDistance` 是左侧边界，表示低于该距离的区域将完全对焦，模糊度为 0；  
+`maxDistance` 是右侧边界，表示高于该距离的区域将完全失焦，模糊度为 1；  
+在两者之间的距离，将根据 S 形曲线平滑插值，模糊度介于 0 到 1 之间。
 
 ```c
 
@@ -125,12 +117,12 @@ These values are interpolated along a s-shaped curve.
   // ...
 ```
 
-The `fragColor` is a mixture of the in focus and out of focus color.
-The closer `blur` is to one, the more it will use the `outOfFocusColor`.
-Zero `blur` means this fragment is entirely in focus.
-At `blur >= 1`, this fragment is completely out of focus.
+最终的 `fragColor` 是对焦色与失焦色之间的混合。  
+`blur` 越接近 1，使用的失焦色越多；  
+`blur` 为 0 表示完全对焦；  
+`blur >= 1` 时表示完全失焦。
 
-### Source
+### 源码参考
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [basic.vert](../demonstration/shaders/vertex/basic.vert)

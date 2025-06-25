@@ -4,18 +4,17 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](film-grain.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门
 
-## Dilation
+## 膨胀（Dilation）
 
 <p align="center">
 <img src="../resources/images/z751O74.gif" alt="Dilation" title="Dilation">
 </p>
 
-Dilation dilates or enlarges the brighter areas of an image while at the same time,
-contracts or shrinks the darker areas of an image.
-This tends to create a pillowy look.
-You can use dilation for a glow/bloom effect or to add bokeh to your [depth of field](depth-of-field.md).
+膨胀操作会扩大图像中亮度较高的区域，同时收缩图像中较暗的区域，  
+从而产生一种“膨胀柔软”的外观。  
+你可以使用膨胀来实现光晕 / 泛光效果，或者为你的 [景深效果](depth-of-field.md) 添加散景。
 
 ```c
   // ...
@@ -28,10 +27,11 @@ You can use dilation for a glow/bloom effect or to add bokeh to your [depth of f
   // ...
 ```
 
-The `size` and `separation` parameters control how dilated the image becomes.
-A larger `size` will increase the dilation at the cost of performance.
-A larger `separation` will increase the dilation at the cost of quality.
-The `minThreshold` and `maxThreshold` parameters control which parts of the image become dilated.
+`size` 和 `separation` 参数控制图像的膨胀程度。  
+更大的 `size` 会带来更明显的膨胀效果，但性能开销更大。  
+更大的 `separation` 也会扩大膨胀区域，但会降低图像质量。  
+`minThreshold` 和 `maxThreshold` 控制图像中哪些部分会被膨胀。
+
 
 ```c
   // ...
@@ -44,7 +44,7 @@ The `minThreshold` and `maxThreshold` parameters control which parts of the imag
   // ...
 ```
 
-Sample the color at the current fragment's position.
+采样当前片元位置的颜色。
 
 ```c
   // ...
@@ -61,8 +61,8 @@ Sample the color at the current fragment's position.
   // ...
 ```
 
-Loop through a `size` by `size` window, centered at the current fragment position.
-As you loop, find the brightest color based on the surrounding greyscale values.
+在当前片元位置周围建立一个 `size` × `size` 的窗口进行遍历。  
+在遍历过程中，找出周围片元中亮度最高的颜色。
 
 <p align="center">
 <img src="../resources/images/X3uIyIL.png" alt="Dilation Window" title="Dilation Window">
@@ -83,9 +83,9 @@ As you loop, find the brightest color based on the surrounding greyscale values.
       // ...
 ```
 
-The window shape will determine the shape of the dilated parts of the image.
-For a rectangular shape, you can use every fragment covered by the window.
-For any other shape, skip the fragments that fall outside the desired shape.
+窗口的形状会影响图像膨胀区域的形状。  
+如果使用矩形形状，则处理窗口内的所有片元；  
+若使用其他形状（如菱形或圆形），则跳过不在该形状内的片元。
 
 ```c
       // ...
@@ -102,7 +102,7 @@ For any other shape, skip the fragments that fall outside the desired shape.
       // ...
 ```
 
-Sample a fragment color from the surrounding window.
+从周围窗口中采样片元颜色。
 
 ```c
       // ...
@@ -112,7 +112,7 @@ Sample a fragment color from the surrounding window.
       // ...
 ```
 
-Convert the sampled color to a greyscale value.
+将采样颜色转换为灰度值（亮度值）。
 
 ```c
       // ...
@@ -125,8 +125,7 @@ Convert the sampled color to a greyscale value.
       // ...
 ```
 
-If the sampled greyscale value is larger than the current maximum greyscale value,
-update the maximum greyscale value and its corresponding color.
+如果当前灰度值大于之前记录的最大值，则更新最大灰度值和对应颜色。
 
 ```c
   // ...
@@ -141,16 +140,12 @@ update the maximum greyscale value and its corresponding color.
   // ...
 ```
 
-The new fragment color is a mixture between the existing fragment color and
-the brightest color found.
-If the maximum greyscale value found is less than `minThreshold`,
-the fragment color is unchanged.
-If the maximum greyscale value is greater than `maxThreshold`,
-the fragment color is replaced with the brightest color found.
-For any other case,
-the fragment color is a mix between the current fragment color and the brightest color.
+最终的片元颜色是原始颜色与亮度最高颜色之间的混合结果。  
+如果最大灰度值小于 `minThreshold`，颜色保持不变；  
+如果大于 `maxThreshold`，颜色被替换为亮度最高的颜色；  
+如果介于两者之间，则按 `smoothstep` 插值进行混合。
 
-### Source
+### 源码参考
 
 - [main.cxx](../demonstration/src/main.cxx)
 - [basic.vert](../demonstration/shaders/vertex/basic.vert)
