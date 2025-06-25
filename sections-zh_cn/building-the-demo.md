@@ -4,39 +4,38 @@
 [:arrow_down_small:](#copyright)
 [:arrow_forward:](running-the-demo.md)
 
-# 3D Game Shaders For Beginners
+# 3D 游戏着色器入门教程
 
-## Building The Demo
+## 构建演示程序
 
 <p align="center">
-<img src="../resources/images/PQcDnIu.gif" alt="Building The Demo" title="Building The Demo">
+<img src="../resources/images/PQcDnIu.gif" alt="构建演示程序" title="构建演示程序">
 </p>
 
-Before you can try out the demo program, you'll have to build the example code first.
+在你尝试运行演示程序之前，需要先编译示例代码。
 
-### Dependencies
+### 依赖项
 
-Before you can compile the example code, you'll need to install
-[Panda3D](https://www.panda3d.org/)
-for your platform.
-Panda3D is available for Linux, Mac, and Windows.
+在你编译示例代码之前，需要先为你的平台安装  
+[Panda3D](https://www.panda3d.org/)。  
+Panda3D 支持 Linux、Mac 和 Windows 平台。
 
 ### Linux
 
-Start by [installing](https://www.panda3d.org/manual/?title=Installing_Panda3D_in_Linux) the
-[Panda3D SDK](https://www.panda3d.org/download/sdk-1-10-9/) for your distribution.
+首先，为你的发行版[安装](https://www.panda3d.org/manual/?title=Installing_Panda3D_in_Linux)  
+[Panda3D SDK](https://www.panda3d.org/download/sdk-1-10-9/)。
 
-Make sure to locate where the Panda3D headers and libraries are.
-The headers and libraries are most likely in `/usr/include/panda3d/` and `/usr/lib/panda3d/` respectively.
+确保找到 Panda3D 的头文件和库文件路径。  
+头文件和库文件通常分别位于 `/usr/include/panda3d/` 和 `/usr/lib/panda3d/`。
 
-Next clone this repository and change directory into it.
+接下来，克隆该代码仓库并切换到示例目录下：
 
 ```bash
 git clone https://github.com/lettier/3d-game-shaders-for-beginners.git
 cd 3d-game-shaders-for-beginners/demonstration
 ```
 
-Now compile the source code into an object file.
+现在将源代码编译为目标文件：
 
 ```bash
 g++ \
@@ -48,7 +47,7 @@ g++ \
   -I/path/to/panda3d/include/
 ```
 
-With the object file created, create the executable by linking the object file to its dependencies.
+完成目标文件编译后，通过链接依赖项生成可执行文件：
 
 ```bash
 g++ \
@@ -65,23 +64,24 @@ g++ \
   -lpthread
 ```
 
-For more help, see the [Panda3D manual](https://www.panda3d.org/manual/?title=How_to_compile_a_C++_Panda3D_program_on_Linux).
+有关更多帮助，请参阅 [Panda3D 手册](https://www.panda3d.org/manual/?title=How_to_compile_a_C++_Panda3D_program_on_Linux)。
+
 
 ### Mac
 
-Start by installing the [Panda3D SDK](https://www.panda3d.org/download/sdk-1-10-9/) for Mac.
+首先为 Mac 安装 [Panda3D SDK](https://www.panda3d.org/download/sdk-1-10-9/)。
 
-Make sure to locate where the Panda3D headers and libraries are.
+确保找到 Panda3D 的头文件和库文件路径。
 
-Next clone this repository and change directory into it.
+接下来，克隆代码仓库并切换目录：
 
 ```bash
 git clone https://github.com/lettier/3d-game-shaders-for-beginners.git
 cd 3d-game-shaders-for-beginners
 ```
 
-Now compile the source code into an object file.
-You'll have to find where the Python 2.7 and Panda3D include directories are.
+然后将源代码编译为目标文件。
+你需要找到 Python 2.7 和 Panda3D 的头文件路径：
 
 ```bash
 clang++ \
@@ -94,8 +94,8 @@ clang++ \
   -I/path/to/panda3d/include/
 ```
 
-With the object file created, create the executable by linking the object file to its dependencies.
-You'll need to track down where the Panda3D libraries are located.
+创建目标文件后，通过链接依赖项生成可执行文件。
+你需要定位 Panda3D 的库文件位置：
 
 ```bash
 clang++ \
@@ -112,23 +112,23 @@ clang++ \
   -lpthread
 ```
 
-For more help, see the [Panda3D manual](https://www.panda3d.org/manual/?title=How_to_compile_a_C++_Panda3D_program_on_macOS).
+有关更多帮助，请参阅 [Panda3D 手册](https://www.panda3d.org/manual/?title=How_to_compile_a_C++_Panda3D_program_on_macOS)。
 
 ### Windows
 
-Start by [installing](https://www.panda3d.org/manual/?title=Installing_Panda3D_in_Windows) the
-[Panda3D SDK](https://www.panda3d.org/download/sdk-1-10-9/) for Windows.
+首先为 [Windows 安装](https://www.panda3d.org/manual/?title=Installing_Panda3D_in_Windows)
+[Panda3D SDK](https://www.panda3d.org/download/sdk-1-10-9/)。
 
-Make sure to locate where the Panda3D headers and libraries are.
+确保找到 Panda3D 的头文件和库文件路径。
 
-Next clone this repository and change directory into it.
+接下来，克隆该代码仓库并切换目录：
 
 ```bash
 git clone https://github.com/lettier/3d-game-shaders-for-beginners.git
 cd 3d-game-shaders-for-beginners
 ```
 
-For more help, see the [Panda3D manual](https://www.panda3d.org/manual/?title=Running_your_Program&language=cxx).
+有关更多帮助，请参阅 [Panda3D 手册](https://www.panda3d.org/manual/?title=Running_your_Program&language=cxx)。
 
 ## Copyright
 
